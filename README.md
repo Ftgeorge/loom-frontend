@@ -1,50 +1,60 @@
-# Welcome to your Expo app 👋
+# Operis — Mobile App Frontend
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Operis is an intelligent, localized platform for artisans in Nigeria. This repository contains the complete frontend mobile application built with React Native, Expo Router, and TypeScript.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Dual Personas:** Seamlessly switch between Client and Artisan roles.
+- **Client Experience:** Browse artisans by category, view top-rated pros, search with real-time filtering, post jobs with multi-step flow (including budget/urgency/location), view matched artisans, and track job progress via timeline.
+- **Artisan Experience:** Detailed dashboard with stats, online/offline toggle, manage new job requests (accept/decline), track active jobs via timeline with status updates (On the way, Start Work, Complete), and view earnings summary with charts and transactions.
+- **Communication:** Built-in messaging thread interface with "Quick Replies" (in Nigerian Pidgin context), unread badges, and real-time chat UI.
+- **Localization:** Full i18n support with English, Nigerian Pidgin, and Yoruba, and culturally relevant mock data including Naira (₦) formatting.
+- **Reusable UI Kit:** Comprehensive standard design system including custom cards, segmented controls, status pills, offline/error boundaries, toast notifications, skeleton loading states, OTP inputs, and more.
+- **Mock Data Engine:** Services layer fully wired to a mock API featuring simulated network delays, random failures, and comprehensive datasets (12 artisans, 10 jobs, message threads, earnings, notifications).
+- **Styling:** Custom theme configuration using standard React Native StyleSheet, newly integrated with `nativewind` (Tailwind CSS) v4 for future development.
 
+## Tech Stack
+
+- **Framework:** Expo SDK 54, React Native
+- **Navigation:** Expo Router (File-based navigation with tab groups and modals)
+- **State Management:** Zustand
+- **Validation:** Zod
+- **Storage:** AsyncStorage
+- **Styling:** Standard StyleSheet + NativeWind/TailwindCSS integration
+- **Icons:** @expo/vector-icons (Ionicons)
+
+## Setup and Running
+
+1. **Install Dependencies:**
    ```bash
    npm install
    ```
 
-2. Start the app
-
+2. **Start the Development Server:**
    ```bash
-   npx expo start
+   npm start
+   ```
+   Press `i` to run on iOS Simulator or `a` to run on Android Emulator.
+
+3. **Verify Types:**
+   ```bash
+   npx tsc --noEmit
    ```
 
-In the output, you'll find options to open the app in a
+## Folder Structure
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- `/app` — Expo Router definitions (Root, Auth stack, Tabs grouping, Modals)
+- `/components` — Shared UI elements and complete UI Kit in `/ui`
+- `/services` — Mock API and data fetching layer
+- `/store` — Global state management (Zustand)
+- `/types` — TypeScript interfaces and data models
+- `/theme` — Global design tokens (Colors, Typography, Spacing, Shadows)
+- `/i18n` — Translations and language switching
+- `/utils` — Helper functions, formatters, and Zod schemas
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Future Roadmap
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Integrate backend APIs (Supabase/Firebase/Custom Node.js)
+- Implement real-time WebSockets for Chat and Notifications
+- Integrate Paystack/Flutterwave for embedded payments
+- Add Maps integration for location tracking on the Job Details screen
