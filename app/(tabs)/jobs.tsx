@@ -43,7 +43,7 @@ export default function JobsScreen() {
     });
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title={t('jobs', language)} onNotification={() => router.push('/notifications')} />
 
             <View className="px-5 py-4">

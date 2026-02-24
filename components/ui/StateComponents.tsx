@@ -17,7 +17,7 @@ export function EmptyState({ icon = 'folder-open-outline', title, message, actio
     return (
         <View className="flex-1 items-center justify-center px-10 py-16">
             <Ionicons name={icon as any} size={64} color={Colors.gray300} />
-            <Text className="text-2xl font-bold mt-5 text-center text-olive">{title}</Text>
+            <Text className="text-2xl font-bold mt-5 text-center text-primary">{title}</Text>
             <Text className="text-base text-gray-500 text-center mt-2">{message}</Text>
             {actionLabel && onAction && (
                 <PrimaryButton title={actionLabel} onPress={onAction} style={{ marginTop: 20 }} />
@@ -36,7 +36,7 @@ export function ErrorState({ message = 'Something went wrong. Check your connect
     return (
         <View className="flex-1 items-center justify-center px-10 py-16">
             <Ionicons name="cloud-offline-outline" size={64} color={Colors.error} />
-            <Text className="text-2xl font-bold mt-5 text-center text-olive">Oops!</Text>
+            <Text className="text-2xl font-bold mt-5 text-center text-primary">Oops!</Text>
             <Text className="text-base text-gray-500 text-center mt-2">{message}</Text>
             <SecondaryButton title="Try Again" onPress={onRetry} style={{ marginTop: 20 }} />
         </View>

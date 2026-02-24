@@ -29,9 +29,9 @@ export default function SignInScreen() {
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-            <ScrollView className="flex-1 bg-operis-bg" contentContainerStyle={{ padding: 32, paddingTop: 100 }} keyboardShouldPersistTaps="handled">
+            <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 100 }} keyboardShouldPersistTaps="handled">
                 <View className="mb-10">
-                    <Text className="text-3xl font-bold text-olive">Welcome Back</Text>
+                    <Text className="text-3xl font-bold text-primary">Welcome Back</Text>
                     <Text className="text-base text-gray-500 mt-2">Sign in to continue using Operis</Text>
                 </View>
 
@@ -70,7 +70,7 @@ export default function SignInScreen() {
                     onPress={() => router.push('/(auth)/sign-up')}
                 >
                     <Text className="text-base text-gray-500">
-                        Don't have an account? <Text className="text-olive font-semibold">Sign Up</Text>
+                        Don't have an account? <Text className="text-primary font-semibold">Sign Up</Text>
                     </Text>
                 </TouchableOpacity>
             </ScrollView>

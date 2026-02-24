@@ -8,7 +8,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
     submitted: { bg: Colors.info + '20', text: Colors.info },
     matched: { bg: Colors.accent + '20', text: Colors.accent },
-    scheduled: { bg: Colors.softSage + '40', text: Colors.deepOlive },
+    scheduled: { bg: Colors.primaryLight + '40', text: Colors.primary },
     in_progress: { bg: Colors.warning + '20', text: Colors.warning },
     completed: { bg: Colors.success + '20', text: Colors.success },
     cancelled: { bg: Colors.error + '15', text: Colors.error },
@@ -36,14 +36,14 @@ export function RequestCard({ job, onPress, isArtisanView }: RequestCardProps) {
 
     return (
         <TouchableOpacity
-            className="bg-white rounded-2xl p-5 border border-operis-border shadow-[0_2px_8px_rgba(0,0,0,0.06)] gap-2.5"
+            className="bg-white rounded-2xl p-5 border border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.06)] gap-2.5"
             onPress={onPress}
             activeOpacity={0.85}
             accessibilityLabel={`${job.category} request, ${STATUS_LABELS[job.status]}`}
         >
             <View className="flex-row justify-between items-center">
-                <View className="bg-sage-200/30 px-3 py-1 rounded-full">
-                    <Text className="text-xs font-semibold text-olive capitalize">
+                <View className="bg-primary/30 px-3 py-1 rounded-full">
+                    <Text className="text-xs font-semibold text-primary capitalize">
                         {job.category === 'not_sure' ? 'Not Sure' : job.category.replace('_', '/')}
                     </Text>
                 </View>

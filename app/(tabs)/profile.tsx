@@ -54,14 +54,14 @@ export default function ProfileScreen() {
     ];
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title={t('profile', language)} showNotification={false} />
 
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
                 {/* Profile Header */}
                 <View className="items-center py-8">
                     <Avatar name={user?.name || 'U'} size={80} />
-                    <Text className="text-[28px] font-bold text-olive mt-4">{user?.name}</Text>
+                    <Text className="text-[28px] font-bold text-primary mt-4">{user?.name}</Text>
                     <Text className="text-base text-gray-500 mt-1">
                         {isArtisan ? '🔧 Artisan' : '👤 Client'} · {user?.location.city}
                     </Text>

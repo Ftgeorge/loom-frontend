@@ -1,9 +1,10 @@
 // Operis Theme System
 export const Colors = {
-  softSage: '#ACC8A2',
-  deepOlive: '#1A2517',
-  background: '#F7F8F4',
-  accent: '#C49A3A',
+  primary: '#2D4A22', // Forest Pine
+  primaryLight: '#C2D5BA', // Soft Pine
+  background: '#F7F3E9', // Parchment
+  surface: '#FFFFFF',
+  accent: '#D4AF37', // Golden Sand
   error: '#D64545',
   white: '#FFFFFF',
   black: '#000000',
@@ -20,13 +21,9 @@ export const Colors = {
   success: '#22C55E',
   warning: '#F59E0B',
   info: '#3B82F6',
-  softSageLight: '#D4E4CE',
-  softSageDark: '#8AB57E',
-  accentLight: '#D4B05C',
-  accentDark: '#A07E28',
   overlayDark: 'rgba(0,0,0,0.5)',
   overlayLight: 'rgba(0,0,0,0.1)',
-  cardBorder: '#E8EBE4',
+  cardBorder: '#EAE5D9',
 };
 
 export const Typography = {
@@ -35,26 +32,26 @@ export const Typography = {
     fontWeight: '700' as const,
     lineHeight: 36,
     letterSpacing: -0.5,
-    color: Colors.deepOlive,
+    color: Colors.primary,
   },
   heading2: {
     fontSize: 24,
     fontWeight: '700' as const,
     lineHeight: 32,
     letterSpacing: -0.3,
-    color: Colors.deepOlive,
+    color: Colors.primary,
   },
   heading3: {
     fontSize: 20,
     fontWeight: '600' as const,
     lineHeight: 28,
-    color: Colors.deepOlive,
+    color: Colors.primary,
   },
   heading4: {
     fontSize: 18,
     fontWeight: '600' as const,
     lineHeight: 24,
-    color: Colors.deepOlive,
+    color: Colors.primary,
   },
   body: {
     fontSize: 16,
@@ -116,23 +113,23 @@ export const Shadows = {
   card: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 3,
   },
   cardHover: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 5,
   },
   button: {
-    shadowColor: Colors.deepOlive,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
 };
 

@@ -20,8 +20,8 @@ export default function ForgotPasswordScreen() {
 
     if (sent) {
         return (
-            <ScrollView className="flex-1 bg-operis-bg" contentContainerStyle={{ padding: 32, paddingTop: 100 }}>
-                <Text className="text-[28px] font-bold text-olive">Check Your Phone</Text>
+            <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 100 }}>
+                <Text className="text-[28px] font-bold text-primary">Check Your Phone</Text>
                 <Text className="text-base text-gray-500 mt-2 mb-10">
                     We've sent a password reset link to your phone number. Follow the link to reset your password.
                 </Text>
@@ -35,8 +35,8 @@ export default function ForgotPasswordScreen() {
     }
 
     return (
-        <ScrollView className="flex-1 bg-operis-bg" contentContainerStyle={{ padding: 32, paddingTop: 100 }}>
-            <Text className="text-[28px] font-bold text-olive">Forgot Password?</Text>
+        <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 100 }}>
+            <Text className="text-[28px] font-bold text-primary">Forgot Password?</Text>
             <Text className="text-base text-gray-500 mt-2 mb-10">
                 Enter your phone number and we'll send you a link to reset your password.
             </Text>

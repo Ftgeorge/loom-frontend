@@ -37,7 +37,7 @@ export default function RequestsScreen() {
     useEffect(() => { setLoading(true); load(); }, [load]);
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title={t('requests', language)} onNotification={() => router.push('/notifications')} />
 
             <View className="px-5 py-4">

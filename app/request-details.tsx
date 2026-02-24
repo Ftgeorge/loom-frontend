@@ -54,21 +54,21 @@ export default function RequestDetailsScreen() {
     };
 
     if (loading) return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
             <View className="p-5"><SkeletonList count={3} /></View>
         </View>
     );
 
     if (error || !job) return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
@@ -122,8 +122,8 @@ export default function RequestDetailsScreen() {
                             className="flex-row items-center gap-4"
                             onPress={() => job.artisanId && router.push({ pathname: '/artisan-profile', params: { id: job.artisanId } })}
                         >
-                            <View className="w-10 h-10 rounded-full bg-sage-200 items-center justify-center">
-                                <Text className="font-bold text-olive">{job.artisanName[0]}</Text>
+                            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
+                                <Text className="font-bold text-primary">{job.artisanName[0]}</Text>
                             </View>
                             <Text className="text-base font-semibold flex-1">{job.artisanName}</Text>
                             <Ionicons name="chevron-forward" size={18} color={Colors.gray400} />

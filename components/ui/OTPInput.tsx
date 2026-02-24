@@ -44,11 +44,11 @@ export function OTPInput({ length = 6, onComplete, error }: OTPInputProps) {
         <View>
             <View className="flex-row justify-center gap-2.5">
                 {values.map((val, i) => {
-                    let cellClass = "w-12 h-14 border-[1.5px] rounded-xl text-2xl font-bold text-olive bg-white text-center ";
+                    let cellClass = "w-12 h-14 border-[1.5px] rounded-xl text-2xl font-bold text-primary bg-white text-center ";
                     if (error) {
                         cellClass += "border-red-500 ";
                     } else if (val) {
-                        cellClass += "border-sage-200 bg-sage-50 ";
+                        cellClass += "border-primary/20 bg-primary/5 ";
                     } else {
                         cellClass += "border-gray-200 ";
                     }

@@ -13,11 +13,11 @@ export function Avatar({ name, size = 48, uri }: AvatarProps) {
 
     return (
         <View
-            className="bg-sage-200 items-center justify-center"
+            className="bg-primary/10 items-center justify-center"
             style={{ width: size, height: size, borderRadius: size / 2 }}
             accessibilityLabel={`${name}'s avatar`}
         >
-            <Text className="text-olive font-bold" style={{ fontSize }}>
+            <Text className="text-primary font-bold" style={{ fontSize }}>
                 {getInitials(name)}
             </Text>
         </View>
@@ -50,7 +50,7 @@ export function RatingStars({ rating, size = 16, showValue = true, count }: Rati
                     <Text key={`e${i}`} className="text-gray-300" style={{ fontSize: size }}>☆</Text>
                 ))}
             {showValue && (
-                <Text className="text-sm font-semibold text-olive ml-1">{rating.toFixed(1)}</Text>
+                <Text className="text-sm font-semibold text-primary ml-1">{rating.toFixed(1)}</Text>
             )}
             {count !== undefined && (
                 <Text className="text-xs text-gray-500 ml-0.5">({count})</Text>

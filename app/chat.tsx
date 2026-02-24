@@ -71,7 +71,7 @@ export default function ChatScreen() {
 
     return (
         <KeyboardAvoidingView
-            className="flex-1 bg-operis-bg"
+            className="flex-1 bg-background"
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             keyboardVerticalOffset={0}
         >
@@ -88,9 +88,9 @@ export default function ChatScreen() {
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ padding: 20, paddingBottom: 8, flexGrow: 1, justifyContent: 'flex-end' }}
                 renderItem={({ item }) => (
-                    <View className={`max-w-[78%] px-4 py-3 rounded-xl mb-2 ${isMe(item) ? 'bg-olive self-end rounded-br-[4px]' : 'bg-white self-start rounded-bl-[4px] border border-gray-200'}`}>
+                    <View className={`max-w-[78%] px-4 py-3 rounded-xl mb-2 ${isMe(item) ? 'bg-primary self-end rounded-br-[4px]' : 'bg-white self-start rounded-bl-[4px] border border-gray-200'}`}>
                         <Text className={`text-base ${isMe(item) ? 'text-white' : 'text-gray-700'}`}>{item.text}</Text>
-                        <Text className={`text-[10px] mt-0.5 ${isMe(item) ? 'text-sage-200' : 'text-gray-400'}`}>
+                        <Text className={`text-[10px] mt-0.5 ${isMe(item) ? 'text-primary/60' : 'text-gray-400'}`}>
                             {formatTime(item.timestamp)}
                         </Text>
                     </View>
@@ -106,8 +106,8 @@ export default function ChatScreen() {
                 contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 8, gap: 8 }}
                 keyExtractor={(item) => item}
                 renderItem={({ item }) => (
-                    <TouchableOpacity className="bg-sage-200/25 px-4 py-2 rounded-full border border-sage-200" onPress={() => handleSend(item)}>
-                        <Text className="text-xs text-olive font-medium">{item}</Text>
+                    <TouchableOpacity className="bg-primary/25 px-4 py-2 rounded-full border border-primary/20" onPress={() => handleSend(item)}>
+                        <Text className="text-xs text-primary font-medium">{item}</Text>
                     </TouchableOpacity>
                 )}
             />
@@ -118,7 +118,7 @@ export default function ChatScreen() {
                     <Ionicons name="attach" size={24} color={Colors.gray500} />
                 </TouchableOpacity>
                 <TextInput
-                    className="flex-1 text-base text-olive max-h-[100px] py-2"
+                    className="flex-1 text-base text-primary max-h-[100px] py-2"
                     placeholder="Type a message..."
                     placeholderTextColor={Colors.gray400}
                     value={text}
@@ -126,7 +126,7 @@ export default function ChatScreen() {
                     multiline
                 />
                 <TouchableOpacity
-                    className={`w-10 h-10 rounded-full items-center justify-center mb-1 ${!text.trim() ? 'bg-gray-200' : 'bg-olive'}`}
+                    className={`w-10 h-10 rounded-full items-center justify-center mb-1 ${!text.trim() ? 'bg-gray-200' : 'bg-primary'}`}
                     onPress={() => handleSend()}
                     disabled={!text.trim()}
                 >

@@ -12,7 +12,7 @@ interface CardProps {
 export function Card({ children, style, noPadding, className = '' }: CardProps) {
     return (
         <View
-            className={`bg-operis-card rounded-2xl border border-operis-border shadow-[0_2px_8px_rgba(0,0,0,0.06)] ${noPadding ? '' : 'p-5'} ${className}`}
+            className={`bg-surface rounded-2xl border border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.06)] ${noPadding ? '' : 'p-5'} ${className}`}
             style={style}
         >
             {children}
@@ -41,8 +41,8 @@ export function Chip({ label, selected, onPress, color, small }: ChipProps) {
 
     // Colors
     if (selected) {
-        if (!color) containerClass += 'bg-sage-200 ';
-        textClass += 'text-olive';
+        if (!color) containerClass += 'bg-primary/10 ';
+        textClass += 'text-primary';
     } else {
         containerClass += 'bg-gray-100 ';
         textClass += 'text-gray-600';
@@ -74,9 +74,9 @@ interface BadgeProps {
 export function Badge({ label, count, color, variant = 'default' }: BadgeProps) {
     if (variant === 'verified') {
         return (
-            <View className="flex-row items-center bg-sage-200/40 px-3 py-1 rounded-full gap-1">
-                <Text className="text-[10px] text-olive font-bold">✓</Text>
-                <Text className="text-[11px] text-olive font-semibold">Verified</Text>
+            <View className="flex-row items-center bg-primary/40 px-3 py-1 rounded-full gap-1">
+                <Text className="text-[10px] text-primary font-bold">✓</Text>
+                <Text className="text-[11px] text-primary font-semibold">Verified</Text>
             </View>
         );
     }
@@ -94,10 +94,10 @@ export function Badge({ label, count, color, variant = 'default' }: BadgeProps) 
 
     return (
         <View
-            className="bg-sage-200 px-3 py-1 rounded-md"
+            className="bg-primary/10 px-3 py-1 rounded-md"
             style={color ? { backgroundColor: color } : undefined}
         >
-            <Text className="text-xs text-olive font-semibold">{label}</Text>
+            <Text className="text-xs text-primary font-semibold">{label}</Text>
         </View>
     );
 }

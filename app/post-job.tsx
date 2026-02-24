@@ -63,7 +63,7 @@ export default function PostJobScreen() {
 
     if (submitted) {
         return (
-            <View className="flex-1 bg-operis-bg items-center justify-center p-10">
+            <View className="flex-1 bg-background items-center justify-center p-10">
                 <View className="mb-5">
                     <Ionicons name="checkmark-circle" size={80} color={Colors.success} />
                 </View>
@@ -86,7 +86,7 @@ export default function PostJobScreen() {
     }
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader
                 title="Post a Job"
                 showBack
@@ -98,8 +98,8 @@ export default function PostJobScreen() {
             <View className="flex-row px-5 py-4 gap-1">
                 {steps.map((s, i) => (
                     <View key={s} className="flex-1 items-center gap-1">
-                        <View className={`h-[3px] w-full rounded-[2px] ${i <= step ? 'bg-sage-200' : 'bg-gray-200'}`} />
-                        <Text className={`text-xs ${i === step ? 'text-olive font-semibold' : 'text-gray-400'}`}>{s}</Text>
+                        <View className={`h-[3px] w-full rounded-[2px] ${i <= step ? 'bg-primary/10' : 'bg-gray-200'}`} />
+                        <Text className={`text-xs ${i === step ? 'text-primary font-semibold' : 'text-gray-400'}`}>{s}</Text>
                     </View>
                 ))}
             </View>
@@ -113,11 +113,11 @@ export default function PostJobScreen() {
                             {[...CATEGORIES, { id: 'not_sure', label: 'Not Sure', icon: 'help' }].map((cat) => (
                                 <TouchableOpacity
                                     key={cat.id}
-                                    className={`px-5 py-4 rounded-md bg-white border-[1.5px] ${category === cat.id ? 'border-sage-200 bg-sage-200/20' : 'border-gray-200'}`}
+                                    className={`px-5 py-4 rounded-md bg-white border-[1.5px] ${category === cat.id ? 'border-primary/20 bg-primary/20' : 'border-gray-200'}`}
                                     onPress={() => setCategory(cat.id)}
                                     activeOpacity={0.8}
                                 >
-                                    <Text className={`text-sm ${category === cat.id ? 'text-olive font-semibold' : 'text-gray-600'}`}>
+                                    <Text className={`text-sm ${category === cat.id ? 'text-primary font-semibold' : 'text-gray-600'}`}>
                                         {cat.label}
                                     </Text>
                                 </TouchableOpacity>
@@ -137,7 +137,7 @@ export default function PostJobScreen() {
                     <View className="p-8">
                         <Text className="text-2xl font-bold mb-6">Describe the issue</Text>
                         <TextInput
-                            className="bg-white border-[1.5px] border-gray-200 rounded-md p-5 min-h-[140px] text-base text-olive"
+                            className="bg-white border-[1.5px] border-gray-200 rounded-md p-5 min-h-[140px] text-base text-primary"
                             placeholder='English: "My socket sparked and stopped working…"&#10;Pidgin: "My socket dey spark, e no dey work again…"'
                             placeholderTextColor={Colors.gray400}
                             multiline
@@ -149,11 +149,11 @@ export default function PostJobScreen() {
 
                         <View className="flex-row gap-4 mt-5">
                             <TouchableOpacity className="flex-row items-center gap-2 px-5 py-4 rounded-md border border-gray-200 border-dashed">
-                                <Ionicons name="mic-outline" size={22} color={Colors.deepOlive} />
+                                <Ionicons name="mic-outline" size={22} color={Colors.primary} />
                                 <Text className="text-sm text-gray-600">Voice Input</Text>
                             </TouchableOpacity>
                             <TouchableOpacity className="flex-row items-center gap-2 px-5 py-4 rounded-md border border-gray-200 border-dashed">
-                                <Ionicons name="image-outline" size={22} color={Colors.deepOlive} />
+                                <Ionicons name="image-outline" size={22} color={Colors.primary} />
                                 <Text className="text-sm text-gray-600">Add Photo</Text>
                             </TouchableOpacity>
                         </View>
@@ -188,17 +188,17 @@ export default function PostJobScreen() {
                         <Text className="text-sm font-semibold mb-2 mt-5">Budget</Text>
                         <View className="flex-row items-center justify-center gap-6">
                             <TouchableOpacity
-                                className="w-11 h-11 rounded-[22px] bg-sage-200/30 items-center justify-center"
+                                className="w-11 h-11 rounded-[22px] bg-primary/30 items-center justify-center"
                                 onPress={() => setBudget(Math.max(1000, budget - 5000))}
                             >
-                                <Ionicons name="remove" size={24} color={Colors.deepOlive} />
+                                <Ionicons name="remove" size={24} color={Colors.primary} />
                             </TouchableOpacity>
                             <Text className="text-3xl font-bold min-w-[120px] text-center">{formatNaira(budget)}</Text>
                             <TouchableOpacity
-                                className="w-11 h-11 rounded-[22px] bg-sage-200/30 items-center justify-center"
+                                className="w-11 h-11 rounded-[22px] bg-primary/30 items-center justify-center"
                                 onPress={() => setBudget(budget + 5000)}
                             >
-                                <Ionicons name="add" size={24} color={Colors.deepOlive} />
+                                <Ionicons name="add" size={24} color={Colors.primary} />
                             </TouchableOpacity>
                         </View>
 

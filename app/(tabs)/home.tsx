@@ -63,19 +63,19 @@ export default function ClientHomeScreen() {
         .slice(0, 6);
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader showLocation showNotification onNotification={() => router.push('/notifications')} />
 
             <ScrollView
-                className="flex-1 bg-operis-bg"
+                className="flex-1 bg-background"
                 contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.softSage} />}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primaryLight} />}
                 showsVerticalScrollIndicator={false}
             >
                 {/* Greeting */}
                 <View className="mb-5">
                     <View>
-                        <Text className="text-[28px] font-bold text-olive">{getGreeting()}, {user?.name || 'there'} 👋</Text>
+                        <Text className="text-[28px] font-bold text-primary">{getGreeting()}, {user?.name || 'there'} 👋</Text>
                         <Text className="text-base text-gray-500 mt-0.5">What do you need help with?</Text>
                     </View>
                 </View>
@@ -89,20 +89,20 @@ export default function ClientHomeScreen() {
                 />
 
                 {/* Categories */}
-                <Text className="text-xl font-bold text-olive mb-4 mt-5">Categories</Text>
+                <Text className="text-xl font-bold text-primary mb-4 mt-5">Categories</Text>
                 <View className="flex-row flex-wrap gap-4">
                     {CATEGORIES.map((cat) => (
                         <TouchableOpacity
                             key={cat.id}
-                            className="w-[22%] aspect-square bg-white rounded-xl items-center justify-center gap-1 border border-operis-border shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                            className="w-[22%] aspect-square bg-white rounded-xl items-center justify-center gap-1 border border-gray-200 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
                             onPress={() => router.push({ pathname: '/search', params: { category: cat.id } })}
                             activeOpacity={0.8}
                         >
-                            <View className="w-11 h-11 rounded-[22px] bg-sage-200/30 items-center justify-center">
+                            <View className="w-11 h-11 rounded-[22px] bg-primary/30 items-center justify-center">
                                 <Ionicons
                                     name={CATEGORY_ICONS[cat.id] as any || 'construct-outline'}
                                     size={24}
-                                    color={Colors.deepOlive}
+                                    color={Colors.primary}
                                 />
                             </View>
                             <Text className="text-[11px] font-medium text-gray-600 text-center">{cat.label}</Text>
@@ -111,7 +111,7 @@ export default function ClientHomeScreen() {
                 </View>
 
                 {/* Top Rated */}
-                <Text className="text-xl font-bold text-olive mb-4 mt-5">{t('topRated', language)}</Text>
+                <Text className="text-xl font-bold text-primary mb-4 mt-5">{t('topRated', language)}</Text>
                 {loading ? (
                     <SkeletonList count={2} />
                 ) : error ? (
@@ -133,7 +133,7 @@ export default function ClientHomeScreen() {
                 )}
 
                 {/* Recently Used */}
-                <Text className="text-xl font-bold text-olive mb-4 mt-5">{t('recentlyUsed', language)}</Text>
+                <Text className="text-xl font-bold text-primary mb-4 mt-5">{t('recentlyUsed', language)}</Text>
                 {loading ? (
                     <SkeletonList count={2} />
                 ) : (

@@ -43,7 +43,7 @@ export default function ArtisanOnboardingScreen() {
     };
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader
                 title="Set Up Profile"
                 showBack
@@ -55,8 +55,8 @@ export default function ArtisanOnboardingScreen() {
             <View className="flex-row px-5 py-4 gap-1">
                 {STEPS.map((s, i) => (
                     <View key={s} className="flex-1 items-center gap-1">
-                        <View className={`h-[3px] w-full rounded-[2px] ${i <= step ? 'bg-sage-200' : 'bg-gray-200'}`} />
-                        <Text className={`text-[10px] ${i === step ? 'text-olive font-semibold' : 'text-gray-400'}`}>{s}</Text>
+                        <View className={`h-[3px] w-full rounded-[2px] ${i <= step ? 'bg-primary/10' : 'bg-gray-200'}`} />
+                        <Text className={`text-[10px] ${i === step ? 'text-primary font-semibold' : 'text-gray-400'}`}>{s}</Text>
                     </View>
                 ))}
             </View>
@@ -113,10 +113,10 @@ export default function ArtisanOnboardingScreen() {
                             {days.map((d) => (
                                 <TouchableOpacity
                                     key={d}
-                                    className={`w-[46px] h-[46px] rounded-[23px] border-[1.5px] items-center justify-center ${selectedDays.includes(d) ? 'border-sage-200 bg-sage-200/20' : 'border-gray-200 bg-white'}`}
+                                    className={`w-[46px] h-[46px] rounded-[23px] border-[1.5px] items-center justify-center ${selectedDays.includes(d) ? 'border-primary/20 bg-primary/20' : 'border-gray-200 bg-white'}`}
                                     onPress={() => toggleDay(d)}
                                 >
-                                    <Text className={`text-sm ${selectedDays.includes(d) ? 'text-olive font-semibold' : 'text-gray-500 font-medium'}`}>{d}</Text>
+                                    <Text className={`text-sm ${selectedDays.includes(d) ? 'text-primary font-semibold' : 'text-gray-500 font-medium'}`}>{d}</Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
@@ -136,7 +136,7 @@ export default function ArtisanOnboardingScreen() {
                         ].map((opt) => (
                             <TouchableOpacity
                                 key={opt.value}
-                                className={`flex-row items-center gap-4 p-5 rounded-md border-[1.5px] mb-4 ${pricingStyle === opt.value ? 'border-sage-200 bg-sage-200/10' : 'border-gray-200 bg-white'}`}
+                                className={`flex-row items-center gap-4 p-5 rounded-md border-[1.5px] mb-4 ${pricingStyle === opt.value ? 'border-primary/20 bg-primary/10' : 'border-gray-200 bg-white'}`}
                                 onPress={() => setPricingStyle(opt.value)}
                             >
                                 <View>

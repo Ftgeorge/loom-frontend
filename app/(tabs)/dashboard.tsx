@@ -51,14 +51,14 @@ export default function ArtisanDashboard() {
     ];
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader showLocation onNotification={() => router.push('/notifications')} />
 
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
                 {/* Greeting + Online Toggle */}
                 <View className="flex-row items-center mb-6">
                     <View className="flex-1">
-                        <Text className="text-xl font-bold text-olive">
+                        <Text className="text-xl font-bold text-primary">
                             {t('greeting', language)}, {user?.name} 👋
                         </Text>
                     </View>
@@ -69,7 +69,7 @@ export default function ArtisanDashboard() {
                         <Switch
                             value={artisanOnline}
                             onValueChange={setArtisanOnline}
-                            trackColor={{ false: Colors.gray300, true: Colors.softSage }}
+                            trackColor={{ false: Colors.gray300, true: Colors.primaryLight }}
                             thumbColor={Colors.white}
                         />
                     </View>
@@ -95,7 +95,7 @@ export default function ArtisanDashboard() {
                                 >
                                     <Ionicons name={s.icon as any} size={22} color={s.color} />
                                 </View>
-                                <Text className="text-xl font-bold text-olive mt-1">{s.value}</Text>
+                                <Text className="text-xl font-bold text-primary mt-1">{s.value}</Text>
                                 <Text className="text-xs text-gray-500">{s.label}</Text>
                             </Card>
                         ))}
@@ -103,7 +103,7 @@ export default function ArtisanDashboard() {
                 )}
 
                 {/* New Job Requests */}
-                <Text className="text-lg font-bold text-olive mb-4">New Job Requests Near You</Text>
+                <Text className="text-lg font-bold text-primary mb-4">New Job Requests Near You</Text>
                 {loading ? (
                     <SkeletonList count={2} />
                 ) : error ? (

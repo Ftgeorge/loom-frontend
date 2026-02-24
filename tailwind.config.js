@@ -8,27 +8,20 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                sage: {
-                    50: '#f0f5f0',
-                    100: '#d4e6d4',
-                    200: '#A8C5A0',   // softSage
-                    400: '#7FA97A',   // softSageDark
-                    600: '#3B5C3A',
-                    800: '#2C3E2B',   // deepOlive
-                },
-                olive: {
-                    DEFAULT: '#2C3E2B',
-                    light: '#3B5C3A',
+                primary: {
+                    DEFAULT: '#2D4A22', // Forest Pine
+                    light: '#C2D5BA', // Soft lighter version
                 },
                 accent: {
-                    DEFAULT: '#D4A574',
-                    dark: '#B8864E',
+                    DEFAULT: '#D4AF37', // Golden Sand
+                    dark: '#B8962E', // Slightly darker gold
                 },
-                operis: {
-                    bg: '#F5F3EF',
-                    card: '#FFFFFF',
-                    border: '#E8E5E0',
-                },
+                background: '#F7F3E9', // Parchment
+                surface: '#FFFFFF', // White
+                success: '#22C55E',
+                error: '#D64545',
+                info: '#3B82F6',
+                warning: '#F59E0B',
             },
             fontFamily: {
                 sans: ['System'],

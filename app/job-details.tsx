@@ -63,21 +63,21 @@ export default function JobDetailsScreen() {
     };
 
     if (loading) return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
             <View className="p-5"><SkeletonList count={3} /></View>
         </View>
     );
 
     if (error || !job) return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>

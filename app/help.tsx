@@ -41,7 +41,7 @@ export default function HelpScreen() {
     const [contactMsg, setContactMsg] = useState('');
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Help & Support" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>

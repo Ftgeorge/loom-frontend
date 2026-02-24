@@ -42,7 +42,7 @@ export default function SearchScreen() {
     useEffect(() => { search(); }, [search]);
 
     return (
-        <View className="flex-1 bg-operis-bg" style={{ paddingTop: insets.top }}>
+        <View className="flex-1 bg-background" style={{ paddingTop: insets.top }}>
             <View className="px-5 pt-3">
                 <AppTextInput
                     placeholder="Search artisans, skills..."

@@ -15,7 +15,7 @@ export function ArtisanCard({ artisan, onPress, horizontal }: ArtisanCardProps) 
     if (horizontal) {
         return (
             <TouchableOpacity
-                className="flex-row bg-white rounded-2xl p-5 border border-operis-border shadow-[0_2px_8px_rgba(0,0,0,0.06)] gap-4 items-center"
+                className="flex-row bg-white rounded-2xl p-5 border border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.06)] gap-4 items-center"
                 onPress={onPress}
                 activeOpacity={0.85}
                 accessibilityLabel={`View ${artisan.name}'s profile`}
@@ -23,7 +23,7 @@ export function ArtisanCard({ artisan, onPress, horizontal }: ArtisanCardProps) 
                 <Avatar name={artisan.name} size={56} />
                 <View className="flex-1 gap-[3px]">
                     <View className="flex-row items-center gap-2">
-                        <Text className="text-lg font-bold flex-1 text-olive" numberOfLines={1}>{artisan.name}</Text>
+                        <Text className="text-lg font-bold flex-1 text-primary" numberOfLines={1}>{artisan.name}</Text>
                         {artisan.verified && <Badge variant="verified" />}
                     </View>
                     <Text className="text-xs text-gray-500 capitalize" numberOfLines={1}>
@@ -48,13 +48,13 @@ export function ArtisanCard({ artisan, onPress, horizontal }: ArtisanCardProps) 
 
     return (
         <TouchableOpacity
-            className="bg-white rounded-2xl p-5 border border-operis-border shadow-[0_2px_8px_rgba(0,0,0,0.06)] items-center gap-1 w-[140px]"
+            className="bg-white rounded-2xl p-5 border border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.06)] items-center gap-1 w-[140px]"
             onPress={onPress}
             activeOpacity={0.85}
             accessibilityLabel={`View ${artisan.name}'s profile`}
         >
             <Avatar name={artisan.name} size={48} />
-            <Text className="text-sm font-semibold text-olive mt-1 text-center" numberOfLines={1}>{artisan.name}</Text>
+            <Text className="text-sm font-semibold text-primary mt-1 text-center" numberOfLines={1}>{artisan.name}</Text>
             <RatingStars rating={artisan.rating} size={12} showValue={false} />
             <Text className="text-xs text-gray-500 capitalize" numberOfLines={1}>
                 {artisan.skills[0]?.replace('_', '/')}

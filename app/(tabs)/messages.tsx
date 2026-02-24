@@ -32,7 +32,7 @@ export default function MessagesScreen() {
     useEffect(() => { load(); }, [load]);
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title={t('messages', language)} onNotification={() => router.push('/notifications')} />
 
             {loading ? (
@@ -55,7 +55,7 @@ export default function MessagesScreen() {
                             <Avatar name={item.participantName} size={50} />
                             <View className="flex-1">
                                 <View className="flex-row justify-between items-center">
-                                    <Text className="text-base font-bold text-olive flex-1" numberOfLines={1}>{item.participantName}</Text>
+                                    <Text className="text-base font-bold text-primary flex-1" numberOfLines={1}>{item.participantName}</Text>
                                     <Text className="text-xs text-gray-400">{timeAgo(item.lastMessageTime)}</Text>
                                 </View>
                                 <Text className="text-sm text-gray-500 mt-0.5" numberOfLines={1}>{item.lastMessage}</Text>

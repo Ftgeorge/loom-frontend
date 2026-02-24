@@ -32,9 +32,9 @@ export default function OTPScreen() {
     };
 
     return (
-        <ScrollView className="flex-1 bg-operis-bg" contentContainerStyle={{ padding: 32, paddingTop: 100, alignItems: 'center' }}>
+        <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 100, alignItems: 'center' }}>
             <View className="mb-10 items-center">
-                <Text className="text-[28px] font-bold text-olive">Verify Your Number</Text>
+                <Text className="text-[28px] font-bold text-primary">Verify Your Number</Text>
                 <Text className="text-base text-gray-500 mt-2 text-center">Enter the 6-digit code sent to your phone</Text>
             </View>
 

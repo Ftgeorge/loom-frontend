@@ -17,7 +17,7 @@ export function StatusTimeline({ steps }: StatusTimelineProps) {
             {steps.map((step, i) => {
                 let dotClass = "w-[22px] h-[22px] rounded-full border-2 items-center justify-center ";
                 if (step.completed) {
-                    dotClass += "bg-sage-200 border-sage-200";
+                    dotClass += "bg-primary/10 border-primary/20";
                 } else if (step.active) {
                     dotClass += "border-accent bg-accent/20";
                 } else {
@@ -26,7 +26,7 @@ export function StatusTimeline({ steps }: StatusTimelineProps) {
 
                 let labelClass = "text-sm ml-4 mt-0.5 ";
                 if (step.active) {
-                    labelClass += "text-olive font-semibold";
+                    labelClass += "text-primary font-semibold";
                 } else if (step.completed) {
                     labelClass += "text-gray-600 font-medium";
                 } else {
@@ -37,11 +37,11 @@ export function StatusTimeline({ steps }: StatusTimelineProps) {
                     <View key={step.label} className="flex-row items-start min-h-[40px]">
                         <View className="items-center w-7">
                             <View className={dotClass}>
-                                {step.completed && <Text className="text-[11px] text-olive font-bold">✓</Text>}
+                                {step.completed && <Text className="text-[11px] text-primary font-bold">✓</Text>}
                             </View>
                             {i < steps.length - 1 && (
                                 <View
-                                    className={`w-[2px] flex-1 min-h-[18px] ${step.completed ? 'bg-sage-200' : 'bg-gray-200'}`}
+                                    className={`w-[2px] flex-1 min-h-[18px] ${step.completed ? 'bg-primary/10' : 'bg-gray-200'}`}
                                 />
                             )}
                         </View>

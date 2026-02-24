@@ -38,21 +38,21 @@ export default function ArtisanProfileScreen() {
     useEffect(() => { load(); }, [load]);
 
     if (loading) return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Profile" showBack onBack={() => router.back()} showNotification={false} />
             <View className="p-5"><SkeletonList count={3} /></View>
         </View>
     );
 
     if (error || !artisan) return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Profile" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader
                 title=""
                 showBack
@@ -70,7 +70,7 @@ export default function ArtisanProfileScreen() {
                 <View className="items-center gap-2">
                     <Avatar name={artisan.name} size={90} />
                     <View className="flex-row items-center gap-2">
-                        <Text className="text-[28px] font-bold text-olive">{artisan.name}</Text>
+                        <Text className="text-[28px] font-bold text-primary">{artisan.name}</Text>
                         {artisan.verified && <Badge variant="verified" />}
                     </View>
                     <Text className="text-base text-gray-500 text-center">{artisan.bio}</Text>
@@ -125,7 +125,7 @@ export default function ArtisanProfileScreen() {
                 </Card>
 
                 {/* Reviews */}
-                <Text className="text-lg font-bold text-olive mb-4">Reviews ({artisan.reviewCount})</Text>
+                <Text className="text-lg font-bold text-primary mb-4">Reviews ({artisan.reviewCount})</Text>
                 {artisan.reviews.map((review) => (
                     <View key={review.id} className="mb-5 pb-4 border-b border-gray-100">
                         <View className="flex-row justify-between items-center">
@@ -154,13 +154,13 @@ export default function ArtisanProfileScreen() {
                             title="Message"
                             onPress={() => router.push({ pathname: '/chat', params: { threadId: 't1' } })}
                             style={{ flex: 1 }}
-                            icon={<Ionicons name="chatbubble-outline" size={18} color={Colors.deepOlive} />}
+                            icon={<Ionicons name="chatbubble-outline" size={18} color={Colors.primary} />}
                         />
                         <SecondaryButton
                             title="Call"
                             onPress={() => { }}
                             style={{ flex: 1 }}
-                            icon={<Ionicons name="call-outline" size={18} color={Colors.deepOlive} />}
+                            icon={<Ionicons name="call-outline" size={18} color={Colors.primary} />}
                         />
                     </View>
                 </View>

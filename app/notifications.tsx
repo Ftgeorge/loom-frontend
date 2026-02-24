@@ -12,7 +12,7 @@ import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 const TYPE_ICONS: Record<string, { icon: string; color: string }> = {
     job_update: { icon: 'briefcase-outline', color: Colors.info },
-    message: { icon: 'chatbubble-outline', color: Colors.softSageDark },
+    message: { icon: 'chatbubble-outline', color: Colors.primary },
     booking: { icon: 'calendar-outline', color: Colors.accent },
     review: { icon: 'star-outline', color: Colors.warning },
     system: { icon: 'information-circle-outline', color: Colors.gray500 },
@@ -36,7 +36,7 @@ export default function NotificationsScreen() {
     useEffect(() => { load(); }, [load]);
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader
                 title="Notifications"
                 showBack
@@ -62,7 +62,7 @@ export default function NotificationsScreen() {
                         const typeInfo = TYPE_ICONS[item.type] || TYPE_ICONS.system;
                         return (
                             <TouchableOpacity
-                                className={`flex-row p-5 gap-4 items-start ${!item.read ? 'bg-sage-200/10' : ''}`}
+                                className={`flex-row p-5 gap-4 items-start ${!item.read ? 'bg-primary/10' : ''}`}
                                 onPress={() => markNotificationRead(item.id)}
                                 activeOpacity={0.8}
                             >

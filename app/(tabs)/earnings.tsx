@@ -32,14 +32,14 @@ export default function EarningsScreen() {
     useEffect(() => { load(); }, [load]);
 
     if (loading) return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title={t('earnings', language)} showNotification={false} />
             <View className="p-5"><SkeletonList count={4} /></View>
         </View>
     );
 
     if (error || !earnings) return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title={t('earnings', language)} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
@@ -48,13 +48,13 @@ export default function EarningsScreen() {
     const maxBar = Math.max(...earnings.weeklyData.map((d) => d.amount), 1);
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title={t('earnings', language)} showNotification={false} />
 
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
                 {/* Total Earnings Card */}
-                <Card className="bg-olive p-8">
-                    <Text className="text-sm text-sage-200">Total Earnings</Text>
+                <Card className="bg-primary p-8">
+                    <Text className="text-sm text-primary/60">Total Earnings</Text>
                     <Text className="text-4xl font-bold text-white my-2">{formatNaira(earnings.totalEarnings)}</Text>
                     <View className="flex-row mt-4 gap-6">
                         <View>
@@ -75,14 +75,14 @@ export default function EarningsScreen() {
                 </Card>
 
                 {/* Weekly Chart */}
-                <Text className="text-lg font-bold text-olive mb-4 mt-5">This Week</Text>
+                <Text className="text-lg font-bold text-primary mb-4 mt-5">This Week</Text>
                 <Card className="py-5 px-4 mb-4">
                     <View className="flex-row justify-between h-[120px] items-end">
                         {earnings.weeklyData.map((d) => (
                             <View key={d.day} className="items-center flex-1">
                                 <View className="w-7 h-[100px] justify-end">
                                     <View
-                                        className="bg-sage-200 rounded min-h-[4px] w-full"
+                                        className="bg-primary/10 rounded min-h-[4px] w-full"
                                         style={[{ height: `${Math.max((d.amount / maxBar) * 100, 4)}%` }]}
                                     />
                                 </View>
@@ -101,7 +101,7 @@ export default function EarningsScreen() {
                 />
 
                 {/* Transactions */}
-                <Text className="text-lg font-bold text-olive mb-4 mt-5">Recent Transactions</Text>
+                <Text className="text-lg font-bold text-primary mb-4 mt-5">Recent Transactions</Text>
                 {earnings.transactions.map((tx) => (
                     <View key={tx.id} className="flex-row items-center py-4 gap-4 border-b border-gray-100">
                         <View

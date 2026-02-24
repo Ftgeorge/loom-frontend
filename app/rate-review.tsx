@@ -33,7 +33,7 @@ export default function RateReviewScreen() {
     };
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Rate & Review" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView contentContainerStyle={{ padding: 32, paddingBottom: 100 }}>

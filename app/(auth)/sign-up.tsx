@@ -28,9 +28,9 @@ export default function SignUpScreen() {
 
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-            <ScrollView className="flex-1 bg-operis-bg" contentContainerStyle={{ padding: 32, paddingTop: 80 }} keyboardShouldPersistTaps="handled">
+            <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 80 }} keyboardShouldPersistTaps="handled">
                 <View className="mb-10">
-                    <Text className="text-3xl font-bold text-olive">Create Account</Text>
+                    <Text className="text-3xl font-bold text-primary">Create Account</Text>
                     <Text className="text-base text-gray-500 mt-2">
                         {user?.role === 'artisan'
                             ? 'Join as an artisan and start getting jobs'
@@ -82,15 +82,15 @@ export default function SignUpScreen() {
                     onPress={() => router.push('/(auth)/sign-in')}
                 >
                     <Text className="text-base text-gray-500">
-                        Already have an account? <Text className="text-olive font-semibold">Sign In</Text>
+                        Already have an account? <Text className="text-primary font-semibold">Sign In</Text>
                     </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity className="items-center mt-6">
                     <Text className="text-xs text-gray-400 text-center leading-[18px]">
                         By signing up, you agree to our{' '}
-                        <Text className="text-olive font-semibold">Terms of Service</Text> and{' '}
-                        <Text className="text-olive font-semibold">Privacy Policy</Text>
+                        <Text className="text-primary font-semibold">Terms of Service</Text> and{' '}
+                        <Text className="text-primary font-semibold">Privacy Policy</Text>
                     </Text>
                 </TouchableOpacity>
             </ScrollView>

@@ -22,7 +22,7 @@ interface Props {
 export function PrimaryButton({ title, onPress, loading, disabled, style, textStyle, icon, className = '' }: Props) {
     return (
         <TouchableOpacity
-            className={`py-3.5 px-6 rounded-xl flex-row items-center justify-center gap-2 min-h-[50px] shadow-[0_1px_2px_rgba(0,0,0,0.05)] ${disabled || loading ? 'bg-gray-300' : 'bg-olive'} ${className}`}
+            className={`py-3.5 px-6 rounded-xl flex-row items-center justify-center gap-2 min-h-[50px] shadow-[0_1px_2px_rgba(0,0,0,0.05)] ${disabled || loading ? 'bg-gray-300' : 'bg-primary'} ${className}`}
             style={style}
             onPress={onPress}
             disabled={disabled || loading}
@@ -45,7 +45,7 @@ export function PrimaryButton({ title, onPress, loading, disabled, style, textSt
 export function SecondaryButton({ title, onPress, loading, disabled, style, textStyle, icon, className = '' }: Props) {
     return (
         <TouchableOpacity
-            className={`bg-transparent py-3.5 px-6 rounded-xl flex-row items-center justify-center gap-2 min-h-[50px] border-[1.5px] ${disabled || loading ? 'border-gray-300' : 'border-olive'} ${className}`}
+            className={`bg-transparent py-3.5 px-6 rounded-xl flex-row items-center justify-center gap-2 min-h-[50px] border-[1.5px] ${disabled || loading ? 'border-gray-300' : 'border-primary'} ${className}`}
             style={style}
             onPress={onPress}
             disabled={disabled || loading}
@@ -54,12 +54,12 @@ export function SecondaryButton({ title, onPress, loading, disabled, style, text
             accessibilityLabel={title}
         >
             {loading ? (
-                <ActivityIndicator color={Colors.deepOlive} size="small" />
+                <ActivityIndicator color={Colors.primary} size="small" />
             ) : (
                 <>
                     {icon}
                     <Text
-                        className={`text-base font-bold ${disabled || loading ? 'text-gray-400' : 'text-olive'}`}
+                        className={`text-base font-bold ${disabled || loading ? 'text-gray-400' : 'text-primary'}`}
                         style={textStyle}
                     >
                         {title}

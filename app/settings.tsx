@@ -41,7 +41,7 @@ export default function SettingsScreen() {
     };
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Settings" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
@@ -56,7 +56,7 @@ export default function SettingsScreen() {
                         >
                             <Text className="text-base">{languageNames[lang]}</Text>
                             {language === lang && (
-                                <Ionicons name="checkmark" size={22} color={Colors.softSageDark} />
+                                <Ionicons name="checkmark" size={22} color={Colors.primary} />
                             )}
                         </TouchableOpacity>
                     ))}
@@ -70,7 +70,7 @@ export default function SettingsScreen() {
                         <Switch
                             value={notifEnabled}
                             onValueChange={setNotifEnabled}
-                            trackColor={{ false: Colors.gray300, true: Colors.softSage }}
+                            trackColor={{ false: Colors.gray300, true: Colors.primaryLight }}
                         />
                     </View>
                 </Card>
@@ -80,7 +80,7 @@ export default function SettingsScreen() {
                 <Card noPadding>
                     <TouchableOpacity className="flex-row items-center justify-between py-5 px-5 border-b border-gray-100" onPress={handleRoleSwitch}>
                         <View className="flex-row items-center gap-4">
-                            <Ionicons name="swap-horizontal-outline" size={22} color={Colors.deepOlive} />
+                            <Ionicons name="swap-horizontal-outline" size={22} color={Colors.primary} />
                             <View>
                                 <Text className="text-base">Switch Role</Text>
                                 <Text className="text-xs text-gray-400 mt-0.5">
@@ -93,7 +93,7 @@ export default function SettingsScreen() {
 
                     <TouchableOpacity className="flex-row items-center justify-between py-5 px-5 border-b border-gray-100" onPress={() => router.push('/help')}>
                         <View className="flex-row items-center gap-4">
-                            <Ionicons name="help-circle-outline" size={22} color={Colors.deepOlive} />
+                            <Ionicons name="help-circle-outline" size={22} color={Colors.primary} />
                             <Text className="text-base">Help & Support</Text>
                         </View>
                         <Ionicons name="chevron-forward" size={18} color={Colors.gray400} />
@@ -101,7 +101,7 @@ export default function SettingsScreen() {
 
                     <TouchableOpacity className="flex-row items-center justify-between py-5 px-5">
                         <View className="flex-row items-center gap-4">
-                            <Ionicons name="document-text-outline" size={22} color={Colors.deepOlive} />
+                            <Ionicons name="document-text-outline" size={22} color={Colors.primary} />
                             <Text className="text-base">Privacy & Terms</Text>
                         </View>
                         <Ionicons name="chevron-forward" size={18} color={Colors.gray400} />

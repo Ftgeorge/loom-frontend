@@ -43,7 +43,7 @@ export default function MatchedArtisansScreen() {
     });
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Matched Artisans" showBack onBack={() => router.back()} showNotification={false} />
 
             <FlatList

@@ -23,7 +23,7 @@ export function AppTextInput({ label, error, leftIcon, rightIcon, style, ...prop
     if (error) {
         wrapperClass += "border-red-500";
     } else if (focused) {
-        wrapperClass += "border-sage-200";
+        wrapperClass += "border-primary/20";
     } else {
         wrapperClass += "border-gray-200";
     }
@@ -34,7 +34,7 @@ export function AppTextInput({ label, error, leftIcon, rightIcon, style, ...prop
             <View className={wrapperClass}>
                 {leftIcon && <View className="pl-5">{leftIcon}</View>}
                 <RNTextInput
-                    className="flex-1 text-base px-5 py-3 text-olive"
+                    className="flex-1 text-base px-5 py-3 text-primary"
                     style={style}
                     placeholderTextColor={Colors.gray400}
                     onFocus={() => setFocused(true)}

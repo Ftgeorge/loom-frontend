@@ -42,7 +42,7 @@ export default function BookingScreen() {
     };
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <AppHeader title="Book Appointment" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
@@ -51,12 +51,12 @@ export default function BookingScreen() {
                     {DAYS.map((d) => (
                         <TouchableOpacity
                             key={d.date}
-                            className={`w-[65px] py-4 items-center rounded-md border-[1.5px] gap-0.5 ${selectedDate === d.date ? 'border-sage-200 bg-sage-200/20' : 'border-gray-200 bg-white'}`}
+                            className={`w-[65px] py-4 items-center rounded-md border-[1.5px] gap-0.5 ${selectedDate === d.date ? 'border-primary/20 bg-primary/20' : 'border-gray-200 bg-white'}`}
                             onPress={() => setSelectedDate(d.date)}
                         >
-                            <Text className={`text-xs ${selectedDate === d.date ? 'text-olive' : 'text-gray-500'}`}>{d.day}</Text>
-                            <Text className={`text-[20px] font-bold ${selectedDate === d.date ? 'text-olive' : ''}`}>{d.num}</Text>
-                            <Text className={`text-xs text-gray-400 ${selectedDate === d.date ? 'text-olive' : ''}`}>{d.month}</Text>
+                            <Text className={`text-xs ${selectedDate === d.date ? 'text-primary' : 'text-gray-500'}`}>{d.day}</Text>
+                            <Text className={`text-[20px] font-bold ${selectedDate === d.date ? 'text-primary' : ''}`}>{d.num}</Text>
+                            <Text className={`text-xs text-gray-400 ${selectedDate === d.date ? 'text-primary' : ''}`}>{d.month}</Text>
                         </TouchableOpacity>
                     ))}
                 </ScrollView>
@@ -66,10 +66,10 @@ export default function BookingScreen() {
                     {TIME_SLOTS.map((t) => (
                         <TouchableOpacity
                             key={t}
-                            className={`px-5 py-4 rounded-md border-[1.5px] ${selectedTime === t ? 'border-sage-200 bg-sage-200/20' : 'border-gray-200 bg-white'}`}
+                            className={`px-5 py-4 rounded-md border-[1.5px] ${selectedTime === t ? 'border-primary/20 bg-primary/20' : 'border-gray-200 bg-white'}`}
                             onPress={() => setSelectedTime(t)}
                         >
-                            <Text className={`text-sm ${selectedTime === t ? 'text-olive font-semibold' : 'text-gray-600'}`}>{t}</Text>
+                            <Text className={`text-sm ${selectedTime === t ? 'text-primary font-semibold' : 'text-gray-600'}`}>{t}</Text>
                         </TouchableOpacity>
                     ))}
                 </View>

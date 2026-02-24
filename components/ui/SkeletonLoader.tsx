@@ -35,7 +35,7 @@ export function Skeleton({ width = '100%', height = 16, borderRadius = 6, style 
 
 export function SkeletonCard() {
     return (
-        <View className="bg-white rounded-2xl p-5 border border-operis-border mb-4">
+        <View className="bg-white rounded-2xl p-5 border border-gray-200 mb-4">
             <View className="flex-row gap-4">
                 <Skeleton width={56} height={56} borderRadius={28} />
                 <View className="flex-1 justify-center">

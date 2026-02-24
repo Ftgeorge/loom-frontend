@@ -16,7 +16,7 @@ export default function RoleSelectionScreen() {
     };
 
     return (
-        <View className="flex-1 bg-operis-bg px-8 justify-center">
+        <View className="flex-1 bg-background px-8 justify-center">
             <View className="mb-10">
                 <Text className="text-[30px] font-bold leading-tight text-black">How do you want{'\n'}to use Operis?</Text>
                 <Text className="text-base text-gray-500 mt-2">You can always switch later in Settings.</Text>
@@ -24,23 +24,23 @@ export default function RoleSelectionScreen() {
 
             <View className="gap-5">
                 <TouchableOpacity
-                    className="bg-white rounded-[20px] p-8 border border-operis-border shadow-[0_2px_8px_rgba(0,0,0,0.06)] items-center gap-4"
+                    className="bg-white rounded-[20px] p-8 border border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.06)] items-center gap-4"
                     onPress={() => handleSelect('client')}
                     activeOpacity={0.85}
                     accessibilityLabel="Continue as client"
                 >
-                    <View className="w-20 h-20 rounded-full items-center justify-center bg-sage-200/30">
-                        <Ionicons name="person-outline" size={40} color={Colors.deepOlive} />
+                    <View className="w-20 h-20 rounded-full items-center justify-center bg-primary/30">
+                        <Ionicons name="person-outline" size={40} color={Colors.primary} />
                     </View>
                     <Text className="text-xl font-bold text-center text-black">{t('iNeedArtisan', language)}</Text>
                     <Text className="text-sm text-gray-500 text-center">{t('clientDesc', language)}</Text>
-                    <View className="px-3 py-1 bg-sage-200/25 rounded-full">
-                        <Text className="text-xs font-semibold text-olive">Client</Text>
+                    <View className="px-3 py-1 bg-primary/25 rounded-full">
+                        <Text className="text-xs font-semibold text-primary">Client</Text>
                     </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    className="bg-white rounded-[20px] p-8 border border-operis-border shadow-[0_2px_8px_rgba(0,0,0,0.06)] items-center gap-4"
+                    className="bg-white rounded-[20px] p-8 border border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.06)] items-center gap-4"
                     onPress={() => handleSelect('artisan')}
                     activeOpacity={0.85}
                     accessibilityLabel="Continue as artisan"
@@ -51,7 +51,7 @@ export default function RoleSelectionScreen() {
                     <Text className="text-xl font-bold text-center text-black">{t('iAmArtisan', language)}</Text>
                     <Text className="text-sm text-gray-500 text-center">{t('artisanDesc', language)}</Text>
                     <View className="px-3 py-1 rounded-full bg-accent/15">
-                        <Text className="text-xs font-semibold text-accent-dark" style={{ color: '#E66A2B' }}>Artisan</Text>
+                        <Text className="text-xs font-semibold text-accent" style={{ color: '#E66A2B' }}>Artisan</Text>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -61,7 +61,7 @@ export default function RoleSelectionScreen() {
                 onPress={() => router.push('/(auth)/sign-in')}
             >
                 <Text className="text-base text-gray-500">
-                    Already have an account? <Text className="text-olive font-semibold">Sign In</Text>
+                    Already have an account? <Text className="text-primary font-semibold">Sign In</Text>
                 </Text>
             </TouchableOpacity>
         </View>

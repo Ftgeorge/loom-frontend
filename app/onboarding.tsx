@@ -22,7 +22,7 @@ const pages = [
         icon: 'search-outline' as const,
         titleKey: 'onboard1Title' as const,
         descKey: 'onboard1Desc' as const,
-        color: Colors.softSage,
+        color: Colors.primaryLight,
     },
     {
         icon: 'chatbubble-ellipses-outline' as const,
@@ -34,7 +34,7 @@ const pages = [
         icon: 'shield-checkmark-outline' as const,
         titleKey: 'onboard3Title' as const,
         descKey: 'onboard3Desc' as const,
-        color: Colors.softSageDark,
+        color: Colors.primary,
     },
 ];
 
@@ -65,7 +65,7 @@ export default function OnboardingScreen() {
     };
 
     return (
-        <View className="flex-1 bg-operis-bg">
+        <View className="flex-1 bg-background">
             <TouchableOpacity className="absolute top-[60px] right-6 z-10 p-2" onPress={handleSkip}>
                 <Text className="text-base text-gray-500 font-medium">{t('skip', language)}</Text>
             </TouchableOpacity>
@@ -98,7 +98,7 @@ export default function OnboardingScreen() {
                     {pages.map((_, i) => (
                         <View
                             key={i}
-                            className={`h-2 rounded-full ${i === currentPage ? 'w-6 bg-olive' : 'w-2 bg-gray-300'}`}
+                            className={`h-2 rounded-full ${i === currentPage ? 'w-6 bg-primary' : 'w-2 bg-gray-300'}`}
                         />
                     ))}
                 </View>
