@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "operis",
-    "slug": "operis",
+    "name": "loom",
+    "slug": "loom",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "operis",
+    "scheme": "loom",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

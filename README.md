@@ -1,6 +1,6 @@
-# Operis — Mobile App Frontend
+# Loom — Mobile App Frontend
 
-Operis is an intelligent, localized platform for artisans in Nigeria. This repository contains the complete frontend mobile application built with React Native, Expo Router, and TypeScript.
+Loom is an intelligent, localized platform for artisans in Nigeria. This repository contains the complete frontend mobile application built with React Native, Expo Router, and TypeScript.
 
 ## Features
 
