@@ -43,7 +43,8 @@ export default function SearchScreen() {
 
     return (
         <View className="flex-1 bg-background" style={{ paddingTop: insets.top }}>
-            <View className="px-5 pt-3">
+            <View className="px-6 pt-8 pb-4">
+                <Text className="text-3xl font-bold text-graphite tracking-tight mb-6">Search</Text>
                 <AppTextInput
                     placeholder="Search artisans, skills..."
                     value={query}
@@ -54,15 +55,18 @@ export default function SearchScreen() {
             </View>
 
             <FlatList
-                data={[]}
-                renderItem={() => null}
+                data={artisans}
+                keyExtractor={(item) => item.id}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 100, paddingHorizontal: 24, gap: 16 }}
                 ListHeaderComponent={
-                    <>
+                    <View className="pb-4">
                         <FlatList
                             data={[{ id: 'all', label: 'All' }, ...CATEGORIES]}
                             horizontal
                             showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 16, gap: 8 }}
+                            className="-mx-6"
+                            contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 12, gap: 10 }}
                             keyExtractor={(item) => item.id}
                             renderItem={({ item }) => (
                                 <Chip
@@ -74,33 +78,39 @@ export default function SearchScreen() {
                         />
 
                         {loading ? (
-                            <View className="p-5">
+                            <View className="pt-4">
                                 <SkeletonList count={4} />
                             </View>
                         ) : error ? (
-                            <ErrorState onRetry={search} />
+                            <View className="pt-4">
+                                <ErrorState onRetry={search} />
+                            </View>
                         ) : artisans.length === 0 ? (
-                            <EmptyState
-                                icon="search-outline"
-                                title="No results found"
-                                message="Try a different search or browse categories"
-                            />
+                            <View className="pt-10">
+                                <EmptyState
+                                    icon="search-outline"
+                                    title="No results found"
+                                    message="Try a different search or browse categories"
+                                />
+                            </View>
                         ) : (
-                            <View className="px-5 gap-4">
-                                <Text className="text-xs text-gray-500 mb-1">{artisans.length} artisans found</Text>
-                                {artisans.map((art) => (
-                                    <ArtisanCard
-                                        key={art.id}
-                                        artisan={art}
-                                        onPress={() => router.push({ pathname: '/artisan-profile', params: { id: art.id } })}
-                                        horizontal
-                                    />
-                                ))}
+                            <View className="pt-2 pb-2">
+                                <Text className="text-xs font-semibold text-muted tracking-widest uppercase">
+                                    {artisans.length} {artisans.length === 1 ? 'artisan' : 'artisans'} found
+                                </Text>
                             </View>
                         )}
-                    </>
+                    </View>
                 }
-                contentContainerStyle={{ paddingBottom: 100 }}
+                renderItem={({ item }) => (
+                    loading || error || artisans.length === 0 ? null : (
+                        <ArtisanCard
+                            artisan={item}
+                            onPress={() => router.push({ pathname: '/artisan-profile', params: { id: item.id } })}
+                            horizontal
+                        />
+                    )
+                )}
             />
         </View>
     );

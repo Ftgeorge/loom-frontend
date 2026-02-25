@@ -41,11 +41,11 @@ export function Chip({ label, selected, onPress, color, small }: ChipProps) {
 
     // Colors
     if (selected) {
-        if (!color) containerClass += 'bg-primary/10 ';
-        textClass += 'text-primary';
+        if (!color) containerClass += 'bg-graphite ';
+        textClass += 'text-white';
     } else {
-        containerClass += 'bg-gray-100 ';
-        textClass += 'text-gray-600';
+        containerClass += 'bg-white border border-gray-100 ';
+        textClass += 'text-muted';
     }
 
     return (
@@ -74,9 +74,9 @@ interface BadgeProps {
 export function Badge({ label, count, color, variant = 'default' }: BadgeProps) {
     if (variant === 'verified') {
         return (
-            <View className="flex-row items-center bg-primary/40 px-3 py-1 rounded-full gap-1">
-                <Text className="text-[10px] text-primary font-bold">✓</Text>
-                <Text className="text-[11px] text-primary font-semibold">Verified</Text>
+            <View className="flex-row items-center bg-black/40 px-3 py-1 rounded-full gap-1">
+                <Text className="text-[10px] text-black font-bold">✓</Text>
+                <Text className="text-[11px] text-black font-semibold">Verified</Text>
             </View>
         );
     }
@@ -97,7 +97,7 @@ export function Badge({ label, count, color, variant = 'default' }: BadgeProps) 
             className="bg-primary/10 px-3 py-1 rounded-md"
             style={color ? { backgroundColor: color } : undefined}
         >
-            <Text className="text-xs text-primary font-semibold">{label}</Text>
+            <Text className="text-xs text-black font-semibold">{label}</Text>
         </View>
     );
 }

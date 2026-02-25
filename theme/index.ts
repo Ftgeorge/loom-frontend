@@ -1,10 +1,11 @@
 // Loom Theme System
 export const Colors = {
-  primary: "#2D4A22", // Forest Pine
-  primaryLight: "#C2D5BA", // Soft Pine
-  background: "#F7F3E9", // Parchment
-  surface: "#FFFFFF",
-  accent: "#D4AF37", // Golden Sand
+  primary: "#7C3AED", // Electric Violet
+  graphite: "#121212", // Deep Graphite
+  background: "#FDFDFD", // Linen White
+  surface: "#F1F5F9", // Ghost Gray
+  muted: "#64748B", // Slate Mist
+  success: "#0D9488", // Teal Glow
   error: "#D64545",
   white: "#FFFFFF",
   black: "#000000",
@@ -18,7 +19,6 @@ export const Colors = {
   gray700: "#374151",
   gray800: "#1F2937",
   gray900: "#111827",
-  success: "#22C55E",
   warning: "#F59E0B",
   info: "#3B82F6",
   overlayDark: "rgba(0,0,0,0.5)",

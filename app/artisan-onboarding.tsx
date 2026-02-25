@@ -51,84 +51,78 @@ export default function ArtisanOnboardingScreen() {
                 showNotification={false}
             />
 
-            {/* Progress */}
             <View className="flex-row px-5 py-4 gap-1">
                 {STEPS.map((s, i) => (
                     <View key={s} className="flex-1 items-center gap-1">
-                        <View className={`h-[3px] w-full rounded-[2px] ${i <= step ? 'bg-primary/10' : 'bg-gray-200'}`} />
-                        <Text className={`text-[10px] ${i === step ? 'text-primary font-semibold' : 'text-gray-400'}`}>{s}</Text>
+                        <View className={`h-[3px] w-full rounded-[2px] ${i <= step ? 'bg-graphite' : 'bg-surface'}`} />
+                        <Text className={`text-[10px] uppercase tracking-widest ${i === step ? 'text-graphite font-bold' : 'text-muted font-medium'}`}>{s}</Text>
                     </View>
                 ))}
             </View>
 
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }} keyboardShouldPersistTaps="handled">
-                {/* Step 1: Basics */}
                 {step === 0 && (
                     <View className="p-8">
-                        <Text className="text-[22px] font-bold mb-2">Your basic info</Text>
+                        <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Your basic info</Text>
                         <AppTextInput label="Full Name" value={name} onChangeText={setName} placeholder="Your full name" />
                         <PhoneInput label="Phone Number" value={phone} onChangeText={setPhone} placeholder="8012345678" />
-                        <TouchableOpacity className="h-[120px] rounded-lg border-2 border-gray-200 border-dashed items-center justify-center gap-2 mb-2">
-                            <Ionicons name="camera-outline" size={32} color={Colors.gray400} />
-                            <Text className="text-sm text-gray-400">Add profile photo</Text>
+                        <TouchableOpacity className="h-[120px] rounded-[24px] border-2 border-surface bg-surface/30 border-dashed items-center justify-center gap-2 mb-2">
+                            <Ionicons name="camera-outline" size={32} color={Colors.muted} />
+                            <Text className="text-sm font-medium text-muted">Add profile photo</Text>
                         </TouchableOpacity>
-                        <PrimaryButton title="Next" onPress={() => setStep(1)} disabled={!name} style={{ marginTop: 32 }} />
+                        <PrimaryButton title="Next" onPress={() => setStep(1)} disabled={!name} style={{ marginTop: 32 }} className="bg-graphite" />
                     </View>
                 )}
 
-                {/* Step 2: Skills */}
                 {step === 1 && (
                     <View className="p-8">
-                        <Text className="text-[22px] font-bold mb-2">What are your trades?</Text>
-                        <Text className="text-base text-gray-500 mb-6">Select all that apply</Text>
+                        <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">What are your trades?</Text>
+                        <Text className="text-base text-muted mb-6">Select all that apply</Text>
                         <View className="flex-row flex-wrap gap-2">
                             {CATEGORIES.map((cat) => (
                                 <Chip key={cat.id} label={cat.label} selected={selectedSkills.includes(cat.id)} onPress={() => toggleSkill(cat.id)} />
                             ))}
                         </View>
-                        <PrimaryButton title="Next" onPress={() => setStep(2)} disabled={selectedSkills.length === 0} style={{ marginTop: 32 }} />
+                        <PrimaryButton title="Next" onPress={() => setStep(2)} disabled={selectedSkills.length === 0} style={{ marginTop: 32 }} className="bg-graphite" />
                     </View>
                 )}
 
-                {/* Step 3: Service Areas */}
                 {step === 2 && (
                     <View className="p-8">
-                        <Text className="text-[22px] font-bold mb-2">Service areas</Text>
-                        <Text className="text-base text-gray-500 mb-6">Where can clients find you?</Text>
+                        <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Service areas</Text>
+                        <Text className="text-base text-muted mb-6">Where can clients find you?</Text>
                         <View className="flex-row flex-wrap gap-2">
                             {areas.map((area) => (
                                 <Chip key={area} label={area} selected={selectedAreas.includes(area)} onPress={() => toggleArea(area)} />
                             ))}
                         </View>
-                        <PrimaryButton title="Next" onPress={() => setStep(3)} disabled={selectedAreas.length === 0} style={{ marginTop: 32 }} />
+                        <PrimaryButton title="Next" onPress={() => setStep(3)} disabled={selectedAreas.length === 0} style={{ marginTop: 32 }} className="bg-graphite" />
                     </View>
                 )}
 
-                {/* Step 4: Availability */}
                 {step === 3 && (
                     <View className="p-8">
-                        <Text className="text-[22px] font-bold mb-2">Your availability</Text>
-                        <Text className="text-base text-gray-500 mb-6">Select your working days</Text>
+                        <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Your availability</Text>
+                        <Text className="text-base text-muted mb-6">Select your working days</Text>
                         <View className="flex-row flex-wrap gap-2">
                             {days.map((d) => (
                                 <TouchableOpacity
                                     key={d}
-                                    className={`w-[46px] h-[46px] rounded-[23px] border-[1.5px] items-center justify-center ${selectedDays.includes(d) ? 'border-primary/20 bg-primary/20' : 'border-gray-200 bg-white'}`}
+                                    className={`w-[46px] h-[46px] rounded-[23px] border-[1.5px] items-center justify-center ${selectedDays.includes(d) ? 'border-graphite bg-surface shadow-sm' : 'border-surface bg-background'}`}
                                     onPress={() => toggleDay(d)}
                                 >
-                                    <Text className={`text-sm ${selectedDays.includes(d) ? 'text-primary font-semibold' : 'text-gray-500 font-medium'}`}>{d}</Text>
+                                    <Text className={`text-sm ${selectedDays.includes(d) ? 'text-graphite font-bold' : 'text-muted font-medium'}`}>{d}</Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
-                        <PrimaryButton title="Next" onPress={() => setStep(4)} style={{ marginTop: 32 }} />
+                        <PrimaryButton title="Next" onPress={() => setStep(4)} style={{ marginTop: 32 }} className="bg-graphite" />
                     </View>
                 )}
 
-                {/* Step 5: Pricing */}
                 {step === 4 && (
                     <View className="p-8">
-                        <Text className="text-[22px] font-bold mb-2">Pricing style</Text>
-                        <Text className="text-base text-gray-500 mb-6">How do you prefer to charge?</Text>
+                        <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Pricing style</Text>
+                        <Text className="text-base text-muted mb-6">How do you prefer to charge?</Text>
                         {[
                             { value: 'fixed', label: 'Fixed Price', desc: 'Set a fixed price per job' },
                             { value: 'estimate', label: 'Estimate', desc: 'Give clients a price range' },
@@ -136,22 +130,22 @@ export default function ArtisanOnboardingScreen() {
                         ].map((opt) => (
                             <TouchableOpacity
                                 key={opt.value}
-                                className={`flex-row items-center gap-4 p-5 rounded-md border-[1.5px] mb-4 ${pricingStyle === opt.value ? 'border-primary/20 bg-primary/10' : 'border-gray-200 bg-white'}`}
+                                className={`flex-row items-center gap-4 p-5 rounded-[20px] border-[1.5px] mb-4 shadow-sm ${pricingStyle === opt.value ? 'border-graphite bg-surface' : 'border-surface bg-background'}`}
                                 onPress={() => setPricingStyle(opt.value)}
                             >
                                 <View>
-                                    <View className={`w-[22px] h-[22px] rounded-[11px] border-2 items-center justify-center ${pricingStyle === opt.value ? 'border-[#3D5A50]' : 'border-gray-300'}`}>
-                                        {pricingStyle === opt.value && <View className="w-3 h-3 rounded-full bg-[#3D5A50]" />}
+                                    <View className={`w-[22px] h-[22px] rounded-[11px] border-2 items-center justify-center ${pricingStyle === opt.value ? 'border-graphite' : 'border-surface'}`}>
+                                        {pricingStyle === opt.value && <View className="w-2.5 h-2.5 rounded-full bg-graphite" />}
                                     </View>
                                 </View>
                                 <View>
-                                    <Text className="text-base font-semibold">{opt.label}</Text>
-                                    <Text className="text-xs text-gray-500">{opt.desc}</Text>
+                                    <Text className="text-base font-bold text-graphite">{opt.label}</Text>
+                                    <Text className="text-xs text-muted mt-0.5">{opt.desc}</Text>
                                 </View>
                             </TouchableOpacity>
                         ))}
 
-                        <PrimaryButton title="Complete Setup" onPress={handleComplete} loading={loading} style={{ marginTop: 32 }} />
+                        <PrimaryButton title="Complete Setup" onPress={handleComplete} loading={loading} style={{ marginTop: 32 }} className="bg-graphite" />
                     </View>
                 )}
             </ScrollView>

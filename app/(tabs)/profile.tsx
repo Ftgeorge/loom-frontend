@@ -31,31 +31,31 @@ export default function ProfileScreen() {
   const menuItems = [
     ...(isArtisan
       ? [
-          {
-            icon: "eye-outline",
-            label: "Public Profile Preview",
-            onPress: () => {},
-          },
-          { icon: "star-outline", label: "My Reviews", onPress: () => {} },
-          {
-            icon: "shield-checkmark-outline",
-            label: "Verification",
-            onPress: () => {},
-          },
-          {
-            icon: "create-outline",
-            label: "Edit Profile & Skills",
-            onPress: () => {},
-          },
-        ]
+        {
+          icon: "eye-outline",
+          label: "Public Profile Preview",
+          onPress: () => { },
+        },
+        { icon: "star-outline", label: "My Reviews", onPress: () => { } },
+        {
+          icon: "shield-checkmark-outline",
+          label: "Verification",
+          onPress: () => { },
+        },
+        {
+          icon: "create-outline",
+          label: "Edit Profile & Skills",
+          onPress: () => { },
+        },
+      ]
       : [
-          {
-            icon: "bookmark-outline",
-            label: `Saved Artisans (${savedArtisans.length})`,
-            onPress: () => {},
-          },
-          { icon: "card-outline", label: "Payment Methods", onPress: () => {} },
-        ]),
+        {
+          icon: "bookmark-outline",
+          label: `Saved Artisans (${savedArtisans.length})`,
+          onPress: () => { },
+        },
+        { icon: "card-outline", label: "Payment Methods", onPress: () => { } },
+      ]),
     {
       icon: "settings-outline",
       label: t("settings", language),
@@ -94,45 +94,49 @@ export default function ProfileScreen() {
       >
         {/* Profile Header */}
         <View className="items-center py-8">
-          <Avatar name={user?.name || "U"} size={80} />
-          <Text className="text-[28px] font-bold text-primary mt-4">
+          <Avatar name={user?.name || "U"} size={88} />
+          <Text className="text-[28px] font-bold text-graphite tracking-tight mt-5">
             {user?.name}
           </Text>
-          <Text className="text-base text-gray-500 mt-1">
-            {isArtisan ? "🔧 Artisan" : "👤 Client"} · {user?.location.city}
+          <Text className="text-base text-muted font-medium mt-1.5">
+            {isArtisan ? "Artisan" : "Client"} • {user?.location.city}
           </Text>
           <Text className="text-sm text-gray-400 mt-1">{user?.phone}</Text>
         </View>
 
         {/* Menu */}
-        <Card className="mt-5" noPadding>
+        <Card
+          className="mt-5 rounded-[24px] border-gray-50"
+          style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 }}
+          noPadding
+        >
           {menuItems.map((item, i) => (
             <TouchableOpacity
               key={item.label}
-              className={`flex-row items-center py-5 px-5 gap-4 ${i < menuItems.length - 1 ? "border-b border-gray-100" : ""}`}
+              className={`flex-row items-center py-5 px-6 gap-4 ${i < menuItems.length - 1 ? "border-b border-gray-50" : ""}`}
               onPress={item.onPress}
               activeOpacity={0.7}
             >
               <Ionicons
                 name={item.icon as any}
                 size={22}
-                color={item.danger ? Colors.error : Colors.gray600}
+                color={item.danger ? Colors.error : Colors.muted}
               />
               <Text
-                className={`text-base flex-1 ${item.danger ? "text-red-500" : "text-black"}`}
+                className={`text-base font-medium flex-1 ${item.danger ? "text-red-500" : "text-graphite"}`}
               >
                 {item.label}
               </Text>
               <Ionicons
                 name="chevron-forward"
                 size={18}
-                color={Colors.gray400}
+                color={Colors.gray300}
               />
             </TouchableOpacity>
           ))}
         </Card>
 
-        <Text className="text-xs text-gray-400 text-center mt-8">
+        <Text className="text-xs font-semibold tracking-wide text-muted text-center mt-8 uppercase">
           Loom v1.0.0
         </Text>
       </ScrollView>

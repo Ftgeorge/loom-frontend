@@ -55,7 +55,7 @@ export default function JobsScreen() {
             ) : error ? (
                 <ErrorState onRetry={load} />
             ) : filtered.length === 0 ? (
-                <EmptyState icon="briefcase-outline" title="No jobs here" message="New job requests will appear when clients post them." />
+                <EmptyState icon="briefcase-outline" title="No jobs yet" message="New job requests will appear here when clients post them." />
             ) : (
                 <FlatList
                     data={filtered}

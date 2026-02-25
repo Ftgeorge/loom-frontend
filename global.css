@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+    .text-montserrat {
+        font-family: 'MontserratAlternates';
+    }
+}
+
+/* Base text styling to attach the default font to RN Text components */
+Text,
+TextInput {
+    font-family: 'MontserratAlternates';
+}

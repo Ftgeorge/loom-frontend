@@ -8,12 +8,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function SettingsScreen() {
@@ -67,89 +67,101 @@ export default function SettingsScreen() {
 
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
         {/* Language */}
-        <Text className="text-xs text-gray-500 font-semibold mt-8 mb-2 ml-1">
+        <Text className="text-xs font-semibold tracking-widest text-muted mt-8 mb-3 ml-2 uppercase">
           LANGUAGE
         </Text>
-        <Card noPadding>
+        <Card
+          className="rounded-[24px] border-gray-50"
+          style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 }}
+          noPadding
+        >
           {(Object.keys(languageNames) as Language[]).map((lang, i, arr) => (
             <TouchableOpacity
               key={lang}
-              className={`flex-row items-center justify-between py-5 px-5 ${i < arr.length - 1 ? "border-b border-gray-100" : ""}`}
+              className={`flex-row items-center justify-between py-5 px-6 ${i < arr.length - 1 ? "border-b border-gray-50" : ""}`}
               onPress={() => setLanguage(lang)}
             >
-              <Text className="text-base">{languageNames[lang]}</Text>
+              <Text className="text-base font-medium text-graphite">{languageNames[lang]}</Text>
               {language === lang && (
-                <Ionicons name="checkmark" size={22} color={Colors.primary} />
+                <Ionicons name="checkmark" size={24} color={Colors.graphite} />
               )}
             </TouchableOpacity>
           ))}
         </Card>
 
         {/* Notifications */}
-        <Text className="text-xs text-gray-500 font-semibold mt-8 mb-2 ml-1">
+        <Text className="text-xs font-semibold tracking-widest text-muted mt-8 mb-3 ml-2 uppercase">
           NOTIFICATIONS
         </Text>
-        <Card noPadding>
-          <View className="flex-row items-center justify-between py-5 px-5">
-            <Text className="text-base">Push Notifications</Text>
+        <Card
+          className="rounded-[24px] border-gray-50"
+          style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 }}
+          noPadding
+        >
+          <View className="flex-row items-center justify-between py-5 px-6">
+            <Text className="text-base font-medium text-graphite">Push Notifications</Text>
             <Switch
               value={notifEnabled}
               onValueChange={setNotifEnabled}
-              trackColor={{ false: Colors.gray300, true: Colors.primaryLight }}
+              trackColor={{ false: Colors.gray300, true: Colors.success }}
             />
           </View>
         </Card>
 
         {/* Role Switch */}
-        <Text className="text-xs text-gray-500 font-semibold mt-8 mb-2 ml-1">
+        <Text className="text-xs font-semibold tracking-widest text-muted mt-8 mb-3 ml-2 uppercase">
           ACCOUNT
         </Text>
-        <Card noPadding>
+        <Card
+          className="rounded-[24px] border-gray-50"
+          style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 }}
+          noPadding
+        >
           <TouchableOpacity
-            className="flex-row items-center justify-between py-5 px-5 border-b border-gray-100"
+            className="flex-row items-center justify-between py-5 px-6 border-b border-gray-50"
             onPress={handleRoleSwitch}
           >
             <View className="flex-row items-center gap-4">
               <Ionicons
                 name="swap-horizontal-outline"
-                size={22}
-                color={Colors.primary}
+                size={24}
+                color={Colors.muted}
               />
               <View>
-                <Text className="text-base">Switch Role</Text>
-                <Text className="text-xs text-gray-400 mt-0.5">
+                <Text className="text-base font-medium text-graphite">Switch Role</Text>
+                <Text className="text-xs text-muted mt-0.5">
                   Currently: {user?.role === "client" ? "Client" : "Artisan"}
                 </Text>
               </View>
             </View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.gray400} />
+            <Ionicons name="chevron-forward" size={18} color={Colors.gray300} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="flex-row items-center justify-between py-5 px-5 border-b border-gray-100"
+            className="flex-row items-center justify-between py-5 px-6 border-b border-gray-50"
             onPress={() => router.push("/help")}
           >
             <View className="flex-row items-center gap-4">
               <Ionicons
                 name="help-circle-outline"
-                size={22}
-                color={Colors.primary}
+                size={24}
+                color={Colors.muted}
               />
-              <Text className="text-base">Help & Support</Text>
+              <Text className="text-base font-medium text-graphite">Help & Support</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.gray400} />
+            <Ionicons name="chevron-forward" size={18} color={Colors.gray300} />
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row items-center justify-between py-5 px-5">
+          <TouchableOpacity className="flex-row items-center justify-between py-5 px-6">
             <View className="flex-row items-center gap-4">
               <Ionicons
                 name="document-text-outline"
-                size={22}
-                color={Colors.primary}
+                size={24}
+                color={Colors.muted}
               />
-              <Text className="text-base">Privacy & Terms</Text>
+              <Text className="text-base font-medium text-graphite">Privacy & Terms</Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.gray400} />
+            <Ionicons name="chevron-forward" size={18} color={Colors.gray300} />
           </TouchableOpacity>
         </Card>
 
@@ -162,7 +174,7 @@ export default function SettingsScreen() {
           <Text className="text-base text-red-500 font-semibold">Log Out</Text>
         </TouchableOpacity>
 
-        <Text className="text-xs text-gray-400 text-center mt-5">
+        <Text className="text-xs font-semibold tracking-wide text-muted text-center mt-5 uppercase">
           Loom v1.0.0
         </Text>
       </ScrollView>

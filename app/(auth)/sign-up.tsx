@@ -1,4 +1,5 @@
-import { PrimaryButton } from '@/components/ui/Buttons';
+import BackButton from '@/components/ui/BackButton';
+import { OauthButton, PrimaryButton } from '@/components/ui/Buttons';
 import { AppTextInput, PasswordInput, PhoneInput } from '@/components/ui/TextInputs';
 import { useAppStore } from '@/store';
 import { SignUpSchema, mapZodErrors } from '@/utils/helpers';
@@ -29,9 +30,10 @@ export default function SignUpScreen() {
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
             <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 80 }} keyboardShouldPersistTaps="handled">
+                <BackButton onPress={() => router.back()} />
                 <View className="mb-10">
-                    <Text className="text-3xl font-bold text-primary">Create Account</Text>
-                    <Text className="text-base text-gray-500 mt-2">
+                    <Text className="text-3xl font-extrabold text-graphite tracking-tight">Create Account</Text>
+                    <Text className="text-base text-muted leading-relaxed mt-2">
                         {user?.role === 'artisan'
                             ? 'Join as an artisan and start getting jobs'
                             : 'Find trusted artisans near you'}
@@ -75,22 +77,41 @@ export default function SignUpScreen() {
                     onPress={handleSignUp}
                     loading={loading}
                     style={{ marginTop: 24 }}
+                    className="bg-graphite"
                 />
 
-                <TouchableOpacity
-                    className="items-center mt-10 p-2"
-                    onPress={() => router.push('/(auth)/sign-in')}
-                >
-                    <Text className="text-base text-gray-500">
-                        Already have an account? <Text className="text-primary font-semibold">Sign In</Text>
-                    </Text>
-                </TouchableOpacity>
+                <View className="flex flex-row items-center gap-4 px-2 my-6">
+                    <View className="flex-1 h-[1px] bg-gray-50" />
+                    <Text className="text-xs text-muted font-semibold tracking-widest uppercase">Or</Text>
+                    <View className="flex-1 h-[1px] bg-gray-50" />
+                </View>
 
-                <TouchableOpacity className="items-center mt-6">
-                    <Text className="text-xs text-gray-400 text-center leading-[18px]">
+                <OauthButton
+                    title="Continue with Google"
+                    onPress={() => { }}
+                    className="border-gray-100"
+                    textStyle={{ color: '#2C2C2C' }} // Graphite text color
+                    image={require("../../assets/images/google-icon.jpeg")}
+                />
+
+                <View className='flex flex-row items-center justify-center mt-12 gap-2'>
+                    <Text className="text-base text-muted">
+                        Already have an account?
+                    </Text>
+                    <TouchableOpacity
+                        className="items-center"
+                        onPress={() => router.push('/(auth)/sign-in')}
+                    >
+                        <Text className="text-graphite font-bold text-base">Sign In</Text>
+                    </TouchableOpacity>
+                </View>
+
+
+                <TouchableOpacity className="items-center mt-8">
+                    <Text className="text-xs text-gray-400 text-center leading-[20px]">
                         By signing up, you agree to our{' '}
-                        <Text className="text-primary font-semibold">Terms of Service</Text> and{' '}
-                        <Text className="text-primary font-semibold">Privacy Policy</Text>
+                        <Text className="text-graphite font-bold">Terms of Service</Text> and{' '}
+                        <Text className="text-graphite font-bold">Privacy Policy</Text>
                     </Text>
                 </TouchableOpacity>
             </ScrollView>

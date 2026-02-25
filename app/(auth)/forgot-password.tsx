@@ -1,3 +1,4 @@
+import BackButton from '@/components/ui/BackButton';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { AppTextInput } from '@/components/ui/TextInputs';
 import { useRouter } from 'expo-router';
@@ -21,14 +22,15 @@ export default function ForgotPasswordScreen() {
     if (sent) {
         return (
             <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 100 }}>
-                <Text className="text-[28px] font-bold text-primary">Check Your Phone</Text>
-                <Text className="text-base text-gray-500 mt-2 mb-10">
+                <Text className="text-[28px] font-extrabold text-graphite tracking-tight">Check Your Phone</Text>
+                <Text className="text-base text-muted leading-relaxed mt-2 mb-10">
                     We've sent a password reset link to your phone number. Follow the link to reset your password.
                 </Text>
                 <PrimaryButton
                     title="Back to Sign In"
                     onPress={() => router.back()}
                     style={{ marginTop: 40 }}
+                    className="bg-graphite"
                 />
             </ScrollView>
         );
@@ -36,8 +38,9 @@ export default function ForgotPasswordScreen() {
 
     return (
         <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 100 }}>
-            <Text className="text-[28px] font-bold text-primary">Forgot Password?</Text>
-            <Text className="text-base text-gray-500 mt-2 mb-10">
+            <BackButton onPress={() => router.back()} />
+            <Text className="text-[28px] font-extrabold text-graphite tracking-tight mt-6">Forgot Password?</Text>
+            <Text className="text-base text-muted leading-relaxed mt-2 mb-10">
                 Enter your phone number and we'll send you a link to reset your password.
             </Text>
 
@@ -55,6 +58,7 @@ export default function ForgotPasswordScreen() {
                 loading={loading}
                 disabled={!phone}
                 style={{ marginTop: 24 }}
+                className="bg-graphite"
             />
         </ScrollView>
     );

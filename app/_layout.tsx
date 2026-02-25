@@ -1,17 +1,43 @@
-import { Colors } from '@/theme';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect } from 'react';
 import '../global.css';
 
+SplashScreen.preventAutoHideAsync();
+
+import BackgroundThread from '@/components/ui/BackgroundThread';
+import { View } from 'react-native';
+
 export default function RootLayout() {
+  const [loaded, error] = useFonts({
+    MontserratAlternates: require('../assets/font/MontserratAlternates-Regular.ttf'),
+    'MontserratAlternates-Bold': require('../assets/font/MontserratAlternates-Bold.ttf'),
+    'MontserratAlternates-Italic': require('../assets/font/MontserratAlternates-Italic.ttf'),
+    'MontserratAlternates-BoldItalic': require('../assets/font/MontserratAlternates-BoldItalic.ttf'),
+    'MontserratAlternates-Medium': require('../assets/font/MontserratAlternates-Medium.ttf'),
+    'MontserratAlternates-SemiBold': require('../assets/font/MontserratAlternates-SemiBold.ttf'),
+  });
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
+
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <StatusBar style="dark" />
+      <BackgroundThread />
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: Colors.background },
+          contentStyle: { backgroundColor: 'transparent' }, // allow background thread to show through
           animation: 'slide_from_right',
         }}
       >
@@ -33,6 +59,6 @@ export default function RootLayout() {
         <Stack.Screen name="artisan-onboarding" options={{ presentation: 'card' }} />
         <Stack.Screen name="matched-artisans" options={{ presentation: 'card' }} />
       </Stack>
-    </>
+    </View>
   );
 }

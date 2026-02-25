@@ -11,11 +11,11 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 const TYPE_ICONS: Record<string, { icon: string; color: string }> = {
-    job_update: { icon: 'briefcase-outline', color: Colors.info },
-    message: { icon: 'chatbubble-outline', color: Colors.primary },
-    booking: { icon: 'calendar-outline', color: Colors.accent },
+    job_update: { icon: 'briefcase-outline', color: Colors.graphite },
+    message: { icon: 'chatbubble-outline', color: Colors.graphite },
+    booking: { icon: 'calendar-outline', color: Colors.graphite },
     review: { icon: 'star-outline', color: Colors.warning },
-    system: { icon: 'information-circle-outline', color: Colors.gray500 },
+    system: { icon: 'information-circle-outline', color: Colors.muted },
 };
 
 export default function NotificationsScreen() {
@@ -44,7 +44,7 @@ export default function NotificationsScreen() {
                 showNotification={false}
                 rightAction={
                     <TouchableOpacity onPress={markAllNotificationsRead}>
-                        <Text className="text-sm text-accent font-medium">Mark all read</Text>
+                        <Text className="text-sm font-semibold text-graphite tracking-tight">Mark all read</Text>
                     </TouchableOpacity>
                 }
             />
@@ -62,26 +62,25 @@ export default function NotificationsScreen() {
                         const typeInfo = TYPE_ICONS[item.type] || TYPE_ICONS.system;
                         return (
                             <TouchableOpacity
-                                className={`flex-row p-5 gap-4 items-start ${!item.read ? 'bg-primary/10' : ''}`}
+                                className={`flex-row px-6 py-5 gap-4 items-start`}
                                 onPress={() => markNotificationRead(item.id)}
                                 activeOpacity={0.8}
                             >
                                 <View
-                                    className="w-10 h-10 rounded-full items-center justify-center"
-                                    style={{ backgroundColor: typeInfo.color + '20' }}
+                                    className="w-11 h-11 rounded-full items-center justify-center bg-surface border border-gray-50"
                                 >
                                     <Ionicons name={typeInfo.icon as any} size={20} color={typeInfo.color} />
                                 </View>
-                                <View className="flex-1">
-                                    <Text className="text-base font-semibold">{item.title}</Text>
-                                    <Text className="text-sm text-gray-500 mt-0.5" numberOfLines={2}>{item.body}</Text>
-                                    <Text className="text-xs text-gray-400 mt-1">{timeAgo(item.createdAt)}</Text>
+                                <View className="flex-1 mt-0.5">
+                                    <Text className="text-base font-bold text-graphite tracking-tight mb-0.5">{item.title}</Text>
+                                    <Text className="text-sm text-muted leading-relaxed" numberOfLines={2}>{item.body}</Text>
+                                    <Text className="text-xs font-semibold text-gray-400 mt-2 tracking-wide uppercase">{timeAgo(item.createdAt)}</Text>
                                 </View>
-                                {!item.read && <View className="w-2 h-2 rounded-full bg-accent mt-1.5" />}
+                                {!item.read && <View className="w-2.5 h-2.5 rounded-full bg-graphite mt-2 shadow-sm" />}
                             </TouchableOpacity>
                         );
                     }}
-                    ItemSeparatorComponent={() => <View className="h-[1px] bg-gray-100" />}
+                    ItemSeparatorComponent={() => <View className="h-[1px] bg-gray-50 ml-[88px]" />}
                 />
             )}
         </View>

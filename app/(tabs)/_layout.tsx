@@ -15,16 +15,24 @@ export default function TabsLayout() {
                 headerShown: false,
                 tabBarStyle: {
                     backgroundColor: Colors.white,
-                    borderTopColor: Colors.cardBorder,
-                    borderTopWidth: 1,
-                    height: 88,
+                    height: 70,
                     paddingTop: 8,
                     paddingBottom: 28,
+                    margin: 26,
+                    elevation: 5,
+                    shadowColor: Colors.black,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 4,
+                    borderRadius: 20,
+                    position: 'absolute',
+                    left: 40,
+                    right: 40,
                 },
-                tabBarActiveTintColor: Colors.primary,
+                tabBarActiveTintColor: Colors.black,
                 tabBarInactiveTintColor: Colors.gray400,
                 tabBarLabelStyle: {
-                    fontSize: 11,
+                    fontSize: 9,
                     fontWeight: '600',
                 },
             }}
@@ -35,7 +43,7 @@ export default function TabsLayout() {
                 options={{
                     title: t('home', language),
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="home-outline" size={size} color={color} />
+                        <Ionicons name="home-outline" size={20} color={color} />
                     ),
                     href: isArtisan ? null : '/home',
                 }}
@@ -45,7 +53,7 @@ export default function TabsLayout() {
                 options={{
                     title: t('search', language),
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="search-outline" size={size} color={color} />
+                        <Ionicons name="search-outline" size={20} color={color} />
                     ),
                     href: isArtisan ? null : '/search',
                 }}
@@ -57,7 +65,7 @@ export default function TabsLayout() {
                 options={{
                     title: t('dashboard', language),
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="grid-outline" size={size} color={color} />
+                        <Ionicons name="grid-outline" size={20} color={color} />
                     ),
                     href: isArtisan ? '/dashboard' : null,
                 }}
@@ -67,7 +75,7 @@ export default function TabsLayout() {
                 options={{
                     title: t('jobs', language),
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="briefcase-outline" size={size} color={color} />
+                        <Ionicons name="briefcase-outline" size={20} color={color} />
                     ),
                     href: isArtisan ? '/jobs' : null,
                 }}
@@ -79,7 +87,7 @@ export default function TabsLayout() {
                 options={{
                     title: t('requests', language),
                     tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="document-text-outline" size={size} color={color} />
+                        <Ionicons name="document-text-outline" size={20} color={color} />
                     ),
                     href: isArtisan ? null : '/requests',
                 }}

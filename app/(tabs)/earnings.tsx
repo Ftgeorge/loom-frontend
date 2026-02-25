@@ -53,21 +53,21 @@ export default function EarningsScreen() {
 
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
                 {/* Total Earnings Card */}
-                <Card className="bg-primary p-8">
-                    <Text className="text-sm text-primary/60">Total Earnings</Text>
-                    <Text className="text-4xl font-bold text-white my-2">{formatNaira(earnings.totalEarnings)}</Text>
-                    <View className="flex-row mt-4 gap-6">
+                <Card className="bg-graphite p-8 rounded-[24px] shadow-sm" style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 4 }}>
+                    <Text className="text-sm text-white/60 font-medium tracking-wide uppercase">Total Earnings</Text>
+                    <Text className="text-[40px] font-extrabold tracking-tight text-white my-2">{formatNaira(earnings.totalEarnings)}</Text>
+                    <View className="flex-row mt-6 gap-6">
                         <View>
-                            <Text className="text-xs text-gray-400">This Week</Text>
-                            <Text className="text-base text-white font-semibold">{formatNaira(earnings.thisWeek)}</Text>
+                            <Text className="text-xs text-white/50 tracking-wide">This Week</Text>
+                            <Text className="text-base text-white font-semibold mt-1">{formatNaira(earnings.thisWeek)}</Text>
                         </View>
                         <View>
-                            <Text className="text-xs text-gray-400">This Month</Text>
-                            <Text className="text-base text-white font-semibold">{formatNaira(earnings.thisMonth)}</Text>
+                            <Text className="text-xs text-white/50 tracking-wide">This Month</Text>
+                            <Text className="text-base text-white font-semibold mt-1">{formatNaira(earnings.thisMonth)}</Text>
                         </View>
                         <View>
-                            <Text className="text-xs text-gray-400">Pending</Text>
-                            <Text className="text-base text-accent font-semibold flex-shrink">
+                            <Text className="text-xs text-white/50 tracking-wide">Pending</Text>
+                            <Text className="text-base text-white/70 font-semibold mt-1 flex-shrink">
                                 {formatNaira(earnings.pendingPayments)}
                             </Text>
                         </View>
@@ -75,8 +75,8 @@ export default function EarningsScreen() {
                 </Card>
 
                 {/* Weekly Chart */}
-                <Text className="text-lg font-bold text-primary mb-4 mt-5">This Week</Text>
-                <Card className="py-5 px-4 mb-4">
+                <Text className="text-lg font-extrabold tracking-tight text-graphite mb-4 mt-8">This Week</Text>
+                <Card className="py-5 px-4 mb-4 rounded-[24px] border border-gray-50 shadow-sm" style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 }}>
                     <View className="flex-row justify-between h-[120px] items-end">
                         {earnings.weeklyData.map((d) => (
                             <View key={d.day} className="items-center flex-1">
@@ -98,10 +98,11 @@ export default function EarningsScreen() {
                     onPress={() => { }}
                     icon={<Ionicons name="arrow-down-circle-outline" size={20} color={Colors.white} />}
                     style={{ marginVertical: 24 }}
+                    className="bg-graphite"
                 />
 
                 {/* Transactions */}
-                <Text className="text-lg font-bold text-primary mb-4 mt-5">Recent Transactions</Text>
+                <Text className="text-lg font-extrabold tracking-tight text-graphite mb-4 mt-5">Recent Transactions</Text>
                 {earnings.transactions.map((tx) => (
                     <View key={tx.id} className="flex-row items-center py-4 gap-4 border-b border-gray-100">
                         <View
@@ -115,8 +116,8 @@ export default function EarningsScreen() {
                             />
                         </View>
                         <View className="flex-1">
-                            <Text className="text-base font-medium text-black" numberOfLines={1}>{tx.description}</Text>
-                            <Text className="text-xs text-gray-400">{formatDate(tx.date)}</Text>
+                            <Text className="text-base font-medium text-graphite" numberOfLines={1}>{tx.description}</Text>
+                            <Text className="text-xs text-muted mt-0.5">{formatDate(tx.date)}</Text>
                         </View>
                         <Text className="text-base font-semibold" style={{ color: tx.type === 'credit' ? Colors.success : Colors.error }}>
                             {tx.type === 'credit' ? '+' : '-'}{formatNaira(tx.amount)}

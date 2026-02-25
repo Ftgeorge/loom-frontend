@@ -1,16 +1,17 @@
-import { PrimaryButton } from "@/components/ui/Buttons";
+import BackButton from "@/components/ui/BackButton";
+import { OauthButton, PrimaryButton } from "@/components/ui/Buttons";
 import { AppTextInput, PasswordInput } from "@/components/ui/TextInputs";
 import { useAppStore } from "@/store";
 import { SignInSchema, mapZodErrors } from "@/utils/helpers";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function SignInScreen() {
@@ -46,9 +47,10 @@ export default function SignInScreen() {
         contentContainerStyle={{ padding: 32, paddingTop: 100 }}
         keyboardShouldPersistTaps="handled"
       >
+        <BackButton onPress={() => router.back()} />
         <View className="mb-10">
-          <Text className="text-3xl font-bold text-primary">Welcome Back</Text>
-          <Text className="text-base text-gray-500 mt-2">
+          <Text className="text-3xl font-extrabold text-graphite tracking-tight">Welcome Back</Text>
+          <Text className="text-base text-muted leading-relaxed mt-2">
             Sign in to continue using Loom
           </Text>
         </View>
@@ -73,7 +75,7 @@ export default function SignInScreen() {
           className="self-end p-2"
           onPress={() => router.push("/(auth)/forgot-password")}
         >
-          <Text className="text-sm text-accent font-medium">
+          <Text className="text-sm text-graphite font-bold">
             Forgot Password?
           </Text>
         </TouchableOpacity>
@@ -83,17 +85,35 @@ export default function SignInScreen() {
           onPress={handleSignIn}
           loading={loading}
           style={{ marginTop: 16 }}
+          className="bg-graphite"
         />
 
-        <TouchableOpacity
-          className="items-center mt-10 p-2"
-          onPress={() => router.push("/(auth)/sign-up")}
+        <View className="flex flex-row items-center gap-4 px-2 my-6">
+          <View className="flex-1 h-[1px] bg-gray-50" />
+          <Text className="text-xs text-muted font-semibold tracking-widest uppercase">Or</Text>
+          <View className="flex-1 h-[1px] bg-gray-50" />
+        </View>
+
+        <OauthButton
+          title="Continue with Google"
+          onPress={() => { }}
+          className="border-gray-100"
+          textStyle={{ color: '#2C2C2C' }} // Hardcoded graphite color for compatibility with existing OauthButton interface
+          image={require("../../assets/images/google-icon.jpeg")}
+        />
+
+        <View
+          className="flex flex-row items-center justify-center mt-12 gap-2"
         >
-          <Text className="text-base text-gray-500">
+          <Text className="text-base text-muted">
             Don't have an account?{" "}
-            <Text className="text-primary font-semibold">Sign Up</Text>
           </Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/(auth)/sign-up")}>
+            <Text className="text-graphite font-bold text-base">Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+
+
       </ScrollView>
     </KeyboardAvoidingView>
   );

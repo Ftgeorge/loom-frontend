@@ -9,22 +9,28 @@ module.exports = {
         extend: {
             colors: {
                 primary: {
-                    DEFAULT: '#2D4A22', // Forest Pine
-                    light: '#C2D5BA', // Soft lighter version
+                    DEFAULT: '#7C3AED', // Electric Violet
                 },
-                accent: {
-                    DEFAULT: '#D4AF37', // Golden Sand
-                    dark: '#B8962E', // Slightly darker gold
+                graphite: {
+                    DEFAULT: '#121212', // Deep Graphite
                 },
-                background: '#F7F3E9', // Parchment
-                surface: '#FFFFFF', // White
-                success: '#22C55E',
+                background: '#FDFDFD', // Linen White
+                surface: '#F1F5F9', // Ghost Gray
+                muted: '#64748B', // Slate Mist
+                success: '#0D9488', // Teal Glow
                 error: '#D64545',
                 info: '#3B82F6',
                 warning: '#F59E0B',
             },
             fontFamily: {
-                sans: ['System'],
+                sans: ['MontserratAlternates', 'System'],
+                serif: ['MontserratAlternates', 'System'],
+                montserrat: ['MontserratAlternates'],
+                'montserrat-medium': ['MontserratAlternates-Medium'],
+                'montserrat-semibold': ['MontserratAlternates-SemiBold'],
+                'montserrat-bold': ['MontserratAlternates-Bold'],
+                'montserrat-italic': ['MontserratAlternates-Italic'],
+                'montserrat-bolditalic': ['MontserratAlternates-BoldItalic'],
             },
         },
     },

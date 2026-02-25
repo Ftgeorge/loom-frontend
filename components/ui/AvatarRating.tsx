@@ -13,11 +13,11 @@ export function Avatar({ name, size = 48, uri }: AvatarProps) {
 
     return (
         <View
-            className="bg-primary/10 items-center justify-center"
+            className="bg-black/10 items-center justify-center"
             style={{ width: size, height: size, borderRadius: size / 2 }}
             accessibilityLabel={`${name}'s avatar`}
         >
-            <Text className="text-primary font-bold" style={{ fontSize }}>
+            <Text className="text-black font-bold" style={{ fontSize }}>
                 {getInitials(name)}
             </Text>
         </View>

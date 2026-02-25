@@ -34,7 +34,7 @@ export function AppTextInput({ label, error, leftIcon, rightIcon, style, ...prop
             <View className={wrapperClass}>
                 {leftIcon && <View className="pl-5">{leftIcon}</View>}
                 <RNTextInput
-                    className="flex-1 text-base px-5 py-3 text-primary"
+                    className="flex-1 text-base px-5 py-3 text-black"
                     style={style}
                     placeholderTextColor={Colors.gray400}
                     onFocus={() => setFocused(true)}

@@ -48,22 +48,30 @@ export default function MessagesScreen() {
                     contentContainerStyle={{ paddingBottom: 100 }}
                     renderItem={({ item }) => (
                         <TouchableOpacity
-                            className="flex-row items-center p-5 gap-4"
+                            className="flex-row items-center px-6 py-4 gap-4"
                             onPress={() => router.push({ pathname: '/chat', params: { threadId: item.id } })}
                             activeOpacity={0.8}
                         >
                             <Avatar name={item.participantName} size={50} />
                             <View className="flex-1">
-                                <View className="flex-row justify-between items-center">
-                                    <Text className="text-base font-bold text-primary flex-1" numberOfLines={1}>{item.participantName}</Text>
-                                    <Text className="text-xs text-gray-400">{timeAgo(item.lastMessageTime)}</Text>
+                                <View className="flex-row justify-between items-center mb-0.5">
+                                    <Text className="text-base font-bold text-graphite tracking-tight flex-1" numberOfLines={1}>
+                                        {item.participantName}
+                                    </Text>
+                                    <Text className="text-xs font-medium text-gray-400">{timeAgo(item.lastMessageTime)}</Text>
                                 </View>
-                                <Text className="text-sm text-gray-500 mt-0.5" numberOfLines={1}>{item.lastMessage}</Text>
+                                <Text
+                                    className={`text-sm ${item.unreadCount > 0 ? 'text-graphite font-semibold' : 'text-muted font-normal'}`}
+                                    numberOfLines={1}
+                                    style={{ lineHeight: 20 }}
+                                >
+                                    {item.lastMessage}
+                                </Text>
                             </View>
                             {item.unreadCount > 0 && <Badge count={item.unreadCount} />}
                         </TouchableOpacity>
                     )}
-                    ItemSeparatorComponent={() => <View className="h-[1px] bg-gray-100 ml-20" />}
+                    ItemSeparatorComponent={() => <View className="h-[1px] bg-gray-50 ml-[88px]" />}
                 />
             )}
         </View>

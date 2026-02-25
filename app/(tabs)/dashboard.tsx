@@ -45,7 +45,7 @@ export default function ArtisanDashboard() {
 
     const stats = [
         { label: t('newRequests', language), value: `${newJobs.length}`, icon: 'mail-unread-outline', color: Colors.info },
-        { label: t('activeJobs', language), value: `${activeJobs.length}`, icon: 'briefcase-outline', color: Colors.accent },
+        { label: t('activeJobs', language), value: `${activeJobs.length}`, icon: 'briefcase-outline', color: Colors.primary },
         { label: t('yourRating', language), value: '4.8', icon: 'star-outline', color: Colors.warning },
         { label: t('totalEarnings', language), value: formatNaira(485000), icon: 'wallet-outline', color: Colors.success },
     ];
@@ -58,7 +58,7 @@ export default function ArtisanDashboard() {
                 {/* Greeting + Online Toggle */}
                 <View className="flex-row items-center mb-6">
                     <View className="flex-1">
-                        <Text className="text-xl font-bold text-primary">
+                        <Text className="text-xl font-extrabold text-graphite tracking-tight">
                             {t('greeting', language)}, {user?.name} 👋
                         </Text>
                     </View>
@@ -69,7 +69,7 @@ export default function ArtisanDashboard() {
                         <Switch
                             value={artisanOnline}
                             onValueChange={setArtisanOnline}
-                            trackColor={{ false: Colors.gray300, true: Colors.primaryLight }}
+                            trackColor={{ false: Colors.gray300, true: Colors.success }}
                             thumbColor={Colors.white}
                         />
                     </View>
@@ -88,29 +88,29 @@ export default function ArtisanDashboard() {
                 ) : (
                     <View className="flex-row flex-wrap gap-4 mb-5">
                         {stats.map((s) => (
-                            <Card key={s.label} className="w-[47%] gap-1">
+                            <Card key={s.label} className="w-[47%] gap-1 rounded-[24px] border border-gray-50 shadow-sm" style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 }}>
                                 <View
                                     className="w-10 h-10 rounded-[20px] items-center justify-center"
                                     style={{ backgroundColor: s.color + '20' }}
                                 >
                                     <Ionicons name={s.icon as any} size={22} color={s.color} />
                                 </View>
-                                <Text className="text-xl font-bold text-primary mt-1">{s.value}</Text>
-                                <Text className="text-xs text-gray-500">{s.label}</Text>
+                                <Text className="text-xl font-bold text-graphite mt-1">{s.value}</Text>
+                                <Text className="text-xs text-muted">{s.label}</Text>
                             </Card>
                         ))}
                     </View>
                 )}
 
                 {/* New Job Requests */}
-                <Text className="text-lg font-bold text-primary mb-4">New Job Requests Near You</Text>
+                <Text className="text-lg font-extrabold text-graphite tracking-tight mb-4">New Job Requests Near You</Text>
                 {loading ? (
                     <SkeletonList count={2} />
                 ) : error ? (
                     <ErrorState onRetry={load} />
                 ) : newJobs.length === 0 ? (
                     <View className="p-8 items-center">
-                        <Text className="text-base text-gray-400 text-center">No new requests right now. Check back soon!</Text>
+                        <Text className="text-base text-muted text-center leading-relaxed">No new requests right now. Check back soon!</Text>
                     </View>
                 ) : (
                     <View className="gap-4">

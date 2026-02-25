@@ -60,7 +60,7 @@ export default function ArtisanProfileScreen() {
                 showNotification={false}
                 rightAction={
                     <TouchableOpacity onPress={() => id && toggleSavedArtisan(id)}>
-                        <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={24} color={Colors.accent} />
+                        <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={24} color={Colors.primary} />
                     </TouchableOpacity>
                 }
             />
@@ -68,12 +68,12 @@ export default function ArtisanProfileScreen() {
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
                 {/* Profile Header */}
                 <View className="items-center gap-2">
-                    <Avatar name={artisan.name} size={90} />
-                    <View className="flex-row items-center gap-2">
-                        <Text className="text-[28px] font-bold text-primary">{artisan.name}</Text>
+                    <Avatar name={artisan.name} size={96} />
+                    <View className="flex-row items-center gap-2 mt-2">
+                        <Text className="text-3xl font-extrabold text-graphite tracking-tight">{artisan.name}</Text>
                         {artisan.verified && <Badge variant="verified" />}
                     </View>
-                    <Text className="text-base text-gray-500 text-center">{artisan.bio}</Text>
+                    <Text className="text-base text-muted text-center leading-relaxed font-medium px-4">{artisan.bio}</Text>
                 </View>
 
                 {/* Skills */}
@@ -84,83 +84,92 @@ export default function ArtisanProfileScreen() {
                 </View>
 
                 {/* Stats Row */}
-                <View className="flex-row justify-center gap-8 my-5">
-                    <View className="flex-row items-center gap-1">
+                <View className="flex-row justify-center gap-8 my-6">
+                    <View className="flex-row items-center gap-1.5">
                         <RatingStars rating={artisan.rating} size={14} count={artisan.reviewCount} />
                     </View>
-                    <View className="flex-row items-center gap-1">
-                        <Ionicons name="location-outline" size={16} color={Colors.gray500} />
-                        <Text className="text-sm text-gray-500">{artisan.distance}km away</Text>
+                    <View className="flex-row items-center gap-1.5">
+                        <Ionicons name="location-outline" size={16} color={Colors.muted} />
+                        <Text className="text-sm font-medium text-graphite">{artisan.distance}km away</Text>
                     </View>
-                    <View className="flex-row items-center gap-1">
-                        <Ionicons name="briefcase-outline" size={16} color={Colors.gray500} />
-                        <Text className="text-sm text-gray-500">{artisan.completedJobs} jobs</Text>
+                    <View className="flex-row items-center gap-1.5">
+                        <Ionicons name="briefcase-outline" size={16} color={Colors.muted} />
+                        <Text className="text-sm font-medium text-graphite">{artisan.completedJobs} jobs</Text>
                     </View>
                 </View>
 
                 {/* Pricing */}
-                <Card className="mb-4">
+                <Card
+                    className="mb-4 rounded-[24px] border-gray-50"
+                    style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 }}
+                >
                     <View className="flex-row justify-between items-center">
-                        <Text className="text-sm text-gray-500">Pricing estimate</Text>
-                        <Text className="text-xl font-bold text-accent">
+                        <Text className="text-sm font-medium text-muted">Pricing estimate</Text>
+                        <Text className="text-xl font-bold text-graphite tracking-tight">
                             {formatNaira(artisan.priceRange.min)} – {formatNaira(artisan.priceRange.max)}
                         </Text>
                     </View>
-                    <Text className="text-xs text-gray-400 capitalize mt-1">Style: {artisan.pricingStyle}</Text>
+                    <Text className="text-xs font-medium text-gray-400 capitalize mt-1.5">Style: {artisan.pricingStyle}</Text>
                 </Card>
 
                 {/* Availability */}
-                <Card className="mb-5">
-                    <View className="flex-row items-center gap-2">
-                        <View className={`w-2.5 h-2.5 rounded-[5px]`} style={{
+                <Card
+                    className="mb-6 rounded-[24px] border-gray-50"
+                    style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 }}
+                >
+                    <View className="flex-row items-center gap-2.5">
+                        <View className={`w-2 h-2 rounded-full`} style={{
                             backgroundColor: artisan.availability === 'online' ? Colors.success : artisan.availability === 'busy' ? Colors.warning : Colors.gray400
                         }} />
-                        <Text className="text-base font-medium">
+                        <Text className="text-base font-semibold text-graphite tracking-tight">
                             {artisan.availability === 'online' ? 'Available now' : artisan.availability === 'busy' ? 'Busy' : 'Offline'}
                         </Text>
                     </View>
-                    <Text className="text-sm text-gray-500 mt-1">
+                    <Text className="text-sm font-medium text-muted mt-1.5">
                         Service areas: {artisan.serviceAreas.join(', ')}
                     </Text>
                 </Card>
 
                 {/* Reviews */}
-                <Text className="text-lg font-bold text-primary mb-4">Reviews ({artisan.reviewCount})</Text>
+                <Text className="text-xl font-bold tracking-tight text-graphite mb-5">Reviews ({artisan.reviewCount})</Text>
                 {artisan.reviews.map((review) => (
-                    <View key={review.id} className="mb-5 pb-4 border-b border-gray-100">
-                        <View className="flex-row justify-between items-center">
-                            <Text className="text-base font-semibold">{review.clientName}</Text>
+                    <View key={review.id} className="mb-5 pb-5 border-b border-gray-50">
+                        <View className="flex-row justify-between items-center mb-1.5">
+                            <Text className="text-base font-bold text-graphite tracking-tight">{review.clientName}</Text>
                             <RatingStars rating={review.rating} size={12} showValue={false} />
                         </View>
-                        <Text className="text-sm text-gray-600 mt-1">{review.comment}</Text>
-                        <View className="flex-row gap-1 mt-2">
+                        <Text className="text-sm text-muted leading-relaxed">{review.comment}</Text>
+                        <View className="flex-row gap-2 mt-3">
                             {review.tags.map((tag) => (
                                 <Chip key={tag} label={tag} small />
                             ))}
                         </View>
-                        <Text className="text-xs text-gray-400 mt-1">{formatDate(review.createdAt)}</Text>
+                        <Text className="text-xs font-medium text-gray-400 mt-2 uppercase tracking-wide">{formatDate(review.createdAt)}</Text>
                     </View>
                 ))}
 
                 {/* Actions */}
-                <View className="mt-6 gap-4">
+                <View className="mt-8 gap-4">
                     <PrimaryButton
                         title="Request Booking"
                         onPress={() => router.push({ pathname: '/booking', params: { artisanId: artisan.id } })}
                         icon={<Ionicons name="calendar-outline" size={20} color={Colors.white} />}
+                        className="bg-graphite"
                     />
                     <View className="flex-row gap-4">
                         <SecondaryButton
                             title="Message"
                             onPress={() => router.push({ pathname: '/chat', params: { threadId: 't1' } })}
-                            style={{ flex: 1 }}
-                            icon={<Ionicons name="chatbubble-outline" size={18} color={Colors.primary} />}
+                            style={{ flex: 1, borderColor: Colors.graphite }}
+                            textStyle={{ color: Colors.graphite }}
+                            icon={<Ionicons name="chatbubble-outline" size={18} color={Colors.graphite} />}
                         />
                         <SecondaryButton
                             title="Call"
                             onPress={() => { }}
-                            style={{ flex: 1 }}
-                            icon={<Ionicons name="call-outline" size={18} color={Colors.primary} />}
+                            style={{ flex: 1, borderColor: Colors.graphite }}
+                            textStyle={{ color: Colors.graphite }}
+                            icon={<Ionicons name="call-outline" size={18} color={Colors.graphite} />}
                         />
                     </View>
                 </View>
