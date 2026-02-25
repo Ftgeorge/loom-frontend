@@ -4,7 +4,8 @@ import { useAppStore } from '@/store';
 import { Colors } from '@/theme';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function OTPScreen() {
     const router = useRouter();
@@ -34,31 +35,35 @@ export default function OTPScreen() {
 
     return (
         <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 100, alignItems: 'center' }}>
-            <View className="mb-10 items-center">
+            <Animated.View entering={FadeInDown.delay(100)} className="mb-10 items-center">
                 <Text className="text-[28px] font-extrabold text-graphite tracking-tight">Verify Your Number</Text>
                 <Text className="text-base text-muted leading-relaxed mt-2 text-center">Enter the 6-digit code sent to your phone</Text>
-            </View>
+            </Animated.View>
 
-            <OTPInput onComplete={setCode} error={error} />
+            <Animated.View entering={FadeInDown.delay(200)} className="w-full">
+                <OTPInput onComplete={setCode} error={error} />
+            </Animated.View>
 
-            <PrimaryButton
-                title="Verify"
-                onPress={handleVerify}
-                loading={loading}
-                style={{ marginTop: 40, width: '100%' }}
-                className="bg-graphite"
-            />
+            <Animated.View entering={FadeInDown.delay(300)} className="w-full">
+                <PrimaryButton
+                    title="Verify"
+                    onPress={handleVerify}
+                    loading={loading}
+                    style={{ marginTop: 40, width: '100%' }}
+                    className="bg-graphite"
+                />
 
-            <SecondaryButton
-                title="Resend Code"
-                onPress={handleResend}
-                style={{ marginTop: 24, width: '100%', borderColor: Colors.graphite }}
-                textStyle={{ color: Colors.graphite }}
-            />
+                <SecondaryButton
+                    title="Resend Code"
+                    onPress={handleResend}
+                    style={{ marginTop: 24, width: '100%', borderColor: Colors.graphite }}
+                    textStyle={{ color: Colors.graphite }}
+                />
 
-            <Text className="text-xs text-gray-400 mt-10 text-center">
-                For demo, enter any 6 digits to proceed.
-            </Text>
+                <Text className="text-xs text-gray-400 mt-10 text-center">
+                    For demo, enter any 6 digits to proceed.
+                </Text>
+            </Animated.View>
         </ScrollView>
     );
 }

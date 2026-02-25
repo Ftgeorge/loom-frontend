@@ -14,6 +14,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -50,13 +51,13 @@ export default function OnboardingScreen() {
             setCurrentPage(currentPage + 1);
         } else {
             setOnboardingComplete();
-            router.replace('/role-selection');
+            router.replace('/language-selection');
         }
     };
 
     const handleSkip = () => {
         setOnboardingComplete();
-        router.replace('/role-selection');
+        router.replace('/language-selection');
     };
 
     const onMomentumScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -80,16 +81,17 @@ export default function OnboardingScreen() {
                 showsHorizontalScrollIndicator={false}
                 onMomentumScrollEnd={onMomentumScrollEnd}
                 keyExtractor={(_, i) => `${i}`}
-                renderItem={({ item }) => (
+                renderItem={({ item, index }) => (
                     <View className="flex-1 items-center justify-center px-10" style={{ width }}>
-                        <View
+                        <Animated.View
+                            entering={FadeInDown.delay(100).springify()}
                             className="w-[140px] h-[140px] rounded-[70px] items-center justify-center mb-10"
                             style={{ backgroundColor: item.color + '15' }}
                         >
                             <Ionicons name={item.icon} size={64} color={item.color} />
-                        </View>
-                        <Text className="text-[28px] font-extrabold tracking-tight text-center mb-6 text-graphite">{t(item.titleKey, language)}</Text>
-                        <Text className="text-base text-muted text-center leading-6">{t(item.descKey, language)}</Text>
+                        </Animated.View>
+                        <Animated.Text entering={FadeInDown.delay(200).springify()} className="text-[28px] font-extrabold tracking-tight text-center mb-6 text-graphite">{t(item.titleKey, language)}</Animated.Text>
+                        <Animated.Text entering={FadeInDown.delay(300).springify()} className="text-base text-muted text-center leading-6">{t(item.descKey, language)}</Animated.Text>
                     </View>
                 )}
             />

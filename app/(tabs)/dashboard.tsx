@@ -18,6 +18,7 @@ import {
     Text,
     View,
 } from 'react-native';
+import Animated, { FadeInUp, StretchInY } from 'react-native-reanimated';
 
 export default function ArtisanDashboard() {
     const router = useRouter();
@@ -87,17 +88,19 @@ export default function ArtisanDashboard() {
                     </View>
                 ) : (
                     <View className="flex-row flex-wrap gap-4 mb-5">
-                        {stats.map((s) => (
-                            <Card key={s.label} className="w-[47%] gap-1 rounded-[24px] border border-gray-50 shadow-sm" style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 }}>
-                                <View
-                                    className="w-10 h-10 rounded-[20px] items-center justify-center"
-                                    style={{ backgroundColor: s.color + '20' }}
-                                >
-                                    <Ionicons name={s.icon as any} size={22} color={s.color} />
-                                </View>
-                                <Text className="text-xl font-bold text-graphite mt-1">{s.value}</Text>
-                                <Text className="text-xs text-muted">{s.label}</Text>
-                            </Card>
+                        {stats.map((s, index) => (
+                            <Animated.View key={s.label} entering={FadeInUp.delay(100 + index * 100).springify()} className="w-[47%]">
+                                <Card className="gap-1 rounded-[24px] border border-gray-50 shadow-sm w-full" style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 }}>
+                                    <View
+                                        className="w-10 h-10 rounded-[20px] items-center justify-center"
+                                        style={{ backgroundColor: s.color + '20' }}
+                                    >
+                                        <Ionicons name={s.icon as any} size={22} color={s.color} />
+                                    </View>
+                                    <Text className="text-xl font-bold text-graphite mt-1">{s.value}</Text>
+                                    <Text className="text-xs text-muted">{s.label}</Text>
+                                </Card>
+                            </Animated.View>
                         ))}
                     </View>
                 )}
@@ -114,13 +117,14 @@ export default function ArtisanDashboard() {
                     </View>
                 ) : (
                     <View className="gap-4">
-                        {newJobs.slice(0, 5).map((job) => (
-                            <RequestCard
-                                key={job.id}
-                                job={job}
-                                isArtisanView
-                                onPress={() => router.push({ pathname: '/job-details', params: { id: job.id } })}
-                            />
+                        {newJobs.slice(0, 5).map((job, index) => (
+                            <Animated.View key={job.id} entering={StretchInY.delay(index * 150)}>
+                                <RequestCard
+                                    job={job}
+                                    isArtisanView
+                                    onPress={() => router.push({ pathname: '/job-details', params: { id: job.id } })}
+                                />
+                            </Animated.View>
                         ))}
                     </View>
                 )}

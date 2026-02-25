@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 export default function SignInScreen() {
   const router = useRouter();
@@ -48,70 +49,74 @@ export default function SignInScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <BackButton onPress={() => router.back()} />
-        <View className="mb-10">
+        <Animated.View entering={FadeInDown.delay(100)} className="mb-10">
           <Text className="text-3xl font-extrabold text-graphite tracking-tight">Welcome Back</Text>
           <Text className="text-base text-muted leading-relaxed mt-2">
             Sign in to continue using Loom
           </Text>
-        </View>
+        </Animated.View>
 
-        <AppTextInput
-          label="Phone Number or Email"
-          placeholder="+234 801 234 5678"
-          value={form.phone}
-          onChangeText={(phone) => setForm({ ...form, phone })}
-          error={errors.phone}
-          keyboardType="phone-pad"
-        />
-        <PasswordInput
-          label="Password"
-          placeholder="Enter your password"
-          value={form.password}
-          onChangeText={(password) => setForm({ ...form, password })}
-          error={errors.password}
-        />
+        <Animated.View entering={FadeInDown.delay(200)}>
+          <AppTextInput
+            label="Phone Number or Email"
+            placeholder="+234 801 234 5678"
+            value={form.phone}
+            onChangeText={(phone) => setForm({ ...form, phone })}
+            error={errors.phone}
+            keyboardType="phone-pad"
+          />
+          <PasswordInput
+            label="Password"
+            placeholder="Enter your password"
+            value={form.password}
+            onChangeText={(password) => setForm({ ...form, password })}
+            error={errors.password}
+          />
 
-        <TouchableOpacity
-          className="self-end p-2"
-          onPress={() => router.push("/(auth)/forgot-password")}
-        >
-          <Text className="text-sm text-graphite font-bold">
-            Forgot Password?
-          </Text>
-        </TouchableOpacity>
-
-        <PrimaryButton
-          title="Sign In"
-          onPress={handleSignIn}
-          loading={loading}
-          style={{ marginTop: 16 }}
-          className="bg-graphite"
-        />
-
-        <View className="flex flex-row items-center gap-4 px-2 my-6">
-          <View className="flex-1 h-[1px] bg-gray-50" />
-          <Text className="text-xs text-muted font-semibold tracking-widest uppercase">Or</Text>
-          <View className="flex-1 h-[1px] bg-gray-50" />
-        </View>
-
-        <OauthButton
-          title="Continue with Google"
-          onPress={() => { }}
-          className="border-gray-100"
-          textStyle={{ color: '#2C2C2C' }} // Hardcoded graphite color for compatibility with existing OauthButton interface
-          image={require("../../assets/images/google-icon.jpeg")}
-        />
-
-        <View
-          className="flex flex-row items-center justify-center mt-12 gap-2"
-        >
-          <Text className="text-base text-muted">
-            Don't have an account?{" "}
-          </Text>
-          <TouchableOpacity onPress={() => router.push("/(auth)/sign-up")}>
-            <Text className="text-graphite font-bold text-base">Sign Up</Text>
+          <TouchableOpacity
+            className="self-end p-2"
+            onPress={() => router.push("/(auth)/forgot-password")}
+          >
+            <Text className="text-sm text-graphite font-bold">
+              Forgot Password?
+            </Text>
           </TouchableOpacity>
-        </View>
+
+          <PrimaryButton
+            title="Sign In"
+            onPress={handleSignIn}
+            loading={loading}
+            style={{ marginTop: 16 }}
+            className="bg-graphite"
+          />
+        </Animated.View>
+
+        <Animated.View entering={FadeInDown.delay(300)}>
+          <View className="flex flex-row items-center gap-4 px-2 my-6">
+            <View className="flex-1 h-[1px] bg-gray-50" />
+            <Text className="text-xs text-muted font-semibold tracking-widest uppercase">Or</Text>
+            <View className="flex-1 h-[1px] bg-gray-50" />
+          </View>
+
+          <OauthButton
+            title="Continue with Google"
+            onPress={() => { }}
+            className="border-gray-100"
+            textStyle={{ color: '#2C2C2C' }} // Hardcoded graphite color for compatibility with existing OauthButton interface
+            image={require("../../assets/images/google-icon.jpeg")}
+          />
+
+          <View
+            className="flex flex-row items-center justify-center mt-12 gap-2"
+          >
+            <Text className="text-base text-muted">
+              Don't have an account?{" "}
+            </Text>
+            <TouchableOpacity onPress={() => router.push("/(auth)/sign-up")}>
+              <Text className="text-graphite font-bold text-base">Sign Up</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
 
 
       </ScrollView>

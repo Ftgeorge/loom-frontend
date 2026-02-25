@@ -6,6 +6,7 @@ import { SignUpSchema, mapZodErrors } from '@/utils/helpers';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function SignUpScreen() {
     const router = useRouter();
@@ -31,89 +32,93 @@ export default function SignUpScreen() {
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
             <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 80 }} keyboardShouldPersistTaps="handled">
                 <BackButton onPress={() => router.back()} />
-                <View className="mb-10">
+                <Animated.View entering={FadeInDown.delay(100)} className="mb-10">
                     <Text className="text-3xl font-extrabold text-graphite tracking-tight">Create Account</Text>
                     <Text className="text-base text-muted leading-relaxed mt-2">
                         {user?.role === 'artisan'
                             ? 'Join as an artisan and start getting jobs'
                             : 'Find trusted artisans near you'}
                     </Text>
-                </View>
+                </Animated.View>
 
-                <AppTextInput
-                    label="Full Name"
-                    placeholder="e.g. Chinedu Okafor"
-                    value={form.name}
-                    onChangeText={(name) => setForm({ ...form, name })}
-                    error={errors.name}
-                    autoCapitalize="words"
-                />
-                <PhoneInput
-                    label="Phone Number"
-                    placeholder="8012345678"
-                    value={form.phone}
-                    onChangeText={(phone) => setForm({ ...form, phone })}
-                    error={errors.phone}
-                />
-                <AppTextInput
-                    label="Email (optional)"
-                    placeholder="chinedu@email.com"
-                    value={form.email}
-                    onChangeText={(email) => setForm({ ...form, email })}
-                    error={errors.email}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                />
-                <PasswordInput
-                    label="Password"
-                    placeholder="At least 6 characters"
-                    value={form.password}
-                    onChangeText={(password) => setForm({ ...form, password })}
-                    error={errors.password}
-                />
+                <Animated.View entering={FadeInDown.delay(200)}>
+                    <AppTextInput
+                        label="Full Name"
+                        placeholder="e.g. Chinedu Okafor"
+                        value={form.name}
+                        onChangeText={(name) => setForm({ ...form, name })}
+                        error={errors.name}
+                        autoCapitalize="words"
+                    />
+                    <PhoneInput
+                        label="Phone Number"
+                        placeholder="8012345678"
+                        value={form.phone}
+                        onChangeText={(phone) => setForm({ ...form, phone })}
+                        error={errors.phone}
+                    />
+                    <AppTextInput
+                        label="Email (optional)"
+                        placeholder="chinedu@email.com"
+                        value={form.email}
+                        onChangeText={(email) => setForm({ ...form, email })}
+                        error={errors.email}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
+                    <PasswordInput
+                        label="Password"
+                        placeholder="At least 6 characters"
+                        value={form.password}
+                        onChangeText={(password) => setForm({ ...form, password })}
+                        error={errors.password}
+                    />
 
-                <PrimaryButton
-                    title="Create Account"
-                    onPress={handleSignUp}
-                    loading={loading}
-                    style={{ marginTop: 24 }}
-                    className="bg-graphite"
-                />
+                    <PrimaryButton
+                        title="Create Account"
+                        onPress={handleSignUp}
+                        loading={loading}
+                        style={{ marginTop: 24 }}
+                        className="bg-graphite"
+                    />
+                </Animated.View>
 
-                <View className="flex flex-row items-center gap-4 px-2 my-6">
-                    <View className="flex-1 h-[1px] bg-gray-50" />
-                    <Text className="text-xs text-muted font-semibold tracking-widest uppercase">Or</Text>
-                    <View className="flex-1 h-[1px] bg-gray-50" />
-                </View>
+                <Animated.View entering={FadeInDown.delay(300)}>
+                    <View className="flex flex-row items-center gap-4 px-2 my-6">
+                        <View className="flex-1 h-[1px] bg-gray-50" />
+                        <Text className="text-xs text-muted font-semibold tracking-widest uppercase">Or</Text>
+                        <View className="flex-1 h-[1px] bg-gray-50" />
+                    </View>
 
-                <OauthButton
-                    title="Continue with Google"
-                    onPress={() => { }}
-                    className="border-gray-100"
-                    textStyle={{ color: '#2C2C2C' }} // Graphite text color
-                    image={require("../../assets/images/google-icon.jpeg")}
-                />
+                    <OauthButton
+                        title="Continue with Google"
+                        onPress={() => { }}
+                        className="border-gray-100"
+                        textStyle={{ color: '#2C2C2C' }} // Graphite text color
+                        image={require("../../assets/images/google-icon.jpeg")}
+                    />
 
-                <View className='flex flex-row items-center justify-center mt-12 gap-2'>
-                    <Text className="text-base text-muted">
-                        Already have an account?
-                    </Text>
-                    <TouchableOpacity
-                        className="items-center"
-                        onPress={() => router.push('/(auth)/sign-in')}
-                    >
-                        <Text className="text-graphite font-bold text-base">Sign In</Text>
+                    <View className='flex flex-row items-center justify-center mt-12 gap-2'>
+                        <Text className="text-base text-muted">
+                            Already have an account?
+                        </Text>
+                        <TouchableOpacity
+                            className="items-center"
+                            onPress={() => router.push('/(auth)/sign-in')}
+                        >
+                            <Text className="text-graphite font-bold text-base">Sign In</Text>
+                        </TouchableOpacity>
+                    </View>
+
+
+                    <TouchableOpacity className="items-center mt-8">
+                        <Text className="text-xs text-gray-400 text-center leading-[20px]">
+                            By signing up, you agree to our{' '}
+                            <Text className="text-graphite font-bold">Terms of Service</Text> and{' '}
+                            <Text className="text-graphite font-bold">Privacy Policy</Text>
+                        </Text>
                     </TouchableOpacity>
-                </View>
-
-
-                <TouchableOpacity className="items-center mt-8">
-                    <Text className="text-xs text-gray-400 text-center leading-[20px]">
-                        By signing up, you agree to our{' '}
-                        <Text className="text-graphite font-bold">Terms of Service</Text> and{' '}
-                        <Text className="text-graphite font-bold">Privacy Policy</Text>
-                    </Text>
-                </TouchableOpacity>
+                </Animated.View>
             </ScrollView>
         </KeyboardAvoidingView>
     );

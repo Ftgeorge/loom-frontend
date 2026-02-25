@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInRight } from 'react-native-reanimated';
 
 const STEPS = ['Basics', 'Skills', 'Areas', 'Availability', 'Pricing'];
 
@@ -62,7 +63,7 @@ export default function ArtisanOnboardingScreen() {
 
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }} keyboardShouldPersistTaps="handled">
                 {step === 0 && (
-                    <View className="p-8">
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
                         <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Your basic info</Text>
                         <AppTextInput label="Full Name" value={name} onChangeText={setName} placeholder="Your full name" />
                         <PhoneInput label="Phone Number" value={phone} onChangeText={setPhone} placeholder="8012345678" />
@@ -71,11 +72,11 @@ export default function ArtisanOnboardingScreen() {
                             <Text className="text-sm font-medium text-muted">Add profile photo</Text>
                         </TouchableOpacity>
                         <PrimaryButton title="Next" onPress={() => setStep(1)} disabled={!name} style={{ marginTop: 32 }} className="bg-graphite" />
-                    </View>
+                    </Animated.View>
                 )}
 
                 {step === 1 && (
-                    <View className="p-8">
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
                         <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">What are your trades?</Text>
                         <Text className="text-base text-muted mb-6">Select all that apply</Text>
                         <View className="flex-row flex-wrap gap-2">
@@ -84,11 +85,11 @@ export default function ArtisanOnboardingScreen() {
                             ))}
                         </View>
                         <PrimaryButton title="Next" onPress={() => setStep(2)} disabled={selectedSkills.length === 0} style={{ marginTop: 32 }} className="bg-graphite" />
-                    </View>
+                    </Animated.View>
                 )}
 
                 {step === 2 && (
-                    <View className="p-8">
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
                         <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Service areas</Text>
                         <Text className="text-base text-muted mb-6">Where can clients find you?</Text>
                         <View className="flex-row flex-wrap gap-2">
@@ -97,11 +98,11 @@ export default function ArtisanOnboardingScreen() {
                             ))}
                         </View>
                         <PrimaryButton title="Next" onPress={() => setStep(3)} disabled={selectedAreas.length === 0} style={{ marginTop: 32 }} className="bg-graphite" />
-                    </View>
+                    </Animated.View>
                 )}
 
                 {step === 3 && (
-                    <View className="p-8">
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
                         <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Your availability</Text>
                         <Text className="text-base text-muted mb-6">Select your working days</Text>
                         <View className="flex-row flex-wrap gap-2">
@@ -116,11 +117,11 @@ export default function ArtisanOnboardingScreen() {
                             ))}
                         </View>
                         <PrimaryButton title="Next" onPress={() => setStep(4)} style={{ marginTop: 32 }} className="bg-graphite" />
-                    </View>
+                    </Animated.View>
                 )}
 
                 {step === 4 && (
-                    <View className="p-8">
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
                         <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Pricing style</Text>
                         <Text className="text-base text-muted mb-6">How do you prefer to charge?</Text>
                         {[
@@ -146,7 +147,7 @@ export default function ArtisanOnboardingScreen() {
                         ))}
 
                         <PrimaryButton title="Complete Setup" onPress={handleComplete} loading={loading} style={{ marginTop: 32 }} className="bg-graphite" />
-                    </View>
+                    </Animated.View>
                 )}
             </ScrollView>
         </View>
