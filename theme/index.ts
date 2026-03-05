@@ -1,136 +1,135 @@
-// Loom Theme System
+// Loom 3.0 Design System - Heritage Forest (Mature & Native)
+// Inspired by: Nigerian Heritage, Kuda, Carbon, Cowrywise (Mature Fintech)
+
 export const Colors = {
-  primary: "#7C3AED", // Electric Violet
-  graphite: "#121212", // Deep Graphite
-  background: "#FDFDFD", // Linen White
-  surface: "#F1F5F9", // Ghost Gray
-  muted: "#64748B", // Slate Mist
-  success: "#0D9488", // Teal Glow
-  error: "#D64545",
+  // Brand Colors - Heritage Forest
+  primary: "#064E3B",     // Deep Forest Green (Authority & Maturity)
+  primaryDark: "#062016",
+  primaryLight: "#ECFDF5",
+
+  accent: "#B45309",      // Heritage Bronze (Craft & red earth)
+  accentLight: "#FFFBEB",
+
+  // Neutrals (Mature & Sharp)
+  background: "#FAFAF9",  // Warm off-white
+  surface: "#FFFFFF",
+  cardBorder: "#E7E5E4",  // Stone 200
+  muted: "#78716C",       // Stone 500
+  text: "#1C1917",        // Stone 900
+  textSecondary: "#44403C",
+
+  // Semantic
+  success: "#15803D",
+  error: "#B91C1C",
+  warning: "#D97706",
+  info: "#0369A1",
+
+  // UI Utilities
   white: "#FFFFFF",
   black: "#000000",
-  gray50: "#F9FAFB",
-  gray100: "#F3F4F6",
-  gray200: "#E5E7EB",
-  gray300: "#D1D5DB",
-  gray400: "#9CA3AF",
-  gray500: "#6B7280",
-  gray600: "#4B5563",
-  gray700: "#374151",
-  gray800: "#1F2937",
-  gray900: "#111827",
-  warning: "#F59E0B",
-  info: "#3B82F6",
-  overlayDark: "rgba(0,0,0,0.5)",
-  overlayLight: "rgba(0,0,0,0.1)",
-  cardBorder: "#EAE5D9",
+  overlay: "rgba(28, 25, 23, 0.7)",
 };
 
 export const Typography = {
-  heading1: {
+  h1: {
     fontSize: 28,
-    fontWeight: "700" as const,
     lineHeight: 36,
-    letterSpacing: -0.5,
-    color: Colors.primary,
-  },
-  heading2: {
-    fontSize: 24,
+    fontFamily: "System", // Mature choice
     fontWeight: "700" as const,
-    lineHeight: 32,
-    letterSpacing: -0.3,
-    color: Colors.primary,
+    color: Colors.text,
+    letterSpacing: -0.5,
   },
-  heading3: {
-    fontSize: 20,
-    fontWeight: "600" as const,
+  h2: {
+    fontSize: 22,
     lineHeight: 28,
-    color: Colors.primary,
+    fontFamily: "System",
+    fontWeight: "700" as const,
+    color: Colors.text,
+    letterSpacing: -0.3,
   },
-  heading4: {
+  h3: {
     fontSize: 18,
-    fontWeight: "600" as const,
     lineHeight: 24,
-    color: Colors.primary,
+    fontFamily: "System",
+    fontWeight: "600" as const,
+    color: Colors.text,
+  },
+  bodyLarge: {
+    fontSize: 17,
+    lineHeight: 24,
+    fontFamily: "System",
+    color: Colors.text,
   },
   body: {
-    fontSize: 16,
-    fontWeight: "400" as const,
-    lineHeight: 24,
-    color: Colors.gray700,
+    fontSize: 15,
+    lineHeight: 22,
+    fontFamily: "System",
+    color: Colors.textSecondary,
   },
   bodySmall: {
-    fontSize: 14,
-    fontWeight: "400" as const,
-    lineHeight: 20,
-    color: Colors.gray600,
-  },
-  caption: {
-    fontSize: 12,
-    fontWeight: "400" as const,
-    lineHeight: 16,
-    color: Colors.gray500,
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: "System",
+    color: Colors.textSecondary,
   },
   label: {
-    fontSize: 14,
-    fontWeight: "500" as const,
-    lineHeight: 20,
-    color: Colors.gray700,
+    fontSize: 11,
+    lineHeight: 14,
+    fontFamily: "System",
+    fontWeight: "600" as const,
+    color: Colors.muted,
+    textTransform: "uppercase" as const,
+    letterSpacing: 1,
   },
   button: {
-    fontSize: 16,
-    fontWeight: "600" as const,
-    lineHeight: 24,
-  },
-  buttonSmall: {
-    fontSize: 14,
-    fontWeight: "600" as const,
+    fontSize: 15,
     lineHeight: 20,
+    fontFamily: "System",
+    fontWeight: "600" as const,
   },
 };
 
 export const Spacing = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-  xxl: 24,
-  xxxl: 32,
-  xxxxl: 40,
-  section: 48,
+  2: 2,
+  4: 4,
+  8: 8,
+  12: 12,
+  16: 16,
+  24: 24,
+  32: 32,
+  48: 48,
+  64: 64,
 };
 
-export const BorderRadius = {
-  sm: 6,
-  md: 10,
-  lg: 14,
-  xl: 20,
-  full: 999,
+export const Radius = {
+  xs: 2,
+  sm: 4,
+  md: 8,    // Mature, sharper corners
+  lg: 12,   // Max for cards
+  xl: 16,   // Used sparingly
+  full: 9999,
 };
 
 export const Shadows = {
-  card: {
+  sm: {
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  md: {
+    shadowColor: "#1C1917",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
   },
-  cardHover: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 5,
-  },
-  button: {
+  lg: {
     shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.1,
+    shadowRadius: 24,
+    elevation: 6,
   },
 };
-
-export const HitSlop = { top: 12, bottom: 12, left: 12, right: 12 };

@@ -1,18 +1,22 @@
 import { AppHeader } from '@/components/AppHeader';
+import { LoomThread } from '@/components/ui/LoomThread';
+import { threadApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors } from '@/theme';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { Message } from '@/types';
 import { formatTime } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+    Alert,
     FlatList,
     KeyboardAvoidingView, Platform,
     Text,
     TextInput, TouchableOpacity,
     View,
 } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const QUICK_REPLIES = [
@@ -32,46 +36,68 @@ export default function ChatScreen() {
     const listRef = useRef<FlatList>(null);
 
     const thread = threads.find((t) => t.id === threadId);
-    const messages = thread?.messages || [];
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const loadMessages = useCallback(async () => {
+        if (!threadId) return;
+        try {
+            const res = await threadApi.getMessages(threadId);
+            const mapped = (res.results as any[]).map((row: any): Message => ({
+                id: row.id,
+                threadId: row.thread_id,
+                senderId: row.sender_id,
+                text: row.content,
+                timestamp: row.sent_at,
+                read: Boolean(row.read_at),
+            }));
+            setMessages(mapped);
+        } catch (err) {
+            console.error('Failed to load messages:', err);
+        } finally {
+            setLoading(false);
+        }
+    }, [threadId]);
+
+    useEffect(() => {
+        loadMessages();
+        // Poll for new messages every 5s
+        const interval = setInterval(loadMessages, 5000);
+        return () => clearInterval(interval);
+    }, [loadMessages]);
 
     const handleSend = async (msgText?: string) => {
         const content = msgText || text.trim();
-        if (!content) return;
+        if (!content || !threadId) return;
         setText('');
 
-        const msg: Message = {
-            id: 'm' + Date.now(),
-            threadId: threadId || '',
-            senderId: user?.id || 'u1',
-            text: content,
-            timestamp: new Date().toISOString(),
-            read: false,
-        };
-        addMessage(threadId || '', msg);
-
-        // Simulate reply after a delay
-        setTimeout(() => {
-            const reply: Message = {
-                id: 'm' + (Date.now() + 1),
-                threadId: threadId || '',
-                senderId: 'other',
-                text: 'Okay, I go get back to you shortly.',
+        try {
+            // Optimistic update
+            const tempId = 'temp-' + Date.now();
+            const optimisticMsg: Message = {
+                id: tempId,
+                threadId,
+                senderId: user?.id || '',
+                text: content,
                 timestamp: new Date().toISOString(),
                 read: false,
             };
-            addMessage(threadId || '', reply);
-        }, 2000);
-    };
+            setMessages(prev => [...prev, optimisticMsg]);
 
-    useEffect(() => {
-        setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 300);
-    }, [messages.length]);
+            // Real send
+            await threadApi.sendMessage(threadId, content);
+            loadMessages(); // Refresh to get the real ID and timestamp
+        } catch (err) {
+            console.error('Failed to send message:', err);
+            Alert.alert('Error', 'Failed to send message. Please try again.');
+        }
+    };
 
     const isMe = (msg: Message) => msg.senderId === (user?.id || 'u1');
 
     return (
         <KeyboardAvoidingView
-            className="flex-1 bg-background"
+            style={{ flex: 1, backgroundColor: Colors.background }}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             keyboardVerticalOffset={0}
         >
@@ -81,63 +107,122 @@ export default function ChatScreen() {
                 onBack={() => router.back()}
                 showNotification={false}
             />
+            <LoomThread variant="minimal" opacity={0.5} animated />
 
             <FlatList
                 ref={listRef}
                 data={messages}
                 keyExtractor={(item) => item.id}
-                contentContainerStyle={{ padding: 20, paddingBottom: 8, flexGrow: 1, justifyContent: 'flex-end' }}
+                contentContainerStyle={{ padding: 20, paddingBottom: 16, flexGrow: 1, justifyContent: 'flex-end' }}
                 renderItem={({ item }) => (
-                    <View className={`max-w-[78%] px-4 py-3 rounded-2xl mb-3 ${isMe(item) ? 'bg-graphite self-end rounded-br-md shadow-[0_2px_8px_rgba(0,0,0,0.08)]' : 'bg-surface self-start rounded-bl-md border border-gray-50 shadow-[0_2px_4px_rgba(0,0,0,0.02)]'}`}>
-                        <Text className={`text-[15px] leading-[22px] font-medium ${isMe(item) ? 'text-white' : 'text-graphite'}`}>{item.text}</Text>
-                        <Text className={`text-[10px] font-semibold tracking-widest mt-1.5 uppercase ${isMe(item) ? 'text-white/60' : 'text-gray-400'}`}>
+                    <Animated.View
+                        entering={FadeIn}
+                        style={{
+                            maxWidth: '80%',
+                            paddingHorizontal: 16,
+                            paddingVertical: 12,
+                            borderRadius: 20,
+                            marginBottom: 8,
+                            backgroundColor: isMe(item) ? Colors.accent : Colors.surface,
+                            alignSelf: isMe(item) ? 'flex-end' : 'flex-start',
+                            borderBottomRightRadius: isMe(item) ? 4 : 20,
+                            borderBottomLeftRadius: isMe(item) ? 20 : 4,
+                            borderWidth: isMe(item) ? 0 : 1,
+                            borderColor: Colors.cardBorder,
+                            ...Shadows.sm
+                        }}
+                    >
+                        <Text style={[Typography.body, { color: isMe(item) ? Colors.white : Colors.text, fontSize: 15 }]}>{item.text}</Text>
+                        <Text style={[Typography.label, {
+                            fontSize: 9,
+                            marginTop: 4,
+                            color: isMe(item) ? 'rgba(255,255,255,0.7)' : Colors.muted,
+                            alignSelf: 'flex-end'
+                        }]}>
                             {formatTime(item.timestamp)}
                         </Text>
-                    </View>
+                    </Animated.View>
                 )}
                 onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
             />
 
             {/* Quick Replies */}
-            <FlatList
-                data={QUICK_REPLIES}
-                horizontal
-                className="flex-grow-0 flex-shrink-0 max-h-[60px]"
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 10, gap: 10, alignItems: 'center' }}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        className="bg-white px-5 rounded-full border border-gray-100 items-center justify-center h-10"
-                        style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}
-                        onPress={() => handleSend(item)}
-                    >
-                        <Text className="text-[13px] text-graphite font-medium tracking-tight">{item}</Text>
-                    </TouchableOpacity>
-                )}
-            />
+            <View>
+                <FlatList
+                    data={QUICK_REPLIES}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 12, gap: 8 }}
+                    keyExtractor={(item) => item}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity
+                            onPress={() => handleSend(item)}
+                            style={{
+                                paddingHorizontal: 16,
+                                paddingVertical: 8,
+                                borderRadius: Radius.full,
+                                backgroundColor: Colors.surface,
+                                borderWidth: 1,
+                                borderColor: Colors.cardBorder,
+                                ...Shadows.sm
+                            }}
+                        >
+                            <Text style={[Typography.bodySmall, { color: Colors.textSecondary, fontFamily: 'MontserratAlternates-Medium' }]}>{item}</Text>
+                        </TouchableOpacity>
+                    )}
+                />
+            </View>
 
-            {/* Input */}
-            <View className={`flex-row items-end px-5 pt-3 border-t border-gray-50 bg-white gap-3`} style={{ paddingBottom: insets.bottom || 16 }}>
-                <TouchableOpacity className="pb-3.5">
-                    <Ionicons name="attach" size={24} color={Colors.muted} />
+            {/* Input Area */}
+            <View style={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+                paddingHorizontal: 16,
+                paddingTop: 12,
+                paddingBottom: Math.max(insets.bottom, 16),
+                backgroundColor: Colors.surface,
+                borderTopWidth: 1,
+                borderTopColor: Colors.cardBorder,
+                gap: 12
+            }}>
+                <TouchableOpacity style={{ paddingBottom: 10 }}>
+                    <Ionicons name="add-circle-outline" size={28} color={Colors.accent} />
                 </TouchableOpacity>
-                <View className="flex-1 bg-surface rounded-2xl border border-gray-50 min-h-[44px]">
+                <View style={{
+                    flex: 1,
+                    backgroundColor: Colors.background,
+                    borderRadius: Radius.lg,
+                    borderWidth: 1,
+                    borderColor: Colors.cardBorder,
+                    minHeight: 44,
+                    maxHeight: 120,
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    justifyContent: 'center'
+                }}>
                     <TextInput
-                        className="flex-1 text-[15px] font-medium text-graphite max-h-[100px] py-3 px-4"
+                        style={[Typography.body, { color: Colors.text, fontSize: 15 }]}
                         placeholder="Type a message..."
-                        placeholderTextColor={Colors.gray400}
+                        placeholderTextColor={Colors.muted}
                         value={text}
                         onChangeText={setText}
                         multiline
                     />
                 </View>
                 <TouchableOpacity
-                    className={`w-11 h-11 rounded-full items-center justify-center mb-0.5 ${!text.trim() ? 'bg-surface border border-gray-100' : 'bg-graphite shadow-sm'}`}
                     onPress={() => handleSend()}
                     disabled={!text.trim()}
+                    style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 22,
+                        backgroundColor: text.trim() ? Colors.accent : Colors.cardBorder + '50',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: 1
+                    }}
                 >
-                    <Ionicons name="paper-plane" size={18} color={text.trim() ? Colors.white : Colors.gray400} style={text.trim() ? { transform: [{ translateX: -1 }, { translateY: 1 }] } : {}} />
+                    <Ionicons name="send" size={20} color={text.trim() ? Colors.white : Colors.muted} />
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>

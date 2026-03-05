@@ -2,7 +2,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { Card } from "@/components/ui/CardChipBadge";
 import { languageNames } from "@/i18n";
 import { useAppStore } from "@/store";
-import { Colors } from "@/theme";
+import { Colors, Radius, Typography } from "@/theme";
 import type { Language, UserRole } from "@/types";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -15,22 +15,22 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated, { FadeInUp } from 'react-native-reanimated';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { language, setLanguage, user, switchRole, signOut } = useAppStore();
-  const [showLangPicker, setShowLangPicker] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(true);
 
   const handleRoleSwitch = () => {
     const newRole: UserRole = user?.role === "client" ? "artisan" : "client";
     Alert.alert(
-      "Switch Role",
+      "Switch Mode",
       `Switch to ${newRole === "client" ? "Client" : "Artisan"} mode?`,
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "Switch",
+          text: "Switch Now",
           onPress: () => {
             switchRole(newRole);
             router.replace(
@@ -43,10 +43,10 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = () => {
-    Alert.alert("Log Out", "Are you sure?", [
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
       { text: "Cancel", style: "cancel" },
       {
-        text: "Log Out",
+        text: "Sign Out",
         style: "destructive",
         onPress: () => {
           signOut();
@@ -56,8 +56,33 @@ export default function SettingsScreen() {
     ]);
   };
 
+  const SettingItem = ({ icon, label, value, onPress, isLast = false, color = Colors.primary }: any) => (
+    <TouchableOpacity
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 18,
+        paddingHorizontal: 20,
+        backgroundColor: Colors.surface,
+        borderBottomWidth: isLast ? 0 : 1,
+        borderBottomColor: Colors.cardBorder
+      }}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
+      <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: color + '10', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
+        <Ionicons name={icon} size={20} color={color} />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={[Typography.body, { fontSize: 15, fontFamily: 'MontserratAlternates-SemiBold', color: Colors.text }]}>{label}</Text>
+        {value && <Text style={[Typography.bodySmall, { fontSize: 13, color: Colors.muted, marginTop: 2 }]}>{value}</Text>}
+      </View>
+      {onPress && <Ionicons name="chevron-forward" size={18} color={Colors.cardBorder} />}
+    </TouchableOpacity>
+  );
+
   return (
-    <View className="flex-1 bg-background">
+    <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <AppHeader
         title="Settings"
         showBack
@@ -65,119 +90,114 @@ export default function SettingsScreen() {
         showNotification={false}
       />
 
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
-        {/* Language */}
-        <Text className="text-xs font-semibold tracking-widest text-muted mt-8 mb-3 ml-2 uppercase">
-          LANGUAGE
-        </Text>
-        <Card
-          className="rounded-[24px] border-gray-50"
-          style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 }}
-          noPadding
-        >
+      <ScrollView
+        contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Profile Card */}
+        <Animated.View entering={FadeInUp.delay(100)} style={{ marginBottom: 32 }}>
+          <Card style={{ padding: 20, flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+            <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={[Typography.h2, { color: Colors.white, fontSize: 20 }]}>{user?.name?.[0]}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={Typography.h3}>{user?.name}</Text>
+              <Text style={[Typography.bodySmall, { color: Colors.muted }]}>{user?.role === 'artisan' ? 'Artisan Partner' : 'Loom Customer'}</Text>
+            </View>
+            <TouchableOpacity style={{ padding: 8 }}>
+              <Ionicons name="pencil-outline" size={20} color={Colors.primary} />
+            </TouchableOpacity>
+          </Card>
+        </Animated.View>
+
+        {/* Section: Language */}
+        <Text style={[Typography.label, { marginBottom: 12, marginLeft: 4 }]}>Language Preference</Text>
+        <Card noPadding style={{ marginBottom: 32, overflow: 'hidden' }}>
           {(Object.keys(languageNames) as Language[]).map((lang, i, arr) => (
             <TouchableOpacity
               key={lang}
-              className={`flex-row items-center justify-between py-5 px-6 ${i < arr.length - 1 ? "border-b border-gray-50" : ""}`}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: 18,
+                paddingHorizontal: 20,
+                borderBottomWidth: i < arr.length - 1 ? 1 : 0,
+                borderBottomColor: Colors.cardBorder
+              }}
               onPress={() => setLanguage(lang)}
             >
-              <Text className="text-base font-medium text-graphite">{languageNames[lang]}</Text>
-              {language === lang && (
-                <Ionicons name="checkmark" size={24} color={Colors.graphite} />
-              )}
+              <Text style={[Typography.body, { color: language === lang ? Colors.primary : Colors.text, fontFamily: language === lang ? 'MontserratAlternates-SemiBold' : 'MontserratAlternates' }]}>{languageNames[lang]}</Text>
+              {language === lang && <Ionicons name="checkmark-circle" size={20} color={Colors.primary} />}
             </TouchableOpacity>
           ))}
         </Card>
 
-        {/* Notifications */}
-        <Text className="text-xs font-semibold tracking-widest text-muted mt-8 mb-3 ml-2 uppercase">
-          NOTIFICATIONS
-        </Text>
-        <Card
-          className="rounded-[24px] border-gray-50"
-          style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 }}
-          noPadding
-        >
-          <View className="flex-row items-center justify-between py-5 px-6">
-            <Text className="text-base font-medium text-graphite">Push Notifications</Text>
+        {/* Section: Preferences */}
+        <Text style={[Typography.label, { marginBottom: 12, marginLeft: 4 }]}>Preferences</Text>
+        <Card noPadding style={{ marginBottom: 32, overflow: 'hidden' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', padding: 20 }}>
+            <View style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: Colors.info + '10', alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
+              <Ionicons name="notifications-outline" size={20} color={Colors.info} />
+            </View>
+            <Text style={[Typography.body, { flex: 1, fontFamily: 'MontserratAlternates-SemiBold' }]}>Push Notifications</Text>
             <Switch
               value={notifEnabled}
               onValueChange={setNotifEnabled}
-              trackColor={{ false: Colors.gray300, true: Colors.success }}
+              trackColor={{ false: Colors.cardBorder, true: Colors.success + '40' }}
+              thumbColor={notifEnabled ? Colors.success : Colors.muted}
             />
           </View>
         </Card>
 
-        {/* Role Switch */}
-        <Text className="text-xs font-semibold tracking-widest text-muted mt-8 mb-3 ml-2 uppercase">
-          ACCOUNT
-        </Text>
-        <Card
-          className="rounded-[24px] border-gray-50"
-          style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 3 }}
-          noPadding
-        >
-          <TouchableOpacity
-            className="flex-row items-center justify-between py-5 px-6 border-b border-gray-50"
+        {/* Section: Account & Support */}
+        <Text style={[Typography.label, { marginBottom: 12, marginLeft: 4 }]}>Support & Legal</Text>
+        <Card noPadding style={{ marginBottom: 32, overflow: 'hidden' }}>
+          <SettingItem
+            icon="swap-horizontal"
+            label="Switch Mode"
+            value={`Usage as ${user?.role === 'artisan' ? 'Client' : 'Artisan'}`}
             onPress={handleRoleSwitch}
-          >
-            <View className="flex-row items-center gap-4">
-              <Ionicons
-                name="swap-horizontal-outline"
-                size={24}
-                color={Colors.muted}
-              />
-              <View>
-                <Text className="text-base font-medium text-graphite">Switch Role</Text>
-                <Text className="text-xs text-muted mt-0.5">
-                  Currently: {user?.role === "client" ? "Client" : "Artisan"}
-                </Text>
-              </View>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.gray300} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            className="flex-row items-center justify-between py-5 px-6 border-b border-gray-50"
+            color={Colors.warning}
+          />
+          <SettingItem
+            icon="help-circle-outline"
+            label="Help Center"
             onPress={() => router.push("/help")}
-          >
-            <View className="flex-row items-center gap-4">
-              <Ionicons
-                name="help-circle-outline"
-                size={24}
-                color={Colors.muted}
-              />
-              <Text className="text-base font-medium text-graphite">Help & Support</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.gray300} />
-          </TouchableOpacity>
-
-          <TouchableOpacity className="flex-row items-center justify-between py-5 px-6">
-            <View className="flex-row items-center gap-4">
-              <Ionicons
-                name="document-text-outline"
-                size={24}
-                color={Colors.muted}
-              />
-              <Text className="text-base font-medium text-graphite">Privacy & Terms</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.gray300} />
-          </TouchableOpacity>
+            color={Colors.info}
+          />
+          <SettingItem
+            icon="shield-checkmark-outline"
+            label="Privacy Policy"
+            onPress={() => { }}
+            isLast={true}
+            color={Colors.success}
+          />
         </Card>
 
         {/* Logout */}
         <TouchableOpacity
-          className="flex-row items-center justify-center gap-2 mt-10 p-5"
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            marginTop: 16,
+            padding: 16,
+            backgroundColor: Colors.error + '10',
+            borderRadius: Radius.lg
+          }}
           onPress={handleLogout}
         >
-          <Ionicons name="log-out-outline" size={22} color={Colors.error} />
-          <Text className="text-base text-red-500 font-semibold">Log Out</Text>
+          <Ionicons name="log-out-outline" size={20} color={Colors.error} />
+          <Text style={[Typography.body, { color: Colors.error, fontFamily: 'MontserratAlternates-Bold' }]}>Sign Out</Text>
         </TouchableOpacity>
 
-        <Text className="text-xs font-semibold tracking-wide text-muted text-center mt-5 uppercase">
-          Loom v1.0.0
-        </Text>
+        <View style={{ marginTop: 48, alignItems: 'center' }}>
+          <Text style={[Typography.label, { fontSize: 10, color: Colors.muted }]}>Loom for Africa • Version 1.0.0</Text>
+        </View>
       </ScrollView>
     </View>
   );
 }
+

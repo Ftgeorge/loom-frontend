@@ -1,10 +1,11 @@
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import React, { useRef, useState } from 'react';
 import {
     NativeSyntheticEvent,
     Text,
     TextInput,
     TextInputKeyPressEventData,
-    View,
+    View
 } from 'react-native';
 
 interface OTPInputProps {
@@ -15,6 +16,7 @@ interface OTPInputProps {
 
 export function OTPInput({ length = 6, onComplete, error }: OTPInputProps) {
     const [values, setValues] = useState<string[]>(Array(length).fill(''));
+    const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
     const refs = useRef<(TextInput | null)[]>([]);
 
     const handleChange = (text: string, index: number) => {
@@ -42,34 +44,48 @@ export function OTPInput({ length = 6, onComplete, error }: OTPInputProps) {
 
     return (
         <View>
-            <View className="flex-row justify-center gap-2.5">
+            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10 }}>
                 {values.map((val, i) => {
-                    let cellClass = "w-12 h-14 border-[1.5px] rounded-xl text-2xl font-bold text-primary bg-white text-center ";
-                    if (error) {
-                        cellClass += "border-red-500 ";
-                    } else if (val) {
-                        cellClass += "border-primary/20 bg-primary/5 ";
-                    } else {
-                        cellClass += "border-gray-200 ";
-                    }
+                    const isFocused = focusedIndex === i;
+                    const hasError = !!error;
 
                     return (
                         <TextInput
                             key={i}
                             ref={(r) => { refs.current[i] = r; }}
-                            className={cellClass}
+                            style={[
+                                {
+                                    width: 48,
+                                    height: 60,
+                                    borderRadius: Radius.md,
+                                    borderWidth: 1.5,
+                                    backgroundColor: isFocused ? Colors.white : Colors.surface,
+                                    borderColor: hasError ? Colors.error : (isFocused ? Colors.primary : Colors.cardBorder),
+                                    fontSize: 24,
+                                    fontFamily: 'MontserratAlternates-Bold',
+                                    color: Colors.text,
+                                    textAlign: 'center',
+                                    ...Shadows.sm
+                                }
+                            ]}
                             value={val}
+                            onFocus={() => setFocusedIndex(i)}
+                            onBlur={() => setFocusedIndex(null)}
                             onChangeText={(t) => handleChange(t.slice(-1), i)}
                             onKeyPress={(e) => handleKeyPress(e, i)}
                             keyboardType="number-pad"
                             maxLength={1}
-                            textAlign="center"
                             accessibilityLabel={`Digit ${i + 1}`}
                         />
                     );
                 })}
             </View>
-            {error && <Text className="text-xs text-red-500 mt-2 text-center">{error}</Text>}
+            {error && (
+                <Text style={[Typography.label, { color: Colors.error, marginTop: 12, textAlign: 'center', fontSize: 11 }]}>
+                    {error}
+                </Text>
+            )}
         </View>
     );
 }
+

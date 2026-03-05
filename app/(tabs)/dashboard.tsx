@@ -1,14 +1,13 @@
 import { AppHeader } from '@/components/AppHeader';
 import { Card } from '@/components/ui/CardChipBadge';
 import { RequestCard } from '@/components/ui/RequestCard';
-import { Skeleton, SkeletonList } from '@/components/ui/SkeletonLoader';
+import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
 import { t } from '@/i18n';
-import { fetchJobs } from '@/services/mockApi';
+import { jobApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors } from '@/theme';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { JobRequest } from '@/types';
-import { formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -16,9 +15,10 @@ import {
     ScrollView,
     Switch,
     Text,
+    TouchableOpacity,
     View,
 } from 'react-native';
-import Animated, { FadeInUp, StretchInY } from 'react-native-reanimated';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 
 export default function ArtisanDashboard() {
     const router = useRouter();
@@ -30,8 +30,24 @@ export default function ArtisanDashboard() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            const data = await fetchJobs();
-            setJobs(data);
+            // GET /jobs — artisan sees open + assigned jobs
+            const res = await jobApi.list({ limit: 30 });
+            const mapped = (res.results as any[]).map((row: any): JobRequest => ({
+                id: row.id,
+                clientId: row.customer_id,
+                clientName: row.customer_email ?? 'Client',
+                category: (row.title ?? 'other') as any,
+                description: row.description,
+                budget: 0,
+                urgency: 'today' as const,
+                location: { area: row.location ?? '', city: '', state: '' },
+                status: (row.status === 'open' ? 'submitted'
+                    : row.status === 'assigned' ? 'matched'
+                        : row.status === 'completed' ? 'completed'
+                            : 'cancelled') as any,
+                createdAt: row.created_at,
+            }));
+            setJobs(mapped);
         } catch {
             setError(true);
         } finally {
@@ -45,80 +61,106 @@ export default function ArtisanDashboard() {
     const activeJobs = jobs.filter((j) => ['matched', 'scheduled', 'in_progress'].includes(j.status));
 
     const stats = [
-        { label: t('newRequests', language), value: `${newJobs.length}`, icon: 'mail-unread-outline', color: Colors.info },
-        { label: t('activeJobs', language), value: `${activeJobs.length}`, icon: 'briefcase-outline', color: Colors.primary },
-        { label: t('yourRating', language), value: '4.8', icon: 'star-outline', color: Colors.warning },
-        { label: t('totalEarnings', language), value: formatNaira(485000), icon: 'wallet-outline', color: Colors.success },
+        { label: 'New Jobs', value: `${newJobs.length}`, icon: 'mail', color: Colors.info },
+        { label: 'Active', value: `${activeJobs.length}`, icon: 'briefcase', color: Colors.primary },
+        { label: 'Rating', value: '4.8', icon: 'star', color: Colors.warning },
+        { label: 'Earnings', value: '₦485k', icon: 'wallet', color: Colors.success },
     ];
 
     return (
-        <View className="flex-1 bg-background">
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <AppHeader showLocation onNotification={() => router.push('/notifications')} />
 
-            <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-                {/* Greeting + Online Toggle */}
-                <View className="flex-row items-center mb-6">
-                    <View className="flex-1">
-                        <Text className="text-xl font-extrabold text-graphite tracking-tight">
-                            {t('greeting', language)}, {user?.name} 👋
+            <ScrollView
+                contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
+                showsVerticalScrollIndicator={false}
+            >
+                {/* Greeting + Mission Control */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 32 }}>
+                    <View style={{ flex: 1 }}>
+                        <Text style={[Typography.h2, { fontSize: 22 }]}>
+                            {t('greeting', language)}, {user?.name.split(' ')[0]} 👋
                         </Text>
+                        <Text style={[Typography.bodySmall, { marginTop: 4 }]}>Hope you're ready for work today!</Text>
                     </View>
-                    <View className="flex-row items-center gap-2">
-                        <Text className="text-xs text-gray-500">
-                            {artisanOnline ? t('goOffline', language) : t('goOnline', language)}
+                    <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        backgroundColor: Colors.surface,
+                        paddingHorizontal: 12,
+                        paddingVertical: 8,
+                        borderRadius: Radius.full,
+                        borderWidth: 1,
+                        borderColor: Colors.cardBorder,
+                        gap: 8,
+                        ...Shadows.sm
+                    }}>
+                        <Text style={[Typography.label, { fontSize: 10, color: artisanOnline ? Colors.success : Colors.muted }]}>
+                            {artisanOnline ? 'ONLINE' : 'OFFLINE'}
                         </Text>
                         <Switch
                             value={artisanOnline}
                             onValueChange={setArtisanOnline}
-                            trackColor={{ false: Colors.gray300, true: Colors.success }}
-                            thumbColor={Colors.white}
+                            trackColor={{ false: Colors.cardBorder, true: Colors.success + '40' }}
+                            thumbColor={artisanOnline ? Colors.success : Colors.muted}
                         />
                     </View>
                 </View>
 
-                {/* Stats Grid */}
+                {/* Performance Grid */}
                 {loading ? (
-                    <View className="flex-row flex-wrap gap-4 mb-5">
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginBottom: 32 }}>
                         {[1, 2, 3, 4].map((i) => (
-                            <View key={i} className="w-[47%] items-center" style={{ padding: 20, backgroundColor: 'white', borderRadius: 16 }}>
-                                <Skeleton width={40} height={40} borderRadius={20} />
-                                <Skeleton width="60%" height={14} style={{ marginTop: 8 }} />
-                            </View>
+                            <View key={i} style={{ width: '47%', height: 100, backgroundColor: Colors.surface, borderRadius: Radius.lg }} />
                         ))}
                     </View>
                 ) : (
-                    <View className="flex-row flex-wrap gap-4 mb-5">
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginBottom: 32 }}>
                         {stats.map((s, index) => (
-                            <Animated.View key={s.label} entering={FadeInUp.delay(100 + index * 100).springify()} className="w-[47%]">
-                                <Card className="gap-1 rounded-[24px] border border-gray-50 shadow-sm w-full" style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 }}>
-                                    <View
-                                        className="w-10 h-10 rounded-[20px] items-center justify-center"
-                                        style={{ backgroundColor: s.color + '20' }}
-                                    >
-                                        <Ionicons name={s.icon as any} size={22} color={s.color} />
+                            <Animated.View key={s.label} entering={FadeInUp.delay(index * 100).springify()} style={{ width: '47.5%' }}>
+                                <Card style={{ padding: 18, gap: 4 }}>
+                                    <View style={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: 18,
+                                        backgroundColor: s.color + '10',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        marginBottom: 8
+                                    }}>
+                                        <Ionicons name={s.icon as any} size={20} color={s.color} />
                                     </View>
-                                    <Text className="text-xl font-bold text-graphite mt-1">{s.value}</Text>
-                                    <Text className="text-xs text-muted">{s.label}</Text>
+                                    <Text style={[Typography.h2, { fontSize: 20 }]}>{s.value}</Text>
+                                    <Text style={[Typography.bodySmall, { fontSize: 11, color: Colors.muted }]}>{s.label}</Text>
                                 </Card>
                             </Animated.View>
                         ))}
                     </View>
                 )}
 
-                {/* New Job Requests */}
-                <Text className="text-lg font-extrabold text-graphite tracking-tight mb-4">New Job Requests Near You</Text>
+                {/* Job Opportunities Section */}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                    <Text style={[Typography.h3]}>Available Near You</Text>
+                    <TouchableOpacity onPress={() => router.push('/(tabs)/jobs')}>
+                        <Text style={[Typography.label, { color: Colors.primary }]}>View All</Text>
+                    </TouchableOpacity>
+                </View>
+
                 {loading ? (
-                    <SkeletonList count={2} />
+                    <SkeletonList count={2} type="request" />
                 ) : error ? (
                     <ErrorState onRetry={load} />
                 ) : newJobs.length === 0 ? (
-                    <View className="p-8 items-center">
-                        <Text className="text-base text-muted text-center leading-relaxed">No new requests right now. Check back soon!</Text>
-                    </View>
+                    <Card style={{ padding: 40, alignItems: 'center', borderStyle: 'dotted' }}>
+                        <Ionicons name="notifications-off-outline" size={48} color={Colors.cardBorder} />
+                        <Text style={[Typography.body, { textAlign: 'center', marginTop: 16 }]}>
+                            Low jobs right now. Try changing your area!
+                        </Text>
+                    </Card>
                 ) : (
-                    <View className="gap-4">
-                        {newJobs.slice(0, 5).map((job, index) => (
-                            <Animated.View key={job.id} entering={StretchInY.delay(index * 150)}>
+                    <View style={{ gap: 16 }}>
+                        {newJobs.slice(0, 4).map((job, index) => (
+                            <Animated.View key={job.id} entering={FadeInUp.delay(400 + index * 100)}>
                                 <RequestCard
                                     job={job}
                                     isArtisanView
@@ -132,3 +174,4 @@ export default function ArtisanDashboard() {
         </View>
     );
 }
+

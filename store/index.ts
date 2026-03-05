@@ -1,14 +1,15 @@
 import type {
-    AppNotification,
-    Artisan,
-    EarningsSummary,
-    JobRequest,
-    Language,
-    Message,
-    MessageThread,
-    User,
-    UserRole,
+  AppNotification,
+  Artisan,
+  EarningsSummary,
+  JobRequest,
+  Language,
+  Message,
+  MessageThread,
+  User,
+  UserRole,
 } from "@/types";
+import { clearToken, saveToken } from "@/services/api";
 import { create } from "zustand";
 
 // ─── Auth Slice ─────────────────────────────────────────
@@ -17,6 +18,9 @@ interface AuthState {
   user: User | null;
   hasCompletedOnboarding: boolean;
   hasSelectedRole: boolean;
+  /** JWT token for API calls (stored in AsyncStorage, mirrored here) */
+  token: string | null;
+  isEmailVerified: boolean;
 }
 
 // ─── App State ──────────────────────────────────────────
@@ -26,11 +30,12 @@ interface AppState extends AuthState {
   setLanguage: (lang: Language) => void;
 
   // Auth
-  signIn: (role: UserRole) => void;
+  signIn: (role: UserRole, userData?: Partial<User>, token?: string) => void;
   signOut: () => void;
   setOnboardingComplete: () => void;
   setRoleSelected: (role: UserRole) => void;
   switchRole: (role: UserRole) => void;
+  setEmailVerified: (verified: boolean) => void;
 
   // Job Requests
   jobs: JobRequest[];
@@ -85,6 +90,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   user: null,
   hasCompletedOnboarding: false,
   hasSelectedRole: false,
+  token: null,
+  isEmailVerified: false,
 
   // Language
   language: "en",
@@ -95,28 +102,52 @@ export const useAppStore = create<AppState>((set, get) => ({
     })),
 
   // Auth actions
-  signIn: (role) =>
+  signIn: (role, userData, token) => {
+    // Merge real user data with defaults for dev fallback
+    const mergedUser: User = {
+      ...defaultUser,
+      role,
+      ...(userData as Partial<User>),
+    };
+
+    if (token) {
+      // Persist token to AsyncStorage (fire and forget)
+      saveToken(token).catch(console.error);
+    }
+
     set({
       isAuthenticated: true,
-      user: { ...defaultUser, role },
+      user: mergedUser,
       hasSelectedRole: true,
-    }),
-  signOut: () =>
+      token: token ?? null,
+    });
+  },
+
+  signOut: () => {
+    clearToken().catch(console.error);
     set({
       isAuthenticated: false,
       user: null,
       hasSelectedRole: false,
-    }),
+      token: null,
+      isEmailVerified: false,
+    });
+  },
+
   setOnboardingComplete: () => set({ hasCompletedOnboarding: true }),
+
   setRoleSelected: (role) =>
     set({
       hasSelectedRole: true,
       user: { ...defaultUser, role },
     }),
+
   switchRole: (role) =>
     set((s) => ({
       user: s.user ? { ...s.user, role } : null,
     })),
+
+  setEmailVerified: (verified) => set({ isEmailVerified: verified }),
 
   // Jobs
   jobs: [],
@@ -146,11 +177,11 @@ export const useAppStore = create<AppState>((set, get) => ({
       threads: s.threads.map((t) =>
         t.id === threadId
           ? {
-              ...t,
-              messages: [...t.messages, message],
-              lastMessage: message.text,
-              lastMessageTime: message.timestamp,
-            }
+            ...t,
+            messages: [...t.messages, message],
+            lastMessage: message.text,
+            lastMessageTime: message.timestamp,
+          }
           : t,
       ),
     })),

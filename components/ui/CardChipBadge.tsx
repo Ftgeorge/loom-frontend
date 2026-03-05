@@ -1,5 +1,7 @@
+import { Colors, Radius, Shadows, Typography } from '@/theme';
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Text, View, ViewStyle } from 'react-native';
+import { Text, TouchableOpacity, View, ViewStyle } from 'react-native';
 
 // ─── Card ───────────────────────────────────────────────
 interface CardProps {
@@ -7,16 +9,30 @@ interface CardProps {
     style?: ViewStyle;
     noPadding?: boolean;
     className?: string;
+    onPress?: () => void;
 }
 
-export function Card({ children, style, noPadding, className = '' }: CardProps) {
+export function Card({ children, style, noPadding, className = '', onPress }: CardProps) {
+    const Wrapper = onPress ? TouchableOpacity : View;
     return (
-        <View
-            className={`bg-surface rounded-2xl border border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.06)] ${noPadding ? '' : 'p-5'} ${className}`}
-            style={style}
+        <Wrapper
+            onPress={onPress}
+            activeOpacity={0.8}
+            style={[
+                {
+                    backgroundColor: Colors.surface,
+                    borderRadius: Radius.md,
+                    borderWidth: 1,
+                    borderColor: Colors.cardBorder,
+                    padding: noPadding ? 0 : 20,
+                    ...Shadows.sm,
+                },
+                style,
+            ]}
+            className={className}
         >
             {children}
-        </View>
+        </Wrapper>
     );
 }
 
@@ -26,40 +42,43 @@ interface ChipProps {
     selected?: boolean;
     onPress?: () => void;
     color?: string;
+    icon?: string;
     small?: boolean;
 }
 
-export function Chip({ label, selected, onPress, color, small }: ChipProps) {
-    const Wrapper = onPress ? require('react-native').TouchableOpacity : View;
-
-    // Fallbacks for dynamic sizing/colors
-    const sizeClasses = small ? 'px-3 py-1' : 'px-4 py-2';
-    const textSizeClasses = small ? 'text-xs' : 'text-sm';
-
-    let containerClass = `rounded-full ${sizeClasses} `;
-    let textClass = `font-medium ${textSizeClasses} `;
-
-    // Colors
-    if (selected) {
-        if (!color) containerClass += 'bg-graphite ';
-        textClass += 'text-white';
-    } else {
-        containerClass += 'bg-white border border-gray-100 ';
-        textClass += 'text-muted';
-    }
+export function Chip({ label, selected, onPress, color, icon, small }: ChipProps) {
+    const activeColor = color ?? Colors.primary;
 
     return (
-        <Wrapper
-            className={containerClass}
-            style={selected && color ? { backgroundColor: color } : undefined}
+        <TouchableOpacity
             onPress={onPress}
             activeOpacity={0.7}
-            accessibilityRole={onPress ? 'button' : undefined}
+            style={{
+                backgroundColor: selected ? activeColor + '15' : Colors.white,
+                borderRadius: Radius.full,
+                paddingHorizontal: small ? 10 : 16,
+                paddingVertical: small ? 6 : 10,
+                borderWidth: small ? 1 : 1.5,
+                borderColor: selected ? activeColor : Colors.cardBorder,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 6,
+            }}
         >
-            <Text className={textClass}>
+            {icon && <Ionicons name={icon as any} size={small ? 12 : 16} color={selected ? activeColor : Colors.muted} />}
+            <Text
+                style={[
+                    small ? { fontSize: 11 } : Typography.bodySmall,
+                    {
+                        color: selected ? activeColor : Colors.textSecondary,
+                        fontFamily: 'System',
+                        fontWeight: selected ? '600' : '400'
+                    }
+                ]}
+            >
                 {label}
             </Text>
-        </Wrapper>
+        </TouchableOpacity>
     );
 }
 
@@ -68,36 +87,62 @@ interface BadgeProps {
     label?: string;
     count?: number;
     color?: string;
-    variant?: 'default' | 'verified' | 'status';
+    variant?: 'default' | 'verified' | 'success' | 'warn';
 }
 
 export function Badge({ label, count, color, variant = 'default' }: BadgeProps) {
     if (variant === 'verified') {
         return (
-            <View className="flex-row items-center bg-black/40 px-3 py-1 rounded-full gap-1">
-                <Text className="text-[10px] text-black font-bold">✓</Text>
-                <Text className="text-[11px] text-black font-semibold">Verified</Text>
+            <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: Colors.primaryLight,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+                borderRadius: Radius.full,
+                gap: 4,
+            }}>
+                <Ionicons name="checkmark-circle" size={12} color={Colors.primary} />
+                <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>Verified Pro</Text>
             </View>
         );
     }
 
     if (count !== undefined) {
         return (
-            <View
-                className="bg-red-500 rounded-full min-w-[20px] h-[20px] items-center justify-center px-1.5"
-                style={color ? { backgroundColor: color } : undefined}
-            >
-                <Text className="text-[11px] text-white font-bold">{count > 99 ? '99+' : count}</Text>
+            <View style={{
+                backgroundColor: Colors.error,
+                borderRadius: 10,
+                minWidth: 20,
+                height: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingHorizontal: 4,
+            }}>
+                <Text style={{ fontSize: 10, color: Colors.white, fontWeight: 'bold' }}>{count > 99 ? '99+' : count}</Text>
             </View>
         );
     }
 
+    const getColors = () => {
+        switch (variant) {
+            case 'success': return { bg: Colors.success + '15', text: Colors.success };
+            case 'warn': return { bg: Colors.warning + '15', text: Colors.warning };
+            default: return { bg: Colors.background, text: Colors.textSecondary };
+        }
+    }
+
+    const { bg, text } = getColors();
+
     return (
-        <View
-            className="bg-primary/10 px-3 py-1 rounded-md"
-            style={color ? { backgroundColor: color } : undefined}
-        >
-            <Text className="text-xs text-black font-semibold">{label}</Text>
+        <View style={{
+            backgroundColor: color ? color + '15' : bg,
+            paddingHorizontal: 10,
+            paddingVertical: 4,
+            borderRadius: Radius.sm,
+        }}>
+            <Text style={[Typography.label, { color: color ?? text, fontSize: 11 }]}>{label}</Text>
         </View>
     );
 }
+

@@ -1,9 +1,12 @@
 import BackButton from '@/components/ui/BackButton';
 import { PrimaryButton } from '@/components/ui/Buttons';
+import { LoomThread } from '@/components/ui/LoomThread';
 import { AppTextInput } from '@/components/ui/TextInputs';
+import { Colors, Typography } from '@/theme';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, Text } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function ForgotPasswordScreen() {
     const router = useRouter();
@@ -19,47 +22,68 @@ export default function ForgotPasswordScreen() {
         setLoading(false);
     };
 
+    const containerStyle = { flex: 1, backgroundColor: Colors.background };
+    const contentStyle = { padding: 32, paddingTop: 80 };
+
     if (sent) {
         return (
-            <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 100 }}>
-                <Text className="text-[28px] font-extrabold text-graphite tracking-tight">Check Your Phone</Text>
-                <Text className="text-base text-muted leading-relaxed mt-2 mb-10">
-                    We've sent a password reset link to your phone number. Follow the link to reset your password.
-                </Text>
-                <PrimaryButton
-                    title="Back to Sign In"
-                    onPress={() => router.back()}
-                    style={{ marginTop: 40 }}
-                    className="bg-graphite"
-                />
-            </ScrollView>
+            <View style={containerStyle}>
+                <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.4 }}>
+                    <LoomThread variant="minimal" scale={1.2} animated />
+                </View>
+                <ScrollView contentContainerStyle={contentStyle}>
+                    <Animated.View entering={FadeInDown.delay(100)}>
+                        <Text style={Typography.h1}>Check Your Phone</Text>
+                        <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 8, marginBottom: 40 }]}>
+                            We've sent a password reset link to your phone number. Follow the link to reset your password.
+                        </Text>
+                        <PrimaryButton
+                            title="Back to Sign In"
+                            onPress={() => router.back()}
+                        />
+                    </Animated.View>
+                </ScrollView>
+            </View>
         );
     }
 
     return (
-        <ScrollView className="flex-1 bg-background" contentContainerStyle={{ padding: 32, paddingTop: 100 }}>
-            <BackButton onPress={() => router.back()} />
-            <Text className="text-[28px] font-extrabold text-graphite tracking-tight mt-6">Forgot Password?</Text>
-            <Text className="text-base text-muted leading-relaxed mt-2 mb-10">
-                Enter your phone number and we'll send you a link to reset your password.
-            </Text>
+        <View style={containerStyle}>
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.4 }}>
+                <LoomThread variant="minimal" scale={1.2} animated />
+            </View>
+            <ScrollView
+                contentContainerStyle={contentStyle}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
+                <BackButton onPress={() => router.back()} />
 
-            <AppTextInput
-                label="Phone Number"
-                placeholder="+234 801 234 5678"
-                value={phone}
-                onChangeText={setPhone}
-                keyboardType="phone-pad"
-            />
+                <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 40, marginTop: 24 }}>
+                    <Text style={Typography.h1}>Forgot Password?</Text>
+                    <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 8 }]}>
+                        Enter your phone number and we'll send you a link to reset your password.
+                    </Text>
+                </Animated.View>
 
-            <PrimaryButton
-                title="Send Reset Link"
-                onPress={handleSend}
-                loading={loading}
-                disabled={!phone}
-                style={{ marginTop: 24 }}
-                className="bg-graphite"
-            />
-        </ScrollView>
+                <Animated.View entering={FadeInDown.delay(200)}>
+                    <AppTextInput
+                        label="Phone Number"
+                        placeholder="+234 801 234 5678"
+                        value={phone}
+                        onChangeText={setPhone}
+                        keyboardType="phone-pad"
+                    />
+
+                    <PrimaryButton
+                        title="Send Reset Link"
+                        onPress={handleSend}
+                        loading={loading}
+                        disabled={!phone}
+                        style={{ marginTop: 24 }}
+                    />
+                </Animated.View>
+            </ScrollView>
+        </View>
     );
 }

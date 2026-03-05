@@ -1,5 +1,5 @@
 import { useAppStore } from '@/store';
-import { Colors } from '@/theme';
+import { Colors, Radius, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -25,48 +25,91 @@ export function AppHeader({
     rightAction,
 }: AppHeaderProps) {
     const insets = useSafeAreaInsets();
-    const { selectedCity, notifications } = useAppStore();
+
+    // Safety check for store
+    const store = useAppStore();
+    const selectedCity = store?.selectedCity || "Abuja";
+    const notifications = store?.notifications || [];
     const unread = notifications.filter((n) => !n.read).length;
 
     return (
         <View
-            className="flex-row items-center justify-between px-5 pb-4 bg-background"
-            style={{ paddingTop: insets.top + 8 }}
+            style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingHorizontal: 24,
+                paddingBottom: 16,
+                backgroundColor: Colors.background,
+                paddingTop: insets.top + 12,
+                borderBottomWidth: 1,
+                borderBottomColor: Colors.cardBorder + '50'
+            }}
         >
-            <View className="flex-row items-center gap-3 flex-1">
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
                 {showBack && (
                     <TouchableOpacity onPress={onBack} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
-                        <Ionicons name="arrow-back" size={24} color={Colors.graphite} />
+                        <Ionicons name="chevron-back" size={24} color={Colors.text} />
                     </TouchableOpacity>
                 )}
                 {showLocation && (
                     <TouchableOpacity
-                        className="flex-row items-center bg-surface px-4 py-2 rounded-full gap-1.5"
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            backgroundColor: Colors.white,
+                            paddingHorizontal: 14,
+                            paddingVertical: 10,
+                            borderRadius: Radius.full,
+                            gap: 6,
+                            borderWidth: 1,
+                            borderColor: Colors.cardBorder,
+                        }}
                         activeOpacity={0.8}
                     >
-                        <Ionicons name="location" size={16} color={Colors.graphite} />
-                        <Text className="text-sm font-semibold text-graphite m-0 tracking-tight">{selectedCity}</Text>
-                        <Ionicons name="chevron-down" size={14} color={Colors.muted} />
+                        <Ionicons name="location" size={14} color={Colors.primary} />
+                        <Text style={[Typography.bodySmall, { fontFamily: 'MontserratAlternates-SemiBold', color: Colors.text, fontSize: 13 }]}>{selectedCity}</Text>
+                        <Ionicons name="chevron-down" size={12} color={Colors.muted} />
                     </TouchableOpacity>
                 )}
                 {title && !showLocation && (
-                    <Text className="text-xl font-bold text-graphite tracking-tight m-0">{title}</Text>
+                    <Text style={[Typography.h2, { flex: 1, fontSize: 18 }]} numberOfLines={1}>{title}</Text>
                 )}
             </View>
 
-            <View className="flex-row items-center gap-5">
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
                 {rightAction}
                 {showNotification && (
                     <TouchableOpacity
                         onPress={onNotification}
                         hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                        accessibilityLabel="Notifications"
-                        className="w-10 h-10 items-center justify-center rounded-full bg-surface"
+                        style={{
+                            width: 44,
+                            height: 44,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: Radius.full,
+                            backgroundColor: Colors.white,
+                            borderWidth: 1,
+                            borderColor: Colors.cardBorder,
+                        }}
                     >
-                        <Ionicons name="notifications-outline" size={20} color={Colors.graphite} />
+                        <Ionicons name="notifications-outline" size={20} color={Colors.text} />
                         {unread > 0 && (
-                            <View className="absolute top-1.5 right-1.5 bg-red-500 rounded-full min-w-[16px] h-[16px] items-center justify-center px-1 border-2 border-surface">
-                                <Text className="text-[9px] font-bold text-white">{unread > 9 ? '9+' : unread}</Text>
+                            <View style={{
+                                position: 'absolute',
+                                top: 8,
+                                right: 8,
+                                backgroundColor: Colors.accent, // High visibility notification dot
+                                borderRadius: 6,
+                                minWidth: 12,
+                                height: 12,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderWidth: 2,
+                                borderColor: Colors.white,
+                            }}>
+                                <Text style={{ fontSize: 0, opacity: 0 }}>{unread}</Text>
                             </View>
                         )}
                     </TouchableOpacity>

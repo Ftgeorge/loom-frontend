@@ -1,11 +1,12 @@
 import { AppHeader } from '@/components/AppHeader';
 import { ArtisanCard } from '@/components/ui/ArtisanCard';
-import { SkeletonList } from '@/components/ui/SkeletonLoader';
+import { LoomThread } from '@/components/ui/LoomThread';
+import { SkeletonHorizontalList, SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
 import { t } from '@/i18n';
-import { fetchArtisans } from '@/services/mockApi';
+import { artisanApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Spacing } from '@/theme';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { Artisan } from '@/types';
 import { CATEGORIES } from '@/types';
 import { getGreeting } from '@/utils/helpers';
@@ -19,13 +20,14 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 
 const CATEGORY_ICONS: Record<string, string> = {
-    plumber: 'water-outline',
+    plumber: 'construct-outline',
     electrician: 'flash-outline',
     carpenter: 'hammer-outline',
     tailor: 'cut-outline',
-    mechanic: 'car-outline',
+    mechanic: 'settings-outline',
     cleaning: 'sparkles-outline',
     hair_beauty: 'heart-outline',
     ac_repair: 'snow-outline',
@@ -42,8 +44,29 @@ export default function ClientHomeScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            const data = await fetchArtisans();
-            setArtisans(data);
+            // GET /artisans — browse all artisans, sorted by rating
+            const res = await artisanApi.list({ limit: 30 });
+            const normalised = (res.results as any[]).map((row: any): Artisan => ({
+                id: row.artisan_profile_id ?? row.id,
+                name: `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim() || 'Artisan',
+                phone: row.phone ?? '',
+                avatar: row.avatar_url ?? undefined,
+                skills: row.skills ?? [],
+                rating: Number(row.avg_rating ?? 4.5),
+                reviewCount: Number(row.ratings_count ?? 0),
+                verified: Boolean(row.verified),
+                distance: Number(row.distance_km ?? 0),
+                availability: row.availability ?? 'online',
+                priceRange: { min: Number(row.price_min ?? 5000), max: Number(row.price_max ?? 50000) },
+                bio: row.bio ?? '',
+                location: { area: row.area ?? '', city: row.city ?? '', state: row.state ?? '' },
+                serviceAreas: row.service_areas ?? [],
+                pricingStyle: row.pricing_style ?? 'estimate',
+                reviews: [],
+                completedJobs: Number(row.completed_jobs ?? 0),
+                joinedDate: row.joined_date ?? new Date().toISOString().split('T')[0],
+            }));
+            setArtisans(normalised);
         } catch {
             setError(true);
         } finally {
@@ -61,77 +84,127 @@ export default function ClientHomeScreen() {
         .sort((a, b) => b.rating - a.rating)
         .slice(0, 6);
 
+    const greeting = typeof getGreeting === 'function' ? getGreeting() : "Hello";
+
     return (
-        <View className="flex-1 bg-background">
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <LoomThread variant="minimal" opacity={0.65} animated />
             <AppHeader showLocation showNotification onNotification={() => router.push('/notifications')} />
 
             <ScrollView
-                className="flex-1 bg-background"
-                contentContainerStyle={{ padding: 24, paddingBottom: 120 }}
+                contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Hero / Greeting */}
-                <View className="mb-8">
-                    <Text className="text-3xl font-bold text-graphite tracking-tight">
-                        {getGreeting()}, {user?.name?.split(' ')[0] || 'there'} 👋
+                {/* Greeting */}
+                <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 32 }}>
+                    <Text style={Typography.h1}>
+                        {greeting}, {user?.name?.split(' ')[0] || 'there'} 👋
                     </Text>
-                    <Text className="text-base text-muted mt-2 leading-relaxed">
-                        What service are you looking for today?
+                    <Text style={[Typography.body, { marginTop: 4, color: Colors.textSecondary }]}>
+                        Find trusted pros for your home needs.
                     </Text>
-                </View>
+                </Animated.View>
 
-                {/* Fake Search Bar */}
-                <TouchableOpacity
-                    className="flex-row items-center bg-white h-14 rounded-2xl px-5 border border-gray-100 mb-10 shadow-sm"
-                    style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.03, shadowRadius: 8, elevation: 2 }}
-                    onPress={() => router.push({ pathname: '/search', params: { category: 'all' } })}
-                    activeOpacity={0.9}
-                >
-                    <Ionicons name="search-outline" size={20} color={Colors.gray400} />
-                    <Text className="flex-1 text-base text-gray-400 ml-3">
-                        Search for plumbers, electricians...
-                    </Text>
-                    <View className="w-8 h-8 rounded-full bg-surface items-center justify-center">
-                        <Ionicons name="options-outline" size={16} color={Colors.graphite} />
-                    </View>
-                </TouchableOpacity>
+                {/* Search Bar */}
+                <Animated.View entering={FadeInDown.delay(200)}>
+                    <TouchableOpacity
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            backgroundColor: Colors.surface,
+                            height: 60,
+                            borderRadius: Radius.md,
+                            paddingHorizontal: 20,
+                            borderWidth: 1,
+                            borderColor: Colors.cardBorder,
+                            marginBottom: 40,
+                            ...Shadows.sm
+                        }}
+                        onPress={() => router.push({ pathname: '/search', params: { category: 'all' } })}
+                        activeOpacity={0.9}
+                    >
+                        <Ionicons name="search" size={20} color={Colors.muted} />
+                        <Text style={[Typography.body, { flex: 1, marginLeft: 12, color: Colors.muted }]}>
+                            Search for plumbers, tailors...
+                        </Text>
+                        <View style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 16,
+                            backgroundColor: Colors.accentLight,
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
+                            <Ionicons name="options-outline" size={16} color={Colors.accent} />
+                        </View>
+                    </TouchableOpacity>
+                </Animated.View>
 
-                {/* Post Job Premium Banner */}
-                <TouchableOpacity
-                    className="bg-graphite rounded-3xl p-6 mb-12 flex-row items-center justify-between"
-                    style={{ shadowColor: Colors.graphite, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 16, elevation: 6 }}
-                    onPress={() => router.push('/post-job')}
-                    activeOpacity={0.9}
-                >
-                    <View className="flex-1 pr-6">
-                        <Text className="text-white text-lg font-bold mb-1 tracking-tight">Need something specific?</Text>
-                        <Text className="text-gray-300 text-sm leading-relaxed">Post a custom job request and let top artisans come to you.</Text>
-                    </View>
-                    <View className="w-12 h-12 rounded-full bg-white/10 items-center justify-center">
-                        <Ionicons name="arrow-forward" size={20} color={Colors.white} />
-                    </View>
-                </TouchableOpacity>
+                {/* Post Job CTA */}
+                <Animated.View entering={FadeInDown.delay(300)}>
+                    <TouchableOpacity
+                        style={{
+                            backgroundColor: Colors.accent,
+                            borderRadius: Radius.lg,
+                            padding: 24,
+                            marginBottom: 48,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            ...Shadows.lg,
+                            shadowColor: Colors.accent // Match shadow to color
+                        }}
+                        onPress={() => router.push('/post-job')}
+                        activeOpacity={0.9}
+                    >
+                        <View style={{ flex: 1, paddingRight: 16 }}>
+                            <Text style={[Typography.h2, { color: Colors.white, fontSize: 20 }]}>Need something custom?</Text>
+                            <Text style={[Typography.bodySmall, { color: Colors.accentLight, marginTop: 4, opacity: 0.9 }]}>Post a request and let top pros find you.</Text>
+                        </View>
+                        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' }}>
+                            <Ionicons name="arrow-forward" size={20} color={Colors.white} />
+                        </View>
+                    </TouchableOpacity>
+                </Animated.View>
 
                 {/* Categories */}
-                <View className="mb-12">
-                    <Text className="text-xl font-bold text-graphite tracking-tight mb-5">Categories</Text>
-                    <View className="flex-row flex-wrap justify-between gap-y-4">
-                        {CATEGORIES.map((cat) => (
+                <View style={{ marginBottom: 48 }}>
+                    <Text style={[Typography.h3, { marginBottom: 20 }]}>Popular Services</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12 }}>
+                        {CATEGORIES.map((cat, index) => (
                             <TouchableOpacity
                                 key={cat.id}
-                                className="w-[23%] h-24 bg-white rounded-2xl items-center justify-center border border-gray-50 bg-white"
-                                style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 2 }}
+                                style={{
+                                    width: '22%',
+                                    aspectRatio: 1,
+                                    backgroundColor: Colors.surface,
+                                    borderRadius: Radius.md,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderWidth: 1,
+                                    borderColor: Colors.cardBorder,
+                                    ...Shadows.sm
+                                }}
                                 onPress={() => router.push({ pathname: '/search', params: { category: cat.id } })}
                                 activeOpacity={0.8}
                             >
-                                <Ionicons
-                                    name={CATEGORY_ICONS[cat.id] as any || 'construct-outline'}
-                                    size={24}
-                                    color={Colors.graphite}
-                                    style={{ marginBottom: 6 }}
-                                />
-                                <Text className="text-[11px] font-medium text-muted text-center leading-tight px-1">
+                                <View style={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: 20,
+                                    backgroundColor: Colors.background,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginBottom: 8
+                                }}>
+                                    <Ionicons
+                                        name={CATEGORY_ICONS[cat.id] as any || 'construct-outline'}
+                                        size={20}
+                                        color={Colors.primary}
+                                    />
+                                </View>
+                                <Text style={[Typography.label, { fontSize: 9, textAlign: 'center', color: Colors.text, textTransform: 'none' }]}>
                                     {cat.label}
                                 </Text>
                             </TouchableOpacity>
@@ -139,56 +212,54 @@ export default function ClientHomeScreen() {
                     </View>
                 </View>
 
-                {/* Top Rated */}
-                <View className="mb-10">
-                    <View className="flex-row items-center justify-between mb-5">
-                        <Text className="text-xl font-bold text-graphite tracking-tight">{t('topRated', language)}</Text>
-                        <TouchableOpacity onPress={() => router.push('/search')} activeOpacity={0.7}>
-                            <Text className="text-sm font-semibold text-primary">See all</Text>
+                {/* Top Rated Horizontal Scroll */}
+                <View style={{ marginBottom: 48 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                        <Text style={Typography.h3}>{t('topRated', language)}</Text>
+                        <TouchableOpacity onPress={() => router.push('/search')}>
+                            <Text style={[Typography.label, { color: Colors.primary, textTransform: 'none' }]}>View All</Text>
                         </TouchableOpacity>
                     </View>
 
                     {loading ? (
-                        <SkeletonList count={2} />
+                        <SkeletonHorizontalList count={3} />
                     ) : error ? (
                         <ErrorState onRetry={load} />
                     ) : (
-                        <>
-                            {/* Negative margin to pull the list to the screen edge, inner padding to push content back to safe area start */}
-                            <FlatList
-                                data={topRated}
-                                horizontal
-                                showsHorizontalScrollIndicator={false}
-                                className="-mx-6"
-                                contentContainerStyle={{ gap: Spacing.md, paddingHorizontal: 24 }}
-                                keyExtractor={(item) => item.id}
-                                renderItem={({ item }) => (
+                        <FlatList
+                            data={topRated}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            style={{ marginHorizontal: -24 }}
+                            contentContainerStyle={{ paddingHorizontal: 24, gap: 16 }}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item, index }) => (
+                                <Animated.View entering={FadeInRight.delay(400 + index * 100)}>
                                     <ArtisanCard
                                         artisan={item}
                                         onPress={() => router.push({ pathname: '/artisan-profile', params: { id: item.id } })}
                                     />
-                                )}
-                            />
-                        </>
+                                </Animated.View>
+                            )}
+                        />
                     )}
                 </View>
 
-                {/* Recently Used */}
-                <View className="mb-6">
-                    <View className="flex-row items-center justify-between mb-5">
-                        <Text className="text-xl font-bold text-graphite tracking-tight">{t('recentlyUsed', language)}</Text>
-                    </View>
+                {/* Pros Near You */}
+                <View>
+                    <Text style={[Typography.h3, { marginBottom: 20 }]}>Pros Near You</Text>
                     {loading ? (
-                        <SkeletonList count={2} />
+                        <SkeletonList count={3} />
                     ) : (
-                        <View className="gap-5">
-                            {artisans.slice(0, 3).map((art) => (
-                                <ArtisanCard
-                                    key={art.id}
-                                    artisan={art}
-                                    onPress={() => router.push({ pathname: '/artisan-profile', params: { id: art.id } })}
-                                    horizontal
-                                />
+                        <View style={{ gap: 16 }}>
+                            {artisans.slice(0, 5).map((art, index) => (
+                                <Animated.View key={art.id} entering={FadeInDown.delay(600 + index * 100)}>
+                                    <ArtisanCard
+                                        artisan={art}
+                                        onPress={() => router.push({ pathname: '/artisan-profile', params: { id: art.id } })}
+                                        horizontal
+                                    />
+                                </Animated.View>
                             ))}
                         </View>
                     )}

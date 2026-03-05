@@ -1,4 +1,4 @@
-import { Colors } from '@/theme';
+import { Colors, Radius, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
@@ -19,32 +19,62 @@ interface AppTextInputProps extends TextInputProps {
 export function AppTextInput({ label, error, leftIcon, rightIcon, style, ...props }: AppTextInputProps) {
     const [focused, setFocused] = useState(false);
 
-    let wrapperClass = "flex-row items-center border-[1.5px] rounded-[16px] min-h-[56px] ";
-    if (error) {
-        wrapperClass += "border-red-500 bg-red-50";
-    } else if (focused) {
-        wrapperClass += "border-graphite bg-white";
-    } else {
-        wrapperClass += "border-transparent bg-surface";
-    }
+    const getBorderColor = () => {
+        if (error) return Colors.error;
+        if (focused) return Colors.primary;
+        return Colors.cardBorder;
+    };
+
+    const getBackgroundColor = () => {
+        if (error) return Colors.error + '05';
+        if (focused) return Colors.white;
+        return Colors.surface;
+    };
 
     return (
-        <View className="mb-5">
-            {label && <Text className="text-[11px] font-semibold text-muted mb-2 tracking-widest uppercase">{label}</Text>}
-            <View className={wrapperClass}>
-                {leftIcon && <View className="pl-5">{leftIcon}</View>}
+        <View style={{ marginBottom: 20 }}>
+            {label && (
+                <Text style={[Typography.label, { marginBottom: 8, color: focused ? Colors.primary : Colors.textSecondary }]}>
+                    {label}
+                </Text>
+            )}
+            <View
+                style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    borderWidth: 1.5,
+                    borderRadius: Radius.md,
+                    minHeight: 58,
+                    borderColor: getBorderColor(),
+                    backgroundColor: getBackgroundColor(),
+                }}
+            >
+                {leftIcon && <View style={{ paddingLeft: 16 }}>{leftIcon}</View>}
                 <RNTextInput
-                    className="flex-1 text-base px-5 py-4 text-graphite font-medium"
-                    style={style}
+                    style={[
+                        Typography.body,
+                        {
+                            flex: 1,
+                            paddingHorizontal: 16,
+                            paddingVertical: 14,
+                            color: Colors.text
+                        },
+                        style
+                    ]}
                     placeholderTextColor={Colors.muted}
                     onFocus={() => setFocused(true)}
                     onBlur={() => setFocused(false)}
                     accessibilityLabel={label}
+                    selectionColor={Colors.primary}
                     {...props}
                 />
-                {rightIcon && <View className="pr-5">{rightIcon}</View>}
+                {rightIcon && <View style={{ paddingRight: 16 }}>{rightIcon}</View>}
             </View>
-            {error && <Text className="text-xs text-red-500 mt-1.5">{error}</Text>}
+            {error && (
+                <Text style={[Typography.label, { color: Colors.error, marginTop: 6, fontSize: 11 }]}>
+                    {error}
+                </Text>
+            )}
         </View>
     );
 }
@@ -74,8 +104,12 @@ export function PhoneInput(props: PhoneInputProps) {
             {...props}
             keyboardType="phone-pad"
             leftIcon={
-                <Text className="text-base text-muted font-medium pl-5">+234</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingLeft: 12 }}>
+                    <Text style={[Typography.body, { color: Colors.textSecondary, fontWeight: '600' }]}>+234</Text>
+                    <View style={{ width: 1, height: 20, backgroundColor: Colors.cardBorder, marginLeft: 4 }} />
+                </View>
             }
         />
     );
 }
+

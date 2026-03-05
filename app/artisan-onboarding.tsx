@@ -2,12 +2,13 @@ import { AppHeader } from '@/components/AppHeader';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { Chip } from '@/components/ui/CardChipBadge';
 import { AppTextInput, PhoneInput } from '@/components/ui/TextInputs';
+import { artisanApi, userApi } from '@/services/api';
 import { Colors } from '@/theme';
 import { CATEGORIES } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
 
 const STEPS = ['Basics', 'Skills', 'Areas', 'Availability', 'Pricing'];
@@ -38,9 +39,34 @@ export default function ArtisanOnboardingScreen() {
 
     const handleComplete = async () => {
         setLoading(true);
-        await new Promise((r) => setTimeout(r, 1000));
-        setLoading(false);
-        router.replace('/(tabs)/dashboard');
+        try {
+            // 1. Update user basic info (name, phone)
+            const [firstName, ...lastNameParts] = name.trim().split(' ');
+            const lastName = lastNameParts.join(' ');
+            await userApi.updateProfile({ first_name: firstName, last_name: lastName, phone });
+
+            // 2. Create Artisan Profile
+            const profile = await artisanApi.createProfile({
+                bio: `Available for ${selectedSkills.join(', ')} in ${selectedAreas.join(', ')}.`,
+                yearsOfExperience: 1, // Default during onboarding
+            });
+
+            const profileId = profile.id;
+
+            // 3. Attach skills (sequentially for simplicity in onboarding)
+            for (const skill of selectedSkills) {
+                // We need to map category ID back to a skill name. 
+                // For now, using the ID as name or finding the label.
+                const skillLabel = CATEGORIES.find(c => c.id === skill)?.label || skill;
+                await artisanApi.addSkill(profileId, skillLabel);
+            }
+
+            router.replace('/(tabs)/dashboard');
+        } catch (err: any) {
+            Alert.alert('Onboarding Error', err.message || 'Failed to save profile');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

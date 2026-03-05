@@ -1,3 +1,4 @@
+import { Colors, Typography } from '@/theme';
 import { getInitials } from '@/utils/helpers';
 import React from 'react';
 import { Text, View } from 'react-native';
@@ -13,11 +14,17 @@ export function Avatar({ name, size = 48, uri }: AvatarProps) {
 
     return (
         <View
-            className="bg-black/10 items-center justify-center"
-            style={{ width: size, height: size, borderRadius: size / 2 }}
+            style={{
+                width: size,
+                height: size,
+                borderRadius: size / 2,
+                backgroundColor: Colors.cardBorder + '50',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}
             accessibilityLabel={`${name}'s avatar`}
         >
-            <Text className="text-black font-bold" style={{ fontSize }}>
+            <Text style={{ fontSize, fontWeight: '700', color: Colors.text }}>
                 {getInitials(name)}
             </Text>
         </View>
@@ -37,23 +44,23 @@ export function RatingStars({ rating, size = 16, showValue = true, count }: Rati
     const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
 
     return (
-        <View className="flex-row items-center gap-[1px]">
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
             {Array(fullStars)
                 .fill(0)
                 .map((_, i) => (
-                    <Text key={`f${i}`} className="text-accent" style={{ fontSize: size }}>★</Text>
+                    <Text key={`f${i}`} style={{ fontSize: size, color: Colors.accent }}>★</Text>
                 ))}
-            {hasHalf && <Text className="text-accent" style={{ fontSize: size }}>★</Text>}
+            {hasHalf && <Text style={{ fontSize: size, color: Colors.accent }}>★</Text>}
             {Array(emptyStars)
                 .fill(0)
                 .map((_, i) => (
-                    <Text key={`e${i}`} className="text-gray-300" style={{ fontSize: size }}>☆</Text>
+                    <Text key={`e${i}`} style={{ fontSize: size, color: Colors.cardBorder }}>☆</Text>
                 ))}
             {showValue && (
-                <Text className="text-sm font-semibold text-primary ml-1">{rating.toFixed(1)}</Text>
+                <Text style={[Typography.label, { color: Colors.primary, marginLeft: 4, textTransform: 'none' }]}>{rating.toFixed(1)}</Text>
             )}
             {count !== undefined && (
-                <Text className="text-xs text-gray-500 ml-0.5">({count})</Text>
+                <Text style={[Typography.bodySmall, { fontSize: 10, marginLeft: 2 }]}>({count})</Text>
             )}
         </View>
     );

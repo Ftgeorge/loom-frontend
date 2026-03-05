@@ -1,11 +1,17 @@
 import BackButton from "@/components/ui/BackButton";
 import { OauthButton, PrimaryButton } from "@/components/ui/Buttons";
+import { LoomThread } from "@/components/ui/LoomThread";
 import { AppTextInput, PasswordInput } from "@/components/ui/TextInputs";
+import { authApi } from "@/services/api";
 import { useAppStore } from "@/store";
+import { Colors, Typography } from "@/theme";
 import { SignInSchema, mapZodErrors } from "@/utils/helpers";
+import { useOAuth } from "@clerk/expo";
+import * as WebBrowser from "expo-web-browser";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -15,12 +21,19 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
+// Required for Clerk OAuth on Expo
+WebBrowser.maybeCompleteAuthSession();
+
 export default function SignInScreen() {
   const router = useRouter();
   const { signIn, user } = useAppStore();
   const [form, setForm] = useState({ phone: "", password: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  // Clerk Google OAuth hook
+  const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
 
   const handleSignIn = async () => {
     const result = SignInSchema.safeParse(form);
@@ -30,40 +43,106 @@ export default function SignInScreen() {
     }
     setErrors({});
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    signIn(user?.role ?? "client");
-    setLoading(false);
-    router.replace(
-      user?.role === "artisan" ? "/(tabs)/dashboard" : "/(tabs)/home",
-    );
+
+    try {
+      const res = await authApi.login({
+        email: form.phone, // field accepts email or phone
+        password: form.password,
+      });
+
+      signIn(
+        (res.user.role as any) ?? "client",
+        {
+          id: res.user.id,
+          email: res.user.email,
+          name: res.user.name ?? form.phone,
+        },
+        res.token
+      );
+
+      router.replace(
+        res.user.role === "artisan" ? "/(tabs)/dashboard" : "/(tabs)/home"
+      );
+    } catch (err: any) {
+      Alert.alert("Sign In Failed", err.message ?? "Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setGoogleLoading(true);
+      const { createdSessionId, setActive, authSessionResult } =
+        await startOAuthFlow();
+
+      if (createdSessionId && setActive) {
+        await setActive({ session: createdSessionId });
+
+        // Exchange with our backend
+        const clerkUser = authSessionResult as any;
+        const email =
+          clerkUser?.params?.email ??
+          clerkUser?.email ??
+          `user_${Date.now()}@google.com`;
+        const name = clerkUser?.params?.name ?? clerkUser?.name ?? "User";
+
+        const res = await authApi.googleSignIn({
+          email,
+          name,
+          clerkUserId: createdSessionId,
+          role: user?.role ?? "customer",
+        });
+
+        signIn(
+          (res.user.role as any) ?? "client",
+          { id: res.user.id, email: res.user.email, name: res.user.name },
+          res.token
+        );
+
+        router.replace(
+          res.user.role === "artisan" ? "/(tabs)/dashboard" : "/(tabs)/home"
+        );
+      }
+    } catch (err: any) {
+      Alert.alert("Google Sign In Failed", err.message ?? "Please try again.");
+    } finally {
+      setGoogleLoading(false);
+    }
   };
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: Colors.background }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
+      <View style={{ position: "absolute", top: 0, right: 0, left: 0, bottom: 0, opacity: 0.4 }}>
+        <LoomThread variant="complex" scale={1.2} animated />
+      </View>
+
       <ScrollView
-        className="flex-1 bg-background"
         contentContainerStyle={{ padding: 32, paddingTop: 100 }}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         <BackButton onPress={() => router.back()} />
-        <Animated.View entering={FadeInDown.delay(100)} className="mb-10">
-          <Text className="text-3xl font-extrabold text-graphite tracking-tight">Welcome Back</Text>
-          <Text className="text-base text-muted leading-relaxed mt-2">
-            Sign in to continue using Loom
+
+        <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 40, marginTop: 24 }}>
+          <Text style={Typography.h1}>Welcome Back</Text>
+          <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 8 }]}>
+            Sign in to continue using Loom.
           </Text>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(200)}>
           <AppTextInput
-            label="Phone Number or Email"
-            placeholder="+234 801 234 5678"
+            label="Email"
+            placeholder="you@email.com"
             value={form.phone}
             onChangeText={(phone) => setForm({ ...form, phone })}
             error={errors.phone}
-            keyboardType="phone-pad"
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
           <PasswordInput
             label="Password"
@@ -74,10 +153,10 @@ export default function SignInScreen() {
           />
 
           <TouchableOpacity
-            className="self-end p-2"
+            style={{ alignSelf: "flex-end", paddingVertical: 8 }}
             onPress={() => router.push("/(auth)/forgot-password")}
           >
-            <Text className="text-sm text-graphite font-bold">
+            <Text style={[Typography.bodySmall, { color: Colors.primary, fontWeight: "600", textDecorationLine: "underline" }]}>
               Forgot Password?
             </Text>
           </TouchableOpacity>
@@ -86,39 +165,33 @@ export default function SignInScreen() {
             title="Sign In"
             onPress={handleSignIn}
             loading={loading}
-            style={{ marginTop: 16 }}
-            className="bg-graphite"
+            style={{ marginTop: 24 }}
           />
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(300)}>
-          <View className="flex flex-row items-center gap-4 px-2 my-6">
-            <View className="flex-1 h-[1px] bg-gray-50" />
-            <Text className="text-xs text-muted font-semibold tracking-widest uppercase">Or</Text>
-            <View className="flex-1 h-[1px] bg-gray-50" />
+          <View style={{ flexDirection: "row", alignItems: "center", marginVertical: 40, gap: 16 }}>
+            <View style={{ flex: 1, height: 1.5, backgroundColor: Colors.cardBorder }} />
+            <Text style={[Typography.label, { color: Colors.muted }]}>OR</Text>
+            <View style={{ flex: 1, height: 1.5, backgroundColor: Colors.cardBorder }} />
           </View>
 
           <OauthButton
             title="Continue with Google"
-            onPress={() => { }}
-            className="border-gray-100"
-            textStyle={{ color: '#2C2C2C' }} // Hardcoded graphite color for compatibility with existing OauthButton interface
+            onPress={handleGoogleSignIn}
+            loading={googleLoading}
             image={require("../../assets/images/google-icon.jpeg")}
           />
 
-          <View
-            className="flex flex-row items-center justify-center mt-12 gap-2"
-          >
-            <Text className="text-base text-muted">
-              Don't have an account?{" "}
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 48, gap: 6 }}>
+            <Text style={[Typography.body, { color: Colors.textSecondary }]}>
+              Don't have an account?
             </Text>
             <TouchableOpacity onPress={() => router.push("/(auth)/sign-up")}>
-              <Text className="text-graphite font-bold text-base">Sign Up</Text>
+              <Text style={[Typography.body, { color: Colors.primary, fontWeight: "700" }]}>Sign Up</Text>
             </TouchableOpacity>
           </View>
         </Animated.View>
-
-
       </ScrollView>
     </KeyboardAvoidingView>
   );

@@ -1,7 +1,7 @@
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { t } from '@/i18n';
 import { useAppStore } from '@/store';
-import { Colors } from '@/theme';
+import { Colors, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
@@ -16,26 +16,26 @@ import {
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const pages = [
     {
-        icon: 'search-outline' as const,
+        icon: 'search-sharp' as const,
         titleKey: 'onboard1Title' as const,
         descKey: 'onboard1Desc' as const,
-        color: Colors.graphite,
+        accent: Colors.primary,
     },
     {
-        icon: 'chatbubble-ellipses-outline' as const,
+        icon: 'chatbubbles-sharp' as const,
         titleKey: 'onboard2Title' as const,
         descKey: 'onboard2Desc' as const,
-        color: Colors.graphite,
+        accent: Colors.accent,
     },
     {
-        icon: 'shield-checkmark-outline' as const,
+        icon: 'shield-checkmark-sharp' as const,
         titleKey: 'onboard3Title' as const,
         descKey: 'onboard3Desc' as const,
-        color: Colors.success,
+        accent: Colors.success,
     },
 ];
 
@@ -68,10 +68,13 @@ export default function OnboardingScreen() {
     };
 
     return (
-        <View className="flex-1 bg-background">
-            <TouchableOpacity className="absolute top-[60px] right-6 z-10 p-2" onPress={handleSkip}>
-                <Text className="text-base text-muted font-medium">{t('skip', language)}</Text>
-            </TouchableOpacity>
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            {/* Header / Skip */}
+            <View style={{ position: 'absolute', top: 60, width: '100%', paddingHorizontal: 24, zIndex: 10, flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <TouchableOpacity onPress={handleSkip}>
+                    <Text style={[Typography.bodySmall, { color: Colors.muted }]}>{t('skip', language)}</Text>
+                </TouchableOpacity>
+            </View>
 
             <FlatList
                 ref={listRef}
@@ -82,35 +85,77 @@ export default function OnboardingScreen() {
                 onMomentumScrollEnd={onMomentumScrollEnd}
                 keyExtractor={(_, i) => `${i}`}
                 renderItem={({ item, index }) => (
-                    <View className="flex-1 items-center justify-center px-10" style={{ width }}>
-                        <Animated.View
-                            entering={FadeInDown.delay(100).springify()}
-                            className="w-[140px] h-[140px] rounded-[70px] items-center justify-center mb-10"
-                            style={{ backgroundColor: item.color + '15' }}
+                    <View style={{ width, flex: 1, paddingTop: height * 0.15, paddingHorizontal: 32 }}>
+                        {/* Visual Group */}
+                        <View style={{ alignItems: 'center', marginBottom: 64 }}>
+                            <Animated.View
+                                entering={FadeInDown.delay(200).springify().damping(12)}
+                                style={{
+                                    width: 200,
+                                    height: 200,
+                                    borderRadius: 100,
+                                    backgroundColor: item.accent + '10',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                {/* Background organic shape */}
+                                <View style={{
+                                    position: 'absolute',
+                                    width: 160,
+                                    height: 160,
+                                    borderRadius: 80,
+                                    borderStyle: 'dashed',
+                                    borderWidth: 2,
+                                    borderColor: item.accent + '30'
+                                }} />
+                                <Ionicons name={item.icon} size={80} color={item.accent} />
+                            </Animated.View>
+                        </View>
+
+                        {/* Content Group */}
+                        <Animated.Text
+                            entering={FadeInDown.delay(400).springify()}
+                            style={[Typography.h1, { textAlign: 'center', marginBottom: 16 }]}
                         >
-                            <Ionicons name={item.icon} size={64} color={item.color} />
-                        </Animated.View>
-                        <Animated.Text entering={FadeInDown.delay(200).springify()} className="text-[28px] font-extrabold tracking-tight text-center mb-6 text-graphite">{t(item.titleKey, language)}</Animated.Text>
-                        <Animated.Text entering={FadeInDown.delay(300).springify()} className="text-base text-muted text-center leading-6">{t(item.descKey, language)}</Animated.Text>
+                            {t(item.titleKey, language)}
+                        </Animated.Text>
+
+                        <Animated.Text
+                            entering={FadeInDown.delay(500).springify()}
+                            style={[Typography.body, { textAlign: 'center', lineHeight: 26, paddingHorizontal: 12 }]}
+                        >
+                            {t(item.descKey, language)}
+                        </Animated.Text>
                     </View>
                 )}
             />
 
-            <View className="px-8 pb-12 items-center gap-8">
-                <View className="flex-row gap-2">
+            {/* Footer */}
+            <View style={{ paddingHorizontal: 32, paddingBottom: 64 }}>
+                {/* Pagination Dots */}
+                <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 40 }}>
                     {pages.map((_, i) => (
                         <View
                             key={i}
-                            className={`h-2 rounded-full ${i === currentPage ? 'w-6 bg-graphite' : 'w-2 bg-muted/40'}`}
+                            style={{
+                                height: 6,
+                                borderRadius: 3,
+                                backgroundColor: i === currentPage ? Colors.primary : Colors.cardBorder,
+                                width: i === currentPage ? 24 : 6,
+                            }}
                         />
                     ))}
                 </View>
+
+                {/* Main Action */}
                 <PrimaryButton
                     title={currentPage === pages.length - 1 ? t('getStarted', language) : t('next', language)}
                     onPress={handleNext}
-                    className="w-full bg-graphite"
+                    style={{ width: '100%' }}
                 />
             </View>
         </View>
     );
 }
+

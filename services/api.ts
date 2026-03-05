@@ -1,0 +1,314 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
+
+// ─── Helpers ─────────────────────────────────────────────
+async function getAuthHeader(): Promise<Record<string, string>> {
+    const token = await AsyncStorage.getItem("@loom/token");
+    return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+async function apiFetch<T>(
+    path: string,
+    options: RequestInit = {}
+): Promise<T> {
+    const authHeaders = await getAuthHeader();
+    const response = await fetch(`${BASE_URL}${path}`, {
+        headers: {
+            "Content-Type": "application/json",
+            ...authHeaders,
+            ...(options.headers as Record<string, string>),
+        },
+        ...options,
+    });
+
+    const json = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(json.error ?? `Request failed: ${response.status}`);
+    }
+
+    return json as T;
+}
+
+// ─── Auth API ─────────────────────────────────────────────
+export interface AuthUser {
+    id: string;
+    email: string;
+    role: string;
+    name?: string;
+}
+
+export interface AuthResponse {
+    token: string;
+    user: AuthUser;
+}
+
+export const authApi = {
+    register: (data: {
+        email: string;
+        password: string;
+        role: "customer" | "artisan";
+        name?: string;
+    }) =>
+        apiFetch<{ id: string; email: string; role: string }>("/auth/register", {
+            method: "POST",
+            body: JSON.stringify(data),
+        }),
+
+    login: (data: { email: string; password: string }) =>
+        apiFetch<AuthResponse>("/auth/login", {
+            method: "POST",
+            body: JSON.stringify(data),
+        }),
+
+    me: () => apiFetch<{ user: AuthUser }>("/auth/me"),
+
+    requestOtp: (email: string) =>
+        apiFetch<{ message: string }>("/auth/request-otp", {
+            method: "POST",
+            body: JSON.stringify({ email }),
+        }),
+
+    verifyOtp: (otp: string) =>
+        apiFetch<{ message: string }>("/auth/verify-otp", {
+            method: "POST",
+            body: JSON.stringify({ otp }),
+        }),
+
+    /**
+     * Called after a successful Clerk Google sign-in.
+     * Sends the Clerk user info to our backend which upserts the user
+     * and returns our own JWT.
+     */
+    googleSignIn: (data: {
+        email: string;
+        name: string;
+        clerkUserId: string;
+        role?: string;
+    }) =>
+        apiFetch<AuthResponse>("/auth/google", {
+            method: "POST",
+            body: JSON.stringify(data),
+        }),
+};
+
+// ─── Artisan API ─────────────────────────────────────────
+export const artisanApi = {
+    /** GET /artisans/search?skill=plumber — category-filtered artisan search */
+    search: (params: { skill: string; limit?: number; offset?: number }) => {
+        const qs = new URLSearchParams({
+            skill: params.skill,
+            limit: String(params.limit ?? 20),
+            offset: String(params.offset ?? 0),
+        });
+        return apiFetch<{ total: number; count: number; limit: number; offset: number; results: unknown[] }>(
+            `/artisans/search?${qs}`
+        );
+    },
+
+    /** GET /artisans — browse all artisans (no skill filter) */
+    list: (params?: { limit?: number; offset?: number }) => {
+        const qs = new URLSearchParams({
+            limit: String(params?.limit ?? 20),
+            offset: String(params?.offset ?? 0),
+        });
+        return apiFetch<{ count: number; limit: number; offset: number; results: unknown[] }>(
+            `/artisans?${qs}`
+        );
+    },
+
+    /** GET /artisans/:id — get a single artisan by profile ID */
+    getById: (id: string) => apiFetch<unknown>(`/artisans/${id}`),
+
+    /** GET /artisans/me/full — logged-in artisan's own full profile */
+    meProfile: () => apiFetch<unknown>("/artisans/me/full"),
+
+    /** GET /artisans/me/earnings — my earnings (artisan only) */
+    meEarnings: () =>
+        apiFetch<{
+            artisan_profile_id: string;
+            total_earned: string;
+            jobs_completed: number;
+            pending_payout: string;
+            total_withdrawn: string;
+        }>("/artisans/me/earnings"),
+
+    /** POST /artisans/me/profile — create artisan profile for logged in user */
+    createProfile: (data: { bio?: string; yearsOfExperience?: number }) =>
+        apiFetch<any>(`/artisans/me/profile`, {
+            method: "POST",
+            body: JSON.stringify(data),
+        }),
+
+    /** POST /artisans/:id/skills — add skill to artisan */
+    addSkill: (artisanProfileId: string, skillName: string) =>
+        apiFetch<any>(`/artisans/${artisanProfileId}/skills`, {
+            method: "POST",
+            body: JSON.stringify({ skillName }),
+        }),
+
+    /** PATCH /artisans/me — update logged-in artisan's profile */
+    updateProfile: (data: {
+        bio?: string;
+        city?: string;
+        state?: string;
+        area?: string;
+        pricing_style?: string;
+        price_min?: number;
+        price_max?: number;
+    }) =>
+        apiFetch<unknown>("/artisans/me", {
+            method: "PATCH",
+            body: JSON.stringify(data),
+        }),
+};
+
+// ─── Job API ─────────────────────────────────────────────
+export const jobApi = {
+    /** GET /jobs — list jobs (role-aware: customer sees own, artisan sees open+assigned) */
+    list: (params?: { status?: string; limit?: number; offset?: number }) => {
+        const qs = new URLSearchParams();
+        if (params?.status) qs.set("status", params.status);
+        qs.set("limit", String(params?.limit ?? 20));
+        qs.set("offset", String(params?.offset ?? 0));
+        return apiFetch<{ total: number; count: number; results: unknown[] }>(`/jobs?${qs}`);
+    },
+
+    /** GET /jobs/:id — single job with full detail */
+    getById: (id: string) => apiFetch<unknown>(`/jobs/${id}`),
+
+    /** POST /jobs — create a new job request (customer only) */
+    create: (data: {
+        description: string;
+        skill: string;
+        budget?: number;
+        location?: string;
+        urgency?: string;
+    }) =>
+        apiFetch<{ id: string; status: string }>("/jobs", {
+            method: "POST",
+            body: JSON.stringify(data),
+        }),
+
+    /** GET /jobs/:jobId/matches?skill=plumber */
+    getMatches: (jobId: string, skill: string) =>
+        apiFetch<{ results: unknown[] }>(
+            `/jobs/${jobId}/matches?skill=${encodeURIComponent(skill)}`
+        ),
+
+    /** POST /jobs/:jobId/assign — assign an artisan (customer only) */
+    assign: (jobId: string, artisanProfileId: string) =>
+        apiFetch<unknown>(`/jobs/${jobId}/assign`, {
+            method: "POST",
+            body: JSON.stringify({ artisanProfileId }),
+        }),
+
+    /** POST /jobs/:jobId/accept — accept job (artisan only) */
+    accept: (jobId: string) =>
+        apiFetch<unknown>(`/jobs/${jobId}/accept`, { method: "POST" }),
+
+    /** POST /jobs/:jobId/complete — mark job done (artisan only) */
+    complete: (jobId: string) =>
+        apiFetch<unknown>(`/jobs/${jobId}/complete`, { method: "POST" }),
+
+    /** POST /jobs/:jobId/cancel — cancel job (customer only) */
+    cancel: (jobId: string) =>
+        apiFetch<unknown>(`/jobs/${jobId}/cancel`, { method: "POST" }),
+
+    /** POST /jobs/:jobId/rate — submit a rating (customer only) */
+    rate: (jobId: string, data: { rating: number; comment?: string }) =>
+        apiFetch<unknown>(`/jobs/${jobId}/rate`, {
+            method: "POST",
+            body: JSON.stringify(data),
+        }),
+};
+
+// ─── Thread / Messaging API ───────────────────────────────
+export const threadApi = {
+    /** GET /threads — list all threads for logged-in user */
+    list: () => apiFetch<{ count: number; results: unknown[] }>("/threads"),
+
+    /** GET /threads/:id/messages */
+    getMessages: (threadId: string, params?: { limit?: number; offset?: number }) => {
+        const qs = new URLSearchParams({
+            limit: String(params?.limit ?? 50),
+            offset: String(params?.offset ?? 0),
+        });
+        return apiFetch<{ count: number; results: unknown[] }>(
+            `/threads/${threadId}/messages?${qs}`
+        );
+    },
+
+    /** POST /threads — open or get existing thread */
+    create: (data: { artisanProfileId: string; jobRequestId?: string }) =>
+        apiFetch<{ id: string }>("/threads", {
+            method: "POST",
+            body: JSON.stringify(data),
+        }),
+
+    /** POST /threads/:id/messages — send a message */
+    sendMessage: (threadId: string, text: string) =>
+        apiFetch<{ id: string; sent_at: string }>(`/threads/${threadId}/messages`, {
+            method: "POST",
+            body: JSON.stringify({ text }),
+        }),
+};
+
+// ─── Notification API ─────────────────────────────────────
+export const notificationApi = {
+    /** GET /notifications */
+    list: (params?: { limit?: number; offset?: number }) => {
+        const qs = new URLSearchParams({
+            limit: String(params?.limit ?? 30),
+            offset: String(params?.offset ?? 0),
+        });
+        return apiFetch<{ count: number; unread: number; results: unknown[] }>(
+            `/notifications?${qs}`
+        );
+    },
+
+    /** PATCH /notifications/:id/read */
+    markRead: (id: string) =>
+        apiFetch<{ id: string; read: boolean }>(`/notifications/${id}/read`, {
+            method: "PATCH",
+        }),
+
+    /** PATCH /notifications/read-all */
+    markAllRead: () =>
+        apiFetch<{ message: string }>("/notifications/read-all", { method: "PATCH" }),
+};
+
+// ─── User API ────────────────────────────────────────────
+export const userApi = {
+    /** PATCH /users/me — update basic user profile */
+    updateProfile: (data: {
+        first_name?: string;
+        last_name?: string;
+        phone?: string;
+        email?: string;
+    }) =>
+        apiFetch<unknown>("/users/me", {
+            method: "PATCH",
+            body: JSON.stringify(data),
+        }),
+};
+
+// ─── Skills API ───────────────────────────────────────────
+export const skillApi = {
+    /** GET /skills — list all available skill categories */
+    list: () => apiFetch<{ id: string; name: string }[]>("/skills"),
+};
+
+// ─── Token helpers (used by store) ───────────────────────
+export async function saveToken(token: string) {
+    await AsyncStorage.setItem("@loom/token", token);
+}
+
+export async function clearToken() {
+    await AsyncStorage.removeItem("@loom/token");
+}
+
+export async function getStoredToken(): Promise<string | null> {
+    return AsyncStorage.getItem("@loom/token");
+}

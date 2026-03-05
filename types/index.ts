@@ -32,14 +32,14 @@ export type NotificationType =
 
 // ─── Categories ─────────────────────────────────────────
 export const CATEGORIES = [
-    { id: 'plumber', label: 'Plumber', icon: 'wrench' },
-    { id: 'electrician', label: 'Electrician', icon: 'zap' },
-    { id: 'carpenter', label: 'Carpenter', icon: 'hammer' },
-    { id: 'tailor', label: 'Tailor', icon: 'scissors' },
-    { id: 'mechanic', label: 'Mechanic', icon: 'settings' },
-    { id: 'cleaning', label: 'Cleaning', icon: 'sparkles' },
-    { id: 'hair_beauty', label: 'Hair / Beauty', icon: 'heart' },
-    { id: 'ac_repair', label: 'AC Repair', icon: 'wind' },
+    { id: 'plumber', label: 'Plumber', icon: 'construct-outline' },
+    { id: 'electrician', label: 'Electrician', icon: 'flash-outline' },
+    { id: 'carpenter', label: 'Carpenter', icon: 'hammer-outline' },
+    { id: 'tailor', label: 'Tailor', icon: 'cut-outline' },
+    { id: 'mechanic', label: 'Mechanic', icon: 'settings-outline' },
+    { id: 'cleaning', label: 'Cleaning', icon: 'sparkles-outline' },
+    { id: 'hair_beauty', label: 'Hair / Beauty', icon: 'heart-outline' },
+    { id: 'ac_repair', label: 'AC Repair', icon: 'snow-outline' },
 ] as const;
 
 export type CategoryId = (typeof CATEGORIES)[number]['id'];

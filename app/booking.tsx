@@ -1,8 +1,11 @@
 import { AppHeader } from '@/components/AppHeader';
 import { PrimaryButton } from '@/components/ui/Buttons';
+import { LoomThread } from '@/components/ui/LoomThread';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const TIME_SLOTS = [
     '08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM',
@@ -42,52 +45,115 @@ export default function BookingScreen() {
     };
 
     return (
-        <View className="flex-1 bg-background">
-            <AppHeader title="Book Appointment" showBack onBack={() => router.back()} showNotification={false} />
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <LoomThread variant="minimal" opacity={0.6} animated />
+            <AppHeader title="Schedule Booking" showBack onBack={() => router.back()} showNotification={false} />
 
-            <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-                <Text className="text-lg font-bold mb-4 mt-5">Select Date</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-                    {DAYS.map((d) => (
-                        <TouchableOpacity
-                            key={d.date}
-                            className={`w-[65px] py-4 items-center rounded-md border-[1.5px] gap-0.5 ${selectedDate === d.date ? 'border-primary/20 bg-primary/20' : 'border-gray-200 bg-white'}`}
-                            onPress={() => setSelectedDate(d.date)}
-                        >
-                            <Text className={`text-xs ${selectedDate === d.date ? 'text-primary' : 'text-gray-500'}`}>{d.day}</Text>
-                            <Text className={`text-[20px] font-bold ${selectedDate === d.date ? 'text-primary' : ''}`}>{d.num}</Text>
-                            <Text className={`text-xs text-gray-400 ${selectedDate === d.date ? 'text-primary' : ''}`}>{d.month}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
+            <ScrollView
+                contentContainerStyle={{ padding: 24, paddingBottom: 120 }}
+                showsVerticalScrollIndicator={false}
+            >
+                <Animated.View entering={FadeInDown.delay(100)}>
+                    <Text style={[Typography.h3, { marginBottom: 16 }]}>Select Date</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -24 }}>
+                        <View style={{ flexDirection: 'row', paddingHorizontal: 24, gap: 10 }}>
+                            {DAYS.map((d) => (
+                                <TouchableOpacity
+                                    key={d.date}
+                                    activeOpacity={0.8}
+                                    onPress={() => setSelectedDate(d.date)}
+                                    style={{
+                                        width: 70,
+                                        height: 90,
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderRadius: Radius.lg,
+                                        backgroundColor: selectedDate === d.date ? Colors.accent : Colors.surface,
+                                        borderWidth: 1.5,
+                                        borderColor: selectedDate === d.date ? Colors.accent : Colors.cardBorder,
+                                        ...Shadows.sm
+                                    }}
+                                >
+                                    <Text style={[Typography.label, {
+                                        color: selectedDate === d.date ? Colors.white : Colors.muted,
+                                        fontSize: 10,
+                                        textTransform: 'none'
+                                    }]}>{d.day}</Text>
+                                    <Text style={[Typography.h2, {
+                                        color: selectedDate === d.date ? Colors.white : Colors.text,
+                                        marginVertical: 4
+                                    }]}>{d.num}</Text>
+                                    <Text style={[Typography.label, {
+                                        color: selectedDate === d.date ? Colors.white : Colors.muted,
+                                        fontSize: 10,
+                                        textTransform: 'none'
+                                    }]}>{d.month}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </ScrollView>
+                </Animated.View>
 
-                <Text className="text-lg font-bold mb-4 mt-5">Select Time</Text>
-                <View className="flex-row flex-wrap gap-2">
-                    {TIME_SLOTS.map((t) => (
-                        <TouchableOpacity
-                            key={t}
-                            className={`px-5 py-4 rounded-md border-[1.5px] ${selectedTime === t ? 'border-primary/20 bg-primary/20' : 'border-gray-200 bg-white'}`}
-                            onPress={() => setSelectedTime(t)}
-                        >
-                            <Text className={`text-sm ${selectedTime === t ? 'text-primary font-semibold' : 'text-gray-600'}`}>{t}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                <Animated.View entering={FadeInDown.delay(200)} style={{ marginTop: 40 }}>
+                    <Text style={[Typography.h3, { marginBottom: 16 }]}>Select Time</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                        {TIME_SLOTS.map((t) => (
+                            <TouchableOpacity
+                                key={t}
+                                activeOpacity={0.8}
+                                onPress={() => setSelectedTime(t)}
+                                style={{
+                                    paddingHorizontal: 16,
+                                    paddingVertical: 12,
+                                    borderRadius: Radius.full,
+                                    backgroundColor: selectedTime === t ? Colors.accentLight : Colors.surface,
+                                    borderWidth: 1.5,
+                                    borderColor: selectedTime === t ? Colors.accent : Colors.cardBorder,
+                                }}
+                            >
+                                <Text style={[Typography.bodySmall, {
+                                    fontFamily: selectedTime === t ? 'MontserratAlternates-SemiBold' : 'MontserratAlternates',
+                                    color: selectedTime === t ? Colors.accent : Colors.textSecondary
+                                }]}>{t}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </Animated.View>
 
-                <Text className="text-lg font-bold mb-4 mt-5">Notes (optional)</Text>
-                <View className="bg-white border-[1.5px] border-gray-200 rounded-md p-5 min-h-[80px]">
-                    <Text className="text-base text-gray-400">
-                        {notes || 'Add any special instructions or details...'}
+                <Animated.View entering={FadeInDown.delay(300)} style={{ marginTop: 40 }}>
+                    <Text style={[Typography.h3, { marginBottom: 16 }]}>Job Details (Optional)</Text>
+                    <View style={{
+                        backgroundColor: Colors.surface,
+                        borderRadius: Radius.lg,
+                        borderWidth: 1.5,
+                        borderColor: Colors.cardBorder,
+                        padding: 16,
+                        minHeight: 120,
+                        ...Shadows.sm
+                    }}>
+                        <TextInput
+                            style={[Typography.body, { color: Colors.text, textAlignVertical: 'top' }]}
+                            placeholder="Tell the pro more about the job or any gate access codes..."
+                            placeholderTextColor={Colors.muted}
+                            multiline
+                            value={notes}
+                            onChangeText={setNotes}
+                        />
+                    </View>
+                </Animated.View>
+
+                <Animated.View entering={FadeInDown.delay(400)} style={{ marginTop: 48 }}>
+                    <PrimaryButton
+                        title="Confirm Booking"
+                        onPress={handleConfirm}
+                        loading={loading}
+                        disabled={!selectedTime}
+                        variant="accent"
+                    />
+                    <Text style={[Typography.bodySmall, { textAlign: 'center', marginTop: 16, color: Colors.muted }]}>
+                        Cancellation is free up to 2 hours before the job.
                     </Text>
-                </View>
-
-                <PrimaryButton
-                    title="Confirm Booking"
-                    onPress={handleConfirm}
-                    loading={loading}
-                    disabled={!selectedTime}
-                    style={{ marginTop: 32 }}
-                />
+                </Animated.View>
             </ScrollView>
         </View>
     );

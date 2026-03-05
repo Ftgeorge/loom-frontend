@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/CardChipBadge';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { EmptyState, ErrorState } from '@/components/ui/StateComponents';
 import { t } from '@/i18n';
-import { fetchThreads } from '@/services/mockApi';
+import { threadApi } from '@/services/api';
 import { useAppStore } from '@/store';
 import { timeAgo } from '@/utils/helpers';
 import { useRouter } from 'expo-router';
@@ -20,8 +20,22 @@ export default function MessagesScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            const data = await fetchThreads();
-            setThreads(data);
+            // GET /threads — list threads for the logged-in user
+            const res = await threadApi.list();
+            const mapped = (res.results as any[]).map((row: any) => ({
+                id: row.id,
+                participantId: row.customer_id ?? row.artisan_profile_id,
+                participantName: [
+                    row.other_user_first_name,
+                    row.other_user_last_name,
+                ].filter(Boolean).join(' ') || row.other_user_email || 'Unknown',
+                lastMessage: row.last_message ?? '',
+                lastMessageTime: row.last_message_at ?? row.created_at,
+                unreadCount: Number(row.unread_count ?? 0),
+                participantRole: 'artisan' as const,
+                messages: [],
+            }));
+            setThreads(mapped);
         } catch {
             setError(true);
         } finally {
@@ -36,7 +50,7 @@ export default function MessagesScreen() {
             <AppHeader title={t('messages', language)} onNotification={() => router.push('/notifications')} />
 
             {loading ? (
-                <View className="p-5"><SkeletonList count={4} /></View>
+                <View><SkeletonList count={5} type="message" /></View>
             ) : error ? (
                 <ErrorState onRetry={load} />
             ) : threads.length === 0 ? (

@@ -7,6 +7,14 @@ import '../global.css';
 
 SplashScreen.preventAutoHideAsync();
 
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect } from 'react';
+import '../global.css';
+
+SplashScreen.preventAutoHideAsync();
+
 import BackgroundThread from '@/components/ui/BackgroundThread';
 import { View } from 'react-native';
 
@@ -31,35 +39,37 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <StatusBar style="dark" />
-      <BackgroundThread />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: 'transparent' }, // allow background thread to show through
-          animation: 'slide_from_right',
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="language-selection" />
-        <Stack.Screen name="role-selection" />
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="artisan-profile" options={{ presentation: 'card' }} />
-        <Stack.Screen name="booking" options={{ presentation: 'card' }} />
-        <Stack.Screen name="post-job" options={{ presentation: 'card' }} />
-        <Stack.Screen name="request-details" options={{ presentation: 'card' }} />
-        <Stack.Screen name="job-details" options={{ presentation: 'card' }} />
-        <Stack.Screen name="chat" options={{ presentation: 'card' }} />
-        <Stack.Screen name="rate-review" options={{ presentation: 'card' }} />
-        <Stack.Screen name="notifications" options={{ presentation: 'card' }} />
-        <Stack.Screen name="settings" options={{ presentation: 'card' }} />
-        <Stack.Screen name="help" options={{ presentation: 'card' }} />
-        <Stack.Screen name="artisan-onboarding" options={{ presentation: 'card' }} />
-        <Stack.Screen name="matched-artisans" options={{ presentation: 'card' }} />
-      </Stack>
-    </View>
+    <ClerkAuthProvider>
+      <View style={{ flex: 1 }}>
+        <StatusBar style="dark" />
+        <BackgroundThread />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: 'transparent' },
+            animation: 'slide_from_right',
+          }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="language-selection" />
+          <Stack.Screen name="role-selection" />
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="artisan-profile" options={{ presentation: 'card' }} />
+          <Stack.Screen name="booking" options={{ presentation: 'card' }} />
+          <Stack.Screen name="post-job" options={{ presentation: 'card' }} />
+          <Stack.Screen name="request-details" options={{ presentation: 'card' }} />
+          <Stack.Screen name="job-details" options={{ presentation: 'card' }} />
+          <Stack.Screen name="chat" options={{ presentation: 'card' }} />
+          <Stack.Screen name="rate-review" options={{ presentation: 'card' }} />
+          <Stack.Screen name="notifications" options={{ presentation: 'card' }} />
+          <Stack.Screen name="settings" options={{ presentation: 'card' }} />
+          <Stack.Screen name="help" options={{ presentation: 'card' }} />
+          <Stack.Screen name="artisan-onboarding" options={{ presentation: 'card' }} />
+          <Stack.Screen name="matched-artisans" options={{ presentation: 'card' }} />
+        </Stack>
+      </View>
+    </ClerkAuthProvider>
   );
 }

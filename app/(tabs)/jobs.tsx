@@ -4,7 +4,7 @@ import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { EmptyState, ErrorState } from '@/components/ui/StateComponents';
 import { t } from '@/i18n';
-import { fetchJobs } from '@/services/mockApi';
+import { jobApi } from '@/services/api';
 import { useAppStore } from '@/store';
 import type { JobRequest } from '@/types';
 import { useRouter } from 'expo-router';
@@ -25,8 +25,24 @@ export default function JobsScreen() {
         try {
             setError(false);
             setLoading(true);
-            const data = await fetchJobs();
-            setJobs(data);
+            // GET /jobs — artisan role sees open + their assigned jobs
+            const res = await jobApi.list({ limit: 50 });
+            const mapped = (res.results as any[]).map((row: any): JobRequest => ({
+                id: row.id,
+                clientId: row.customer_id,
+                clientName: row.customer_email ?? 'Client',
+                category: (row.title ?? 'other') as any,
+                description: row.description,
+                budget: 0,
+                urgency: 'today',
+                location: { area: row.location ?? '', city: '', state: '' },
+                status: row.status === 'open' ? 'submitted'
+                    : row.status === 'assigned' ? 'matched'
+                        : row.status === 'completed' ? 'completed'
+                            : 'cancelled',
+                createdAt: row.created_at,
+            }));
+            setJobs(mapped);
         } catch {
             setError(true);
         } finally {
@@ -51,7 +67,7 @@ export default function JobsScreen() {
             </View>
 
             {loading ? (
-                <View className="p-5"><SkeletonList count={3} /></View>
+                <View className="p-5"><SkeletonList count={3} type="request" /></View>
             ) : error ? (
                 <ErrorState onRetry={load} />
             ) : filtered.length === 0 ? (

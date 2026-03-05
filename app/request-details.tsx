@@ -4,15 +4,16 @@ import { Card } from '@/components/ui/CardChipBadge';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
 import { StatusTimeline, getJobStatusSteps } from '@/components/ui/StatusTimeline';
-import { fetchJobById, updateJobStatus } from '@/services/mockApi';
+import { jobApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors } from '@/theme';
+import { Colors, Radius, Typography } from '@/theme';
 import type { JobRequest } from '@/types';
 import { formatDate, formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function RequestDetailsScreen() {
     const router = useRouter();
@@ -25,8 +26,26 @@ export default function RequestDetailsScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            const data = await fetchJobById(id || '');
-            if (data) setJob(data);
+            const row = await jobApi.getById(id || '') as any;
+            if (row) {
+                setJob({
+                    id: row.id,
+                    clientId: row.customer_id,
+                    clientName: row.customer_first_name
+                        ? `${row.customer_first_name} ${row.customer_last_name ?? ''}`.trim()
+                        : row.customer_email ?? 'Client',
+                    category: (row.title ?? 'other') as any,
+                    description: row.description,
+                    budget: 0,
+                    urgency: 'today' as const,
+                    location: { area: row.location ?? '', city: '', state: '' },
+                    status: (row.status === 'open' ? 'submitted'
+                        : row.status === 'assigned' ? 'matched'
+                            : row.status === 'completed' ? 'completed'
+                                : 'cancelled') as any,
+                    createdAt: row.created_at,
+                });
+            }
         } catch {
             setError(true);
         } finally {
@@ -44,9 +63,14 @@ export default function RequestDetailsScreen() {
                 style: 'destructive',
                 onPress: async () => {
                     if (id) {
-                        await updateJobStatus(id, 'cancelled');
-                        updateStoreJob(id, 'cancelled');
-                        setJob((j) => j ? { ...j, status: 'cancelled' } : null);
+                        try {
+                            await jobApi.cancel(id);
+                            updateStoreJob(id, 'cancelled');
+                            setJob((j) => j ? { ...j, status: 'cancelled' } : null);
+                            Alert.alert('Success', 'Request cancelled successfully');
+                        } catch (err: any) {
+                            Alert.alert('Error', err.message || 'Failed to cancel request');
+                        }
                     }
                 },
             },
@@ -54,110 +78,150 @@ export default function RequestDetailsScreen() {
     };
 
     if (loading) return (
-        <View className="flex-1 bg-background">
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
-            <View className="p-5"><SkeletonList count={3} /></View>
+            <View style={{ padding: 24 }}><SkeletonList count={3} /></View>
         </View>
     );
 
     if (error || !job) return (
-        <View className="flex-1 bg-background">
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
 
     return (
-        <View className="flex-1 bg-background">
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
 
-            <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                contentContainerStyle={{ padding: 24, paddingBottom: 120 }}
+                showsVerticalScrollIndicator={false}
+            >
                 {/* Status Timeline */}
                 {job.status !== 'cancelled' && (
-                    <Card style={{ marginBottom: 20 }}>
-                        <Text className="text-lg font-bold mb-4">Status</Text>
-                        <StatusTimeline steps={getJobStatusSteps(job.status)} />
-                    </Card>
+                    <Animated.View entering={FadeInDown.delay(100)}>
+                        <Card style={{ marginBottom: 24, padding: 20 }}>
+                            <Text style={[Typography.h3, { marginBottom: 20 }]}>Status Tracker</Text>
+                            <StatusTimeline steps={getJobStatusSteps(job.status)} />
+                        </Card>
+                    </Animated.View>
                 )}
 
                 {/* Details */}
-                <Card>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Category</Text>
-                        <Text className="text-base font-medium capitalize">{job.category === 'not_sure' ? 'Not Sure' : job.category}</Text>
-                    </View>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Description</Text>
-                        <Text className="text-sm text-gray-600">{job.description}</Text>
-                    </View>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Location</Text>
-                        <Text className="text-base font-medium capitalize">{job.location.area}, {job.location.city}</Text>
-                    </View>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Budget</Text>
-                        <Text className="text-base font-medium capitalize">{formatNaira(job.budget)}</Text>
-                    </View>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Urgency</Text>
-                        <Text className="text-base font-medium capitalize">{job.urgency.replace('_', ' ')}</Text>
-                    </View>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Submitted</Text>
-                        <Text className="text-base font-medium capitalize">{formatDate(job.createdAt)}</Text>
-                    </View>
-                    {job.scheduledDate && (
-                        <View className="mb-4">
-                            <Text className="text-xs text-gray-500">Scheduled</Text>
-                            <Text className="text-base font-medium capitalize">{job.scheduledDate} at {job.scheduledTime}</Text>
-                        </View>
-                    )}
-                </Card>
+                <Animated.View entering={FadeInDown.delay(200)}>
+                    <Card style={{ padding: 20 }}>
+                        <Text style={[Typography.h3, { marginBottom: 20 }]}>Job Information</Text>
+
+                        <DetailItem label="Category" value={job.category === 'not_sure' ? 'Not Sure' : job.category} capitalize />
+                        <DetailItem label="Description" value={job.description} />
+                        <DetailItem label="Location" value={`${job.location.area}, ${job.location.city}`} capitalize />
+                        <DetailItem label="Budget" value={formatNaira(job.budget)} />
+                        <DetailItem label="Urgency" value={job.urgency.replace('_', ' ')} capitalize />
+                        <DetailItem label="Submitted" value={formatDate(job.createdAt)} />
+
+                        {job.scheduledDate && (
+                            <DetailItem label="Scheduled For" value={`${job.scheduledDate} at ${job.scheduledTime}`} />
+                        )}
+                    </Card>
+                </Animated.View>
 
                 {/* Artisan info */}
                 {job.artisanName && (
-                    <Card className="mt-5">
-                        <Text className="text-lg font-bold mb-4">Artisan</Text>
-                        <TouchableOpacity
-                            className="flex-row items-center gap-4"
-                            onPress={() => job.artisanId && router.push({ pathname: '/artisan-profile', params: { id: job.artisanId } })}
-                        >
-                            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
-                                <Text className="font-bold text-primary">{job.artisanName[0]}</Text>
-                            </View>
-                            <Text className="text-base font-semibold flex-1">{job.artisanName}</Text>
-                            <Ionicons name="chevron-forward" size={18} color={Colors.gray400} />
-                        </TouchableOpacity>
-                    </Card>
+                    <Animated.View entering={FadeInDown.delay(300)}>
+                        <Card style={{ marginTop: 24, padding: 20 }}>
+                            <Text style={[Typography.h3, { marginBottom: 16 }]}>Assigned Professional</Text>
+                            <TouchableOpacity
+                                activeOpacity={0.7}
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: 16,
+                                    backgroundColor: Colors.background,
+                                    padding: 12,
+                                    borderRadius: Radius.md,
+                                    borderWidth: 1,
+                                    borderColor: Colors.cardBorder
+                                }}
+                                onPress={() => job.artisanId && router.push({ pathname: '/artisan-profile', params: { id: job.artisanId } })}
+                            >
+                                <View style={{
+                                    width: 48,
+                                    height: 48,
+                                    borderRadius: 24,
+                                    backgroundColor: Colors.primaryLight,
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <Text style={[Typography.h3, { color: Colors.primary }]}>{job.artisanName[0]}</Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={Typography.h3}>{job.artisanName}</Text>
+                                    <Text style={[Typography.bodySmall, { color: Colors.primary }]}>View Profile</Text>
+                                </View>
+                                <Ionicons name="chevron-forward" size={20} color={Colors.muted} />
+                            </TouchableOpacity>
+                        </Card>
+                    </Animated.View>
                 )}
 
                 {/* Actions */}
-                <View className="mt-8 gap-4">
+                <Animated.View entering={FadeInDown.delay(400)} style={{ marginTop: 40, gap: 16 }}>
                     {job.artisanName && (
-                        <View className="flex-row gap-4">
+                        <View style={{ flexDirection: 'row', gap: 12 }}>
                             <SecondaryButton
                                 title="Message"
                                 onPress={() => router.push({ pathname: '/chat', params: { threadId: 't1' } })}
                                 style={{ flex: 1 }}
                             />
-                            <SecondaryButton title="Call" onPress={() => { }} style={{ flex: 1 }} />
+                            <SecondaryButton
+                                title="Call"
+                                onPress={() => { }}
+                                style={{ flex: 1 }}
+                                icon={<Ionicons name="call-outline" size={18} color={Colors.primary} />}
+                            />
                         </View>
                     )}
 
                     {job.status === 'completed' && (
                         <PrimaryButton
-                            title="Rate & Review"
+                            title="Rate & Review Experience"
                             onPress={() => router.push({ pathname: '/rate-review', params: { jobId: job.id } })}
                         />
                     )}
 
                     {!['completed', 'cancelled'].includes(job.status) && (
-                        <TouchableOpacity className="items-center p-4" onPress={handleCancel}>
-                            <Text className="text-base text-red-500 font-medium">Cancel Request</Text>
+                        <TouchableOpacity
+                            style={{
+                                alignItems: 'center',
+                                padding: 16,
+                                borderRadius: Radius.md,
+                                borderWidth: 1,
+                                borderColor: Colors.error + '30',
+                                marginTop: 8
+                            }}
+                            onPress={handleCancel}
+                        >
+                            <Text style={[Typography.body, { color: Colors.error, fontFamily: 'MontserratAlternates-SemiBold' }]}>Cancel Request</Text>
                         </TouchableOpacity>
                     )}
-                </View>
+                </Animated.View>
             </ScrollView>
         </View>
     );
 }
+
+function DetailItem({ label, value, capitalize }: { label: string; value: string; capitalize?: boolean }) {
+    return (
+        <View style={{ marginBottom: 16 }}>
+            <Text style={Typography.label}>{label}</Text>
+            <Text style={[Typography.body, {
+                marginTop: 4,
+                color: Colors.text,
+                textTransform: capitalize ? 'capitalize' : 'none'
+            }]}>{value}</Text>
+        </View>
+    );
+}
+

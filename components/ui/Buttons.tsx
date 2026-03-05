@@ -1,4 +1,4 @@
-import { Colors } from '@/theme';
+import { Colors, Radius, Typography } from '@/theme';
 import React from 'react';
 import {
     ActivityIndicator,
@@ -8,6 +8,9 @@ import {
     TouchableOpacity,
     ViewStyle,
 } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+
+const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
 
 interface Props {
     title: string;
@@ -19,84 +22,130 @@ interface Props {
     icon?: React.ReactNode;
     className?: string;
     image?: any;
+    variant?: 'primary' | 'secondary' | 'accent' | 'outlined';
 }
 
-export function PrimaryButton({ title, onPress, loading, disabled, style, textStyle, icon, className = '' }: Props) {
-    return (
-        <TouchableOpacity
-            className={`py-3.5 px-6 rounded-lg flex-row items-center justify-center gap-2 min-h-[50px] shadow-[0_1px_2px_rgba(0,0,0,0.05)] ${disabled || loading ? 'bg-gray-300' : 'bg-primary'} ${className}`}
-            style={style}
-            onPress={onPress}
-            disabled={disabled || loading}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel={title}
-        >
-            {loading ? (
-                <ActivityIndicator color="#FFFFFF" size="small" />
-            ) : (
-                <>
-                    {icon}
-                    <Text className="text-base font-bold text-white" style={textStyle}>{title}</Text>
-                </>
-            )}
-        </TouchableOpacity>
-    );
-}
+export function PrimaryButton({
+    title,
+    onPress,
+    loading,
+    disabled,
+    style,
+    textStyle,
+    icon,
+    className = '',
+    variant = 'primary'
+}: Props) {
+    const scale = useSharedValue(1);
 
-export function SecondaryButton({ title, onPress, loading, disabled, style, textStyle, icon, className = '' }: Props) {
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+    }));
+
+    const handlePressIn = () => { scale.value = withSpring(0.97); };
+    const handlePressOut = () => { scale.value = withSpring(1); };
+
+    const getBgColor = () => {
+        if (disabled) return '#CBD5E1'; // Slate 300
+        if (variant === 'accent') return Colors.accent;
+        if (variant === 'secondary') return Colors.primaryLight;
+        return Colors.primary;
+    };
+
+    const getTextColor = () => {
+        if (variant === 'secondary') return Colors.primary;
+        return Colors.white;
+    };
+
     return (
-        <TouchableOpacity
-            className={`bg-transparent py-3.5 px-6 rounded-lg flex-row items-center justify-center gap-2 min-h-[50px] border-[1px] ${disabled || loading ? 'border-gray-300' : 'border-primary'} ${className}`}
-            style={style}
+        <AnimatedTouchableOpacity
+            activeOpacity={1}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
             onPress={onPress}
             disabled={disabled || loading}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel={title}
+            style={[
+                {
+                    backgroundColor: getBgColor(),
+                    borderRadius: Radius.md,
+                    height: 56,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingHorizontal: 24,
+                },
+                style,
+                animatedStyle
+            ]}
+            className={className}
         >
             {loading ? (
-                <ActivityIndicator color={Colors.primary} size="small" />
+                <ActivityIndicator color={variant === 'secondary' ? Colors.primary : Colors.white} />
             ) : (
                 <>
                     {icon}
                     <Text
-                        className={`text-base font-bold ${disabled || loading ? 'text-gray-400' : 'text-primary'}`}
-                        style={textStyle}
+                        style={[
+                            Typography.button,
+                            { color: getTextColor() },
+                            textStyle
+                        ]}
                     >
                         {title}
                     </Text>
                 </>
             )}
-        </TouchableOpacity>
+        </AnimatedTouchableOpacity>
     );
 }
 
-export function OauthButton({ title, onPress, loading, disabled, style, textStyle, image, className = '' }: Props) {
+export function SecondaryButton(props: Props) {
+    return <PrimaryButton {...props} variant="secondary" />;
+}
+
+export function OutlinedButton({ title, onPress, loading, disabled, style, textStyle, icon, className = '' }: Props) {
     return (
         <TouchableOpacity
-            className={`bg-transparent py-3.5 px-6 rounded-lg flex-row items-center justify-center gap-2 min-h-[50px] border-[1px] ${disabled || loading ? 'border-gray-300' : 'border-gray-300'} ${className}`}
-            style={style}
             onPress={onPress}
             disabled={disabled || loading}
-            activeOpacity={0.8}
-            accessibilityRole="button"
-            accessibilityLabel={title}
+            activeOpacity={0.7}
+            style={[
+                {
+                    height: 56,
+                    borderRadius: Radius.md,
+                    borderWidth: 1.5,
+                    borderColor: Colors.cardBorder,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    paddingHorizontal: 20,
+                },
+                style
+            ]}
+            className={className}
         >
             {loading ? (
-                <ActivityIndicator color={Colors.primary} size="small" />
+                <ActivityIndicator color={Colors.primary} />
             ) : (
                 <>
-
-                    <Text
-                        className={`text-base font-medium ${disabled || loading ? 'text-gray-400' : 'text-black'}`}
-                        style={textStyle}
-                    >
-                        {title}
-                    </Text>
-                    {image && <Image source={image} className='h-5 w-5' resizeMode="contain" />}
+                    {icon}
+                    <Text style={[Typography.button, { color: Colors.text }, textStyle]}>{title}</Text>
                 </>
             )}
         </TouchableOpacity>
     );
 }
+
+export function OauthButton({ title, onPress, loading, image, style, textStyle }: Props) {
+    return (
+        <OutlinedButton
+            title={title}
+            onPress={onPress}
+            loading={loading}
+            style={style}
+            textStyle={textStyle}
+            icon={image && <Image source={image} style={{ width: 22, height: 22, marginRight: 12 }} resizeMode="contain" />}
+        />
+    );
+}
+

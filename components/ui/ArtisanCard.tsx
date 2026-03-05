@@ -1,5 +1,7 @@
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { Artisan } from '@/types';
 import { formatNaira } from '@/utils/helpers';
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Avatar, RatingStars } from './AvatarRating';
@@ -15,60 +17,85 @@ export function ArtisanCard({ artisan, onPress, horizontal }: ArtisanCardProps) 
     if (horizontal) {
         return (
             <TouchableOpacity
-                className="flex-row bg-white rounded-[20px] p-4 border border-gray-50 items-center gap-4"
-                style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.03, shadowRadius: 8, elevation: 2 }}
+                style={{
+                    flexDirection: 'row',
+                    backgroundColor: Colors.surface,
+                    borderRadius: Radius.lg,
+                    padding: 16,
+                    borderWidth: 1,
+                    borderColor: Colors.cardBorder,
+                    alignItems: 'center',
+                    gap: 16,
+                    ...Shadows.sm
+                }}
                 onPress={onPress}
                 activeOpacity={0.85}
                 accessibilityLabel={`View ${artisan.name}'s profile`}
             >
-                <Avatar name={artisan.name} size={56} />
-                <View className="flex-1 gap-1">
-                    <View className="flex-row items-center gap-2">
-                        <Text className="text-lg font-bold flex-1 text-graphite tracking-tight" numberOfLines={1}>{artisan.name}</Text>
+                <Avatar name={artisan.name} size={64} />
+                <View style={{ flex: 1, gap: 4 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Text style={[Typography.h3, { fontSize: 18 }]} numberOfLines={1}>{artisan.name}</Text>
                         {artisan.verified && <Badge variant="verified" />}
                     </View>
-                    <Text className="text-xs text-muted capitalize" numberOfLines={1}>
+                    <Text style={[Typography.bodySmall, { color: Colors.muted }]} numberOfLines={1}>
                         {artisan.skills.map((s) => s.replace('_', '/')).join(', ')}
                     </Text>
-                    <RatingStars rating={artisan.rating} size={13} count={artisan.reviewCount} />
-                    <View className="flex-row justify-between items-center mt-1">
-                        <Text className="text-xs text-muted">{artisan.distance}km away</Text>
-                        <Text className="text-sm font-semibold text-black">
-                            {formatNaira(artisan.priceRange.min)}–{formatNaira(artisan.priceRange.max)}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                        <RatingStars rating={artisan.rating} size={14} count={artisan.reviewCount} />
+                        <Text style={{ color: Colors.cardBorder }}>|</Text>
+                        <Text style={[Typography.bodySmall, { fontSize: 12 }]}>{artisan.distance}km away</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+                        <Text style={[Typography.h3, { fontSize: 16, color: Colors.text }]}>
+                            {formatNaira(artisan.priceRange.min)}
+                            <Text style={[Typography.bodySmall, { color: Colors.muted, fontSize: 12 }]}> avg</Text>
                         </Text>
+                        {artisan.matchScore !== undefined && (
+                            <View style={{ backgroundColor: Colors.accentLight, borderRadius: Radius.full, paddingHorizontal: 10, paddingVertical: 4 }}>
+                                <Text style={[Typography.label, { color: Colors.accent, fontSize: 10, textTransform: 'none' }]}>Match {artisan.matchScore}%</Text>
+                            </View>
+                        )}
                     </View>
                 </View>
-                {artisan.matchScore !== undefined && (
-                    <View className="bg-black/10 rounded-full px-2 py-1">
-                        <Text className="text-xs font-bold text-black">{artisan.matchScore}%</Text>
-                    </View>
-                )}
             </TouchableOpacity>
         );
     }
 
     return (
         <TouchableOpacity
-            className="bg-white rounded-[24px] p-5 items-center justify-center border border-gray-50 w-[140px]"
-            style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 12, elevation: 3 }}
+            style={{
+                backgroundColor: Colors.surface,
+                borderRadius: Radius.lg,
+                padding: 20,
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: Colors.cardBorder,
+                width: 160,
+                ...Shadows.md
+            }}
             onPress={onPress}
             activeOpacity={0.85}
             accessibilityLabel={`View ${artisan.name}'s profile`}
         >
-            <Avatar name={artisan.name} size={64} />
-            <Text className="text-base font-bold text-black mt-3 text-center tracking-tight" numberOfLines={1}>{artisan.name}</Text>
-            <View className="mt-1 mb-1.5">
+            <Avatar name={artisan.name} size={72} />
+            <Text style={[Typography.h3, { marginTop: 12, textAlign: 'center', fontSize: 16 }]} numberOfLines={1}>{artisan.name}</Text>
+            <View style={{ marginTop: 6, marginBottom: 8 }}>
                 <RatingStars rating={artisan.rating} size={14} showValue={false} />
             </View>
-            <Text className="text-xs text-black font-medium capitalize" numberOfLines={1}>
+            <Text style={[Typography.bodySmall, { fontSize: 12, color: Colors.muted, textAlign: 'center' }]} numberOfLines={1}>
                 {artisan.skills[0]?.replace('_', '/')}
             </Text>
-            <Text className="text-xs text-gray-400 mt-1">{artisan.distance}km</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                <Ionicons name="location-outline" size={10} color={Colors.muted} />
+                <Text style={[Typography.bodySmall, { fontSize: 10, color: Colors.muted }]}>{artisan.distance}km</Text>
+            </View>
             {artisan.verified && (
-                <View className="absolute top-3 right-3">
+                <View style={{ position: 'absolute', top: 12, right: 12 }}>
                     <Badge variant="verified" />
                 </View>
             )}
         </TouchableOpacity>
     );
 }
+

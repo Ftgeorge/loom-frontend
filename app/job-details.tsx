@@ -4,14 +4,16 @@ import { Card } from '@/components/ui/CardChipBadge';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
 import { StatusTimeline, getArtisanJobSteps } from '@/components/ui/StatusTimeline';
-import { fetchJobById, updateJobStatus } from '@/services/mockApi';
-import { Colors } from '@/theme';
+import { jobApi } from '@/services/api';
+
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { ArtisanJobStatus, JobRequest } from '@/types';
 import { formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function JobDetailsScreen() {
     const router = useRouter();
@@ -24,10 +26,27 @@ export default function JobDetailsScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            const data = await fetchJobById(id || '');
-            if (data) {
-                setJob(data);
-                setArtisanStatus(data.artisanStatus || 'new');
+            const row = await jobApi.getById(id || '') as any;
+            if (row) {
+                const mapped: JobRequest = {
+                    id: row.id,
+                    clientId: row.customer_id,
+                    clientName: row.customer_first_name
+                        ? `${row.customer_first_name} ${row.customer_last_name ?? ''}`.trim()
+                        : row.customer_email ?? 'Client',
+                    category: (row.title ?? 'other') as any,
+                    description: row.description,
+                    budget: 0,
+                    urgency: 'today' as const,
+                    location: { area: row.location ?? '', city: '', state: '' },
+                    status: (row.status === 'open' ? 'submitted'
+                        : row.status === 'assigned' ? 'matched'
+                            : row.status === 'completed' ? 'completed'
+                                : 'cancelled') as any,
+                    createdAt: row.created_at,
+                };
+                setJob(mapped);
+                setArtisanStatus('new');
             }
         } catch {
             setError(true);
@@ -39,9 +58,15 @@ export default function JobDetailsScreen() {
     useEffect(() => { load(); }, [load]);
 
     const handleAccept = async () => {
-        setArtisanStatus('accepted');
-        if (id) await updateJobStatus(id, 'matched');
-        setJob((j) => j ? { ...j, status: 'matched', artisanStatus: 'accepted' } : null);
+        if (!id) return;
+        try {
+            await jobApi.accept(id);
+            setArtisanStatus('accepted');
+            setJob((j) => j ? { ...j, status: 'matched', artisanStatus: 'accepted' } : null);
+            Alert.alert('Success', 'You have accepted this job!');
+        } catch (err: any) {
+            Alert.alert('Error', err.message || 'Failed to accept job');
+        }
     };
 
     const handleDecline = () => {
@@ -51,9 +76,18 @@ export default function JobDetailsScreen() {
         ]);
     };
 
-    const handleStatusUpdate = (newStatus: ArtisanJobStatus) => {
+    const handleStatusUpdate = async (newStatus: ArtisanJobStatus) => {
         setArtisanStatus(newStatus);
         setJob((j) => j ? { ...j, artisanStatus: newStatus } : null);
+
+        // When the artisan marks the job completed, call the real backend
+        if (newStatus === 'completed' && id) {
+            try {
+                await jobApi.complete(id);
+            } catch (err: any) {
+                Alert.alert('Sync Error', err.message ?? 'Could not mark job complete on server.');
+            }
+        }
     };
 
     const statusActions: Record<string, { label: string; next: ArtisanJobStatus }> = {
@@ -63,75 +97,91 @@ export default function JobDetailsScreen() {
     };
 
     if (loading) return (
-        <View className="flex-1 bg-background">
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
-            <View className="p-5"><SkeletonList count={3} /></View>
+            <View style={{ padding: 24 }}><SkeletonList count={3} type="request" /></View>
         </View>
     );
 
     if (error || !job) return (
-        <View className="flex-1 bg-background">
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
 
     return (
-        <View className="flex-1 bg-background">
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
 
-            <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                contentContainerStyle={{ padding: 24, paddingBottom: 120 }}
+                showsVerticalScrollIndicator={false}
+            >
                 {/* Status Tracker */}
                 {artisanStatus !== 'new' && artisanStatus !== 'declined' && (
-                    <Card style={{ marginBottom: 20 }}>
-                        <Text className="text-lg font-bold mb-4">Job Progress</Text>
-                        <StatusTimeline steps={getArtisanJobSteps(artisanStatus)} />
-                    </Card>
+                    <Animated.View entering={FadeInDown.delay(100)}>
+                        <Card style={{ marginBottom: 24, padding: 20 }}>
+                            <Text style={[Typography.h3, { marginBottom: 20 }]}>Job Progress</Text>
+                            <StatusTimeline steps={getArtisanJobSteps(artisanStatus)} />
+                        </Card>
+                    </Animated.View>
                 )}
 
                 {/* Job Details */}
-                <Card>
-                    <Text className="text-lg font-bold mb-4">Client Request</Text>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Client</Text>
-                        <Text className="text-base font-medium capitalize">{job.clientName}</Text>
-                    </View>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Category</Text>
-                        <Text className="text-base font-medium capitalize">{job.category}</Text>
-                    </View>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Description</Text>
-                        <Text className="text-sm text-gray-600">{job.description}</Text>
-                    </View>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Location</Text>
-                        <Text className="text-base font-medium capitalize">{job.location.area}, {job.location.city}</Text>
-                    </View>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Budget</Text>
-                        <Text className="text-base font-medium capitalize">{formatNaira(job.budget)}</Text>
-                    </View>
-                    <View className="mb-4">
-                        <Text className="text-xs text-gray-500">Urgency</Text>
-                        <Text className="text-base font-medium capitalize">{job.urgency.replace('_', ' ')}</Text>
-                    </View>
-                </Card>
+                <Animated.View entering={FadeInDown.delay(200)}>
+                    <Card style={{ padding: 20 }}>
+                        <Text style={[Typography.h3, { marginBottom: 20 }]}>Client Request</Text>
 
-                {/* Location placeholder */}
-                <Card className="mt-5 items-center py-8">
-                    <Ionicons name="map-outline" size={40} color={Colors.gray400} />
-                    <Text className="text-xs text-gray-400 mt-1">Location preview</Text>
-                    <Text className="text-sm text-gray-600 mt-1 font-medium">{job.location.area}, {job.location.city}</Text>
-                </Card>
+                        <DetailItem label="Client Name" value={job.clientName} capitalize />
+                        <DetailItem label="Service required" value={job.category} capitalize />
+                        <DetailItem label="Job Description" value={job.description} />
+                        <DetailItem label="Location" value={`${job.location.area}, ${job.location.city}`} capitalize />
+                        <DetailItem label="Agreed Budget" value={formatNaira(job.budget)} />
+                        <DetailItem label="Urgency" value={job.urgency.replace('_', ' ')} capitalize />
+                    </Card>
+                </Animated.View>
+
+                {/* Location Map Placeholder */}
+                <Animated.View entering={FadeInDown.delay(300)}>
+                    <TouchableOpacity
+                        activeOpacity={0.9}
+                        style={{
+                            marginTop: 24,
+                            backgroundColor: Colors.surface,
+                            borderRadius: Radius.lg,
+                            borderWidth: 1.5,
+                            borderColor: Colors.cardBorder,
+                            padding: 24,
+                            alignItems: 'center',
+                            ...Shadows.sm
+                        }}
+                    >
+                        <View style={{
+                            width: 56,
+                            height: 56,
+                            borderRadius: 28,
+                            backgroundColor: Colors.primaryLight,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginBottom: 12
+                        }}>
+                            <Ionicons name="map" size={24} color={Colors.primary} />
+                        </View>
+                        <Text style={Typography.h3}>Navigate to Client</Text>
+                        <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 4 }]}>
+                            {job.location.area}, {job.location.city}
+                        </Text>
+                    </TouchableOpacity>
+                </Animated.View>
 
                 {/* Actions */}
-                <View className="mt-8 gap-4">
+                <Animated.View entering={FadeInDown.delay(400)} style={{ marginTop: 40, gap: 16 }}>
                     {artisanStatus === 'new' && (
-                        <>
-                            <PrimaryButton title="Accept Job" onPress={handleAccept} />
-                            <SecondaryButton title="Decline" onPress={handleDecline} />
-                        </>
+                        <View style={{ gap: 12 }}>
+                            <PrimaryButton title="Accept Job Request" onPress={handleAccept} />
+                            <SecondaryButton title="Decline Request" onPress={handleDecline} />
+                        </View>
                     )}
 
                     {statusActions[artisanStatus] && (
@@ -141,16 +191,35 @@ export default function JobDetailsScreen() {
                         />
                     )}
 
-                    <View className="flex-row gap-4">
+                    <View style={{ flexDirection: 'row', gap: 12 }}>
                         <SecondaryButton
                             title="Message"
                             onPress={() => router.push({ pathname: '/chat', params: { threadId: 't1' } })}
                             style={{ flex: 1 }}
                         />
-                        <SecondaryButton title="Call" onPress={() => { }} style={{ flex: 1 }} />
+                        <SecondaryButton
+                            title="Call"
+                            onPress={() => { }}
+                            style={{ flex: 1 }}
+                            icon={<Ionicons name="call-outline" size={18} color={Colors.primary} />}
+                        />
                     </View>
-                </View>
+                </Animated.View>
             </ScrollView>
         </View>
     );
 }
+
+function DetailItem({ label, value, capitalize }: { label: string; value: string; capitalize?: boolean }) {
+    return (
+        <View style={{ marginBottom: 16 }}>
+            <Text style={Typography.label}>{label}</Text>
+            <Text style={[Typography.body, {
+                marginTop: 4,
+                color: Colors.text,
+                textTransform: capitalize ? 'capitalize' : 'none'
+            }]}>{value}</Text>
+        </View>
+    );
+}
+

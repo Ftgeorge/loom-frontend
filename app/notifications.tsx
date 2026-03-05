@@ -1,21 +1,22 @@
 import { AppHeader } from '@/components/AppHeader';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { EmptyState } from '@/components/ui/StateComponents';
-import { fetchNotifications } from '@/services/mockApi';
+import { notificationApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors } from '@/theme';
+import { Colors, Typography } from '@/theme';
 import { timeAgo } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { FadeInRight } from 'react-native-reanimated';
 
-const TYPE_ICONS: Record<string, { icon: string; color: string }> = {
-    job_update: { icon: 'briefcase-outline', color: Colors.graphite },
-    message: { icon: 'chatbubble-outline', color: Colors.graphite },
-    booking: { icon: 'calendar-outline', color: Colors.graphite },
-    review: { icon: 'star-outline', color: Colors.warning },
-    system: { icon: 'information-circle-outline', color: Colors.muted },
+const TYPE_ICONS: Record<string, { icon: string; color: string; bg: string }> = {
+    job_update: { icon: 'briefcase', color: Colors.primary, bg: Colors.primaryLight },
+    message: { icon: 'chatbubble', color: Colors.primary, bg: Colors.primaryLight },
+    booking: { icon: 'calendar', color: Colors.primary, bg: Colors.primaryLight },
+    review: { icon: 'star', color: Colors.accent, bg: Colors.accentLight },
+    system: { icon: 'information-circle', color: Colors.muted, bg: Colors.cardBorder + '30' },
 };
 
 export default function NotificationsScreen() {
@@ -25,62 +26,117 @@ export default function NotificationsScreen() {
 
     const load = useCallback(async () => {
         try {
-            const data = await fetchNotifications();
-            setNotifications(data);
+            // GET /notifications
+            const res = await notificationApi.list({ limit: 50 });
+            const mapped = (res.results as any[]).map((row: any) => ({
+                id: row.id,
+                type: row.type ?? 'system',
+                title: row.title,
+                body: row.body,
+                message: row.body,
+                read: Boolean(row.read),
+                createdAt: row.created_at,
+            }));
+            setNotifications(mapped || []);
         } catch {
         } finally {
             setLoading(false);
         }
     }, [setNotifications]);
 
+    // Wire "Mark all read" to the real endpoint
+    const handleMarkAllRead = async () => {
+        markAllNotificationsRead(); // optimistic local update
+        try { await notificationApi.markAllRead(); } catch { }
+    };
+
     useEffect(() => { load(); }, [load]);
 
     return (
-        <View className="flex-1 bg-background">
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <AppHeader
                 title="Notifications"
                 showBack
                 onBack={() => router.back()}
                 showNotification={false}
                 rightAction={
-                    <TouchableOpacity onPress={markAllNotificationsRead}>
-                        <Text className="text-sm font-semibold text-graphite tracking-tight">Mark all read</Text>
+                    <TouchableOpacity onPress={handleMarkAllRead} hitSlop={12}>
+                        <Text style={[Typography.label, { color: Colors.primary, textTransform: 'none' }]}>Mark all read</Text>
                     </TouchableOpacity>
                 }
             />
 
             {loading ? (
-                <View className="p-5"><SkeletonList count={5} /></View>
+                <View style={{ padding: 24 }}><SkeletonList count={5} type="notification" /></View>
             ) : notifications.length === 0 ? (
-                <EmptyState icon="notifications-off-outline" title="No notifications" message="You're all caught up!" />
+                <EmptyState
+                    icon="notifications-off-outline"
+                    title="All caught up!"
+                    message="When you have new updates, they'll appear here."
+                />
             ) : (
                 <FlatList
                     data={notifications}
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={{ paddingBottom: 100 }}
-                    renderItem={({ item }) => {
+                    renderItem={({ item, index }) => {
                         const typeInfo = TYPE_ICONS[item.type] || TYPE_ICONS.system;
                         return (
-                            <TouchableOpacity
-                                className={`flex-row px-6 py-5 gap-4 items-start`}
-                                onPress={() => markNotificationRead(item.id)}
-                                activeOpacity={0.8}
-                            >
-                                <View
-                                    className="w-11 h-11 rounded-full items-center justify-center bg-surface border border-gray-50"
+                            <Animated.View entering={FadeInRight.delay(index * 50)}>
+                                <TouchableOpacity
+                                    style={{
+                                        flexDirection: 'row',
+                                        paddingHorizontal: 24,
+                                        paddingVertical: 20,
+                                        gap: 16,
+                                        backgroundColor: item.read ? 'transparent' : Colors.surface,
+                                    }}
+                                    onPress={() => markNotificationRead(item.id)}
+                                    activeOpacity={0.7}
                                 >
-                                    <Ionicons name={typeInfo.icon as any} size={20} color={typeInfo.color} />
-                                </View>
-                                <View className="flex-1 mt-0.5">
-                                    <Text className="text-base font-bold text-graphite tracking-tight mb-0.5">{item.title}</Text>
-                                    <Text className="text-sm text-muted leading-relaxed" numberOfLines={2}>{item.body}</Text>
-                                    <Text className="text-xs font-semibold text-gray-400 mt-2 tracking-wide uppercase">{timeAgo(item.createdAt)}</Text>
-                                </View>
-                                {!item.read && <View className="w-2.5 h-2.5 rounded-full bg-graphite mt-2 shadow-sm" />}
-                            </TouchableOpacity>
+                                    <View style={{
+                                        width: 48,
+                                        height: 48,
+                                        borderRadius: 24,
+                                        backgroundColor: typeInfo.bg || Colors.primaryLight,
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}>
+                                        <Ionicons
+                                            name={typeInfo.icon as any}
+                                            size={22}
+                                            color={typeInfo.color || Colors.primary}
+                                        />
+                                    </View>
+
+                                    <View style={{ flex: 1 }}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                                            <Text style={[Typography.h3, { fontSize: 15, flex: 1 }]} numberOfLines={1}>{item.title}</Text>
+                                            <Text style={[Typography.label, { fontSize: 10, color: Colors.muted }]}>{timeAgo(item.createdAt)}</Text>
+                                        </View>
+                                        <Text
+                                            style={[Typography.bodySmall, { color: item.read ? Colors.muted : Colors.textSecondary, lineHeight: 20 }]}
+                                            numberOfLines={2}
+                                        >
+                                            {item.body}
+                                        </Text>
+                                        {!item.read && (
+                                            <View style={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: -12,
+                                                width: 8,
+                                                height: 8,
+                                                borderRadius: 4,
+                                                backgroundColor: Colors.primary,
+                                            }} />
+                                        )}
+                                    </View>
+                                </TouchableOpacity>
+                            </Animated.View>
                         );
                     }}
-                    ItemSeparatorComponent={() => <View className="h-[1px] bg-gray-50 ml-[88px]" />}
+                    ItemSeparatorComponent={() => <View style={{ height: 1, backgroundColor: Colors.cardBorder + '30' }} />}
                 />
             )}
         </View>
