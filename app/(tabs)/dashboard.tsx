@@ -4,10 +4,11 @@ import { RequestCard } from '@/components/ui/RequestCard';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
 import { t } from '@/i18n';
-import { jobApi } from '@/services/api';
+import { artisanApi, jobApi } from '@/services/api';
+import { mapArtisan, mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
-import type { JobRequest } from '@/types';
+import type { Artisan, JobRequest } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -24,31 +25,33 @@ export default function ArtisanDashboard() {
     const router = useRouter();
     const { user, language, artisanOnline, setArtisanOnline } = useAppStore();
     const [jobs, setJobs] = useState<JobRequest[]>([]);
+    const [profile, setProfile] = useState<Artisan | null>(null);
+    const [earnings, setEarnings] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
     const load = useCallback(async () => {
         try {
             setError(false);
-            // GET /jobs — artisan sees open + assigned jobs
-            const res = await jobApi.list({ limit: 30 });
-            const mapped = (res.results as any[]).map((row: any): JobRequest => ({
-                id: row.id,
-                clientId: row.customer_id,
-                clientName: row.customer_email ?? 'Client',
-                category: (row.title ?? 'other') as any,
-                description: row.description,
-                budget: 0,
-                urgency: 'today' as const,
-                location: { area: row.location ?? '', city: '', state: '' },
-                status: (row.status === 'open' ? 'submitted'
-                    : row.status === 'assigned' ? 'matched'
-                        : row.status === 'completed' ? 'completed'
-                            : 'cancelled') as any,
-                createdAt: row.created_at,
-            }));
-            setJobs(mapped);
-        } catch {
+            setLoading(true);
+
+            // Fetch everything in parallel
+            const [jobsRes, profileRes, earningsRes] = await Promise.all([
+                jobApi.list({ limit: 30 }),
+                artisanApi.meProfile(),
+                artisanApi.meEarnings()
+            ]);
+
+            const mappedJobs = (jobsRes.results as any[]).map(mapJob);
+            setJobs(mappedJobs);
+
+            if (profileRes) {
+                setProfile(mapArtisan(profileRes));
+            }
+
+            setEarnings(earningsRes);
+        } catch (err) {
+            console.error('[Dashboard] Error fetching data:', err);
             setError(true);
         } finally {
             setLoading(false);
@@ -61,10 +64,30 @@ export default function ArtisanDashboard() {
     const activeJobs = jobs.filter((j) => ['matched', 'scheduled', 'in_progress'].includes(j.status));
 
     const stats = [
-        { label: 'New Jobs', value: `${newJobs.length}`, icon: 'mail', color: Colors.info },
-        { label: 'Active', value: `${activeJobs.length}`, icon: 'briefcase', color: Colors.primary },
-        { label: 'Rating', value: '4.8', icon: 'star', color: Colors.warning },
-        { label: 'Earnings', value: '₦485k', icon: 'wallet', color: Colors.success },
+        {
+            label: 'New Jobs',
+            value: `${newJobs.length}`,
+            icon: 'mail',
+            color: Colors.info
+        },
+        {
+            label: 'Active',
+            value: `${activeJobs.length}`,
+            icon: 'briefcase',
+            color: Colors.primary
+        },
+        {
+            label: 'Rating',
+            value: profile?.rating && profile.rating > 0 ? profile.rating.toFixed(1) : 'N/A',
+            icon: 'star',
+            color: Colors.warning
+        },
+        {
+            label: 'Earnings',
+            value: `₦${Number(earnings?.total_earned ?? 0).toLocaleString()}`,
+            icon: 'wallet',
+            color: Colors.success
+        },
     ];
 
     return (
@@ -79,7 +102,7 @@ export default function ArtisanDashboard() {
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 32 }}>
                     <View style={{ flex: 1 }}>
                         <Text style={[Typography.h2, { fontSize: 22 }]}>
-                            {t('greeting', language)}, {user?.name.split(' ')[0]} 👋
+                            {t('greeting', language)}, {user?.name?.split(' ')[0] || 'there'} 👋
                         </Text>
                         <Text style={[Typography.bodySmall, { marginTop: 4 }]}>Hope you're ready for work today!</Text>
                     </View>
@@ -174,4 +197,3 @@ export default function ArtisanDashboard() {
         </View>
     );
 }
-

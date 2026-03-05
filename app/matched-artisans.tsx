@@ -4,6 +4,7 @@ import { Chip } from '@/components/ui/CardChipBadge';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
 import { artisanApi } from '@/services/api';
+import { mapArtisan } from '@/services/mappers';
 import { Colors, Typography } from '@/theme';
 import type { Artisan } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -12,38 +13,6 @@ import { FlatList, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const SORT_OPTIONS = ['Best Match', 'Top Rated', 'Lowest Price'];
-
-/** Maps backend artisan search result to frontend Artisan shape */
-function normaliseArtisan(row: any): Artisan {
-    return {
-        id: row.id ?? row.user_id,
-        name: `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim() || 'Artisan',
-        phone: row.phone ?? '',
-        avatar: row.avatar_url ?? undefined,
-        skills: row.skills ?? [],
-        rating: Number(row.avg_rating ?? 4.5),
-        reviewCount: Number(row.review_count ?? 0),
-        verified: Boolean(row.verified),
-        distance: Number(row.distance_km ?? 0),
-        availability: row.availability ?? 'online',
-        priceRange: {
-            min: Number(row.price_min ?? 5000),
-            max: Number(row.price_max ?? 50000),
-        },
-        bio: row.bio ?? '',
-        location: {
-            area: row.area ?? '',
-            city: row.city ?? '',
-            state: row.state ?? '',
-        },
-        serviceAreas: row.service_areas ?? [],
-        pricingStyle: row.pricing_style ?? 'estimate',
-        reviews: [],
-        completedJobs: Number(row.completed_jobs ?? 0),
-        joinedDate: row.joined_date ?? new Date().toISOString().split('T')[0],
-        matchScore: Math.floor(70 + Math.random() * 30),
-    };
-}
 
 export default function MatchedArtisansScreen() {
     const router = useRouter();
@@ -63,7 +32,7 @@ export default function MatchedArtisansScreen() {
                 limit: 20,
             });
             const results = (res.results as any[])
-                .map(normaliseArtisan)
+                .map(mapArtisan)
                 .filter((a) => a.availability === 'online');
             setArtisans(results);
         } catch {

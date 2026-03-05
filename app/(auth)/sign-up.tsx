@@ -1,19 +1,15 @@
 import BackButton from '@/components/ui/BackButton';
-import { OauthButton, PrimaryButton } from '@/components/ui/Buttons';
+import { PrimaryButton } from '@/components/ui/Buttons';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { AppTextInput, PasswordInput, PhoneInput } from '@/components/ui/TextInputs';
 import { authApi } from '@/services/api';
 import { useAppStore } from '@/store';
 import { Colors, Typography } from '@/theme';
 import { SignUpSchema, mapZodErrors } from '@/utils/helpers';
-import { useOAuth } from '@clerk/expo';
-import * as WebBrowser from 'expo-web-browser';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-
-WebBrowser.maybeCompleteAuthSession();
 
 export default function SignUpScreen() {
     const router = useRouter();
@@ -21,9 +17,6 @@ export default function SignUpScreen() {
     const [form, setForm] = useState({ name: '', phone: '', email: '', password: '' });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(false);
-    const [googleLoading, setGoogleLoading] = useState(false);
-
-    const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
 
     const handleSignUp = async () => {
         const result = SignUpSchema.safeParse(form);
@@ -35,11 +28,12 @@ export default function SignUpScreen() {
         setLoading(true);
 
         try {
-            const registeredUser = await authApi.register({
+            await authApi.register({
                 email: form.email || `${form.phone}@loom.ng`,
                 password: form.password,
                 role: (user?.role as any) ?? 'customer',
                 name: form.name,
+                phone: form.phone,
             });
 
             // Log in immediately to get a token so we can call /auth/request-otp
@@ -65,40 +59,6 @@ export default function SignUpScreen() {
             Alert.alert('Sign Up Failed', err.message ?? 'Please try again.');
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleGoogleSignIn = async () => {
-        try {
-            setGoogleLoading(true);
-            const { createdSessionId, setActive, authSessionResult } = await startOAuthFlow();
-
-            if (createdSessionId && setActive) {
-                await setActive({ session: createdSessionId });
-
-                const clerkUser = authSessionResult as any;
-                const email = clerkUser?.params?.email ?? clerkUser?.email ?? `user_${Date.now()}@google.com`;
-                const name = clerkUser?.params?.name ?? clerkUser?.name ?? 'User';
-
-                const res = await authApi.googleSignIn({
-                    email,
-                    name,
-                    clerkUserId: createdSessionId,
-                    role: user?.role ?? 'customer',
-                });
-
-                signIn(
-                    (res.user.role as any) ?? 'client',
-                    { id: res.user.id, email: res.user.email, name: res.user.name },
-                    res.token
-                );
-
-                router.replace(res.user.role === 'artisan' ? '/(tabs)/dashboard' : '/(tabs)/home');
-            }
-        } catch (err: any) {
-            Alert.alert('Google Sign In Failed', err.message ?? 'Please try again.');
-        } finally {
-            setGoogleLoading(false);
         }
     };
 
@@ -169,19 +129,6 @@ export default function SignUpScreen() {
                 </Animated.View>
 
                 <Animated.View entering={FadeInDown.delay(300)}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 32, gap: 16 }}>
-                        <View style={{ flex: 1, height: 1.5, backgroundColor: Colors.cardBorder }} />
-                        <Text style={[Typography.label, { color: Colors.muted }]}>OR</Text>
-                        <View style={{ flex: 1, height: 1.5, backgroundColor: Colors.cardBorder }} />
-                    </View>
-
-                    <OauthButton
-                        title="Continue with Google"
-                        onPress={handleGoogleSignIn}
-                        loading={googleLoading}
-                        image={require('../../assets/images/google-icon.jpeg')}
-                    />
-
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 40, gap: 6 }}>
                         <Text style={[Typography.body, { color: Colors.textSecondary }]}>
                             Already have an account?

@@ -1,3 +1,4 @@
+import { mapArtisan } from '@/services/mappers';
 import { AppHeader } from '@/components/AppHeader';
 import { ArtisanCard } from '@/components/ui/ArtisanCard';
 import { LoomThread } from '@/components/ui/LoomThread';
@@ -46,26 +47,7 @@ export default function ClientHomeScreen() {
             setError(false);
             // GET /artisans — browse all artisans, sorted by rating
             const res = await artisanApi.list({ limit: 30 });
-            const normalised = (res.results as any[]).map((row: any): Artisan => ({
-                id: row.artisan_profile_id ?? row.id,
-                name: `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim() || 'Artisan',
-                phone: row.phone ?? '',
-                avatar: row.avatar_url ?? undefined,
-                skills: row.skills ?? [],
-                rating: Number(row.avg_rating ?? 4.5),
-                reviewCount: Number(row.ratings_count ?? 0),
-                verified: Boolean(row.verified),
-                distance: Number(row.distance_km ?? 0),
-                availability: row.availability ?? 'online',
-                priceRange: { min: Number(row.price_min ?? 5000), max: Number(row.price_max ?? 50000) },
-                bio: row.bio ?? '',
-                location: { area: row.area ?? '', city: row.city ?? '', state: row.state ?? '' },
-                serviceAreas: row.service_areas ?? [],
-                pricingStyle: row.pricing_style ?? 'estimate',
-                reviews: [],
-                completedJobs: Number(row.completed_jobs ?? 0),
-                joinedDate: row.joined_date ?? new Date().toISOString().split('T')[0],
-            }));
+            const normalised = (res.results as any[]).map(mapArtisan);
             setArtisans(normalised);
         } catch {
             setError(true);

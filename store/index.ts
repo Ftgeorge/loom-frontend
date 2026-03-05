@@ -73,17 +73,6 @@ interface AppState extends AuthState {
   setSelectedCity: (city: string) => void;
 }
 
-const defaultUser: User = {
-  id: "u1",
-  name: "George",
-  phone: "+2348012345678",
-  email: "george@loom.ng",
-  role: "client",
-  languagePref: "en",
-  location: { area: "Wuse 2", city: "Abuja", state: "FCT" },
-  createdAt: "2026-01-15T10:00:00Z",
-};
-
 export const useAppStore = create<AppState>((set, get) => ({
   // Auth
   isAuthenticated: false,
@@ -103,21 +92,13 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   // Auth actions
   signIn: (role, userData, token) => {
-    // Merge real user data with defaults for dev fallback
-    const mergedUser: User = {
-      ...defaultUser,
-      role,
-      ...(userData as Partial<User>),
-    };
-
     if (token) {
-      // Persist token to AsyncStorage (fire and forget)
       saveToken(token).catch(console.error);
     }
 
     set({
       isAuthenticated: true,
-      user: mergedUser,
+      user: userData as User,
       hasSelectedRole: true,
       token: token ?? null,
     });
@@ -139,7 +120,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   setRoleSelected: (role) =>
     set({
       hasSelectedRole: true,
-      user: { ...defaultUser, role },
+      user: { role } as User,
     }),
 
   switchRole: (role) =>
@@ -209,6 +190,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   setArtisanOnline: (online) => set({ artisanOnline: online }),
 
   // Location
-  selectedCity: "Abuja",
+  selectedCity: "Lagos",
   setSelectedCity: (city) => set({ selectedCity: city }),
 }));

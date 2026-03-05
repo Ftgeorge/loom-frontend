@@ -48,8 +48,9 @@ export const authApi = {
     register: (data: {
         email: string;
         password: string;
-        role: "customer" | "artisan";
+        role: "customer" | "artisan" | "client";
         name?: string;
+        phone?: string;
     }) =>
         apiFetch<{ id: string; email: string; role: string }>("/auth/register", {
             method: "POST",
@@ -75,25 +76,9 @@ export const authApi = {
             method: "POST",
             body: JSON.stringify({ otp }),
         }),
-
-    /**
-     * Called after a successful Clerk Google sign-in.
-     * Sends the Clerk user info to our backend which upserts the user
-     * and returns our own JWT.
-     */
-    googleSignIn: (data: {
-        email: string;
-        name: string;
-        clerkUserId: string;
-        role?: string;
-    }) =>
-        apiFetch<AuthResponse>("/auth/google", {
-            method: "POST",
-            body: JSON.stringify(data),
-        }),
 };
 
-// ─── Artisan API ─────────────────────────────────────────
+/** Artisan API */
 export const artisanApi = {
     /** GET /artisans/search?skill=plumber — category-filtered artisan search */
     search: (params: { skill: string; limit?: number; offset?: number }) => {
@@ -287,6 +272,10 @@ export const userApi = {
         last_name?: string;
         phone?: string;
         email?: string;
+        area?: string;
+        city?: string;
+        state?: string;
+        avatar_url?: string;
     }) =>
         apiFetch<unknown>("/users/me", {
             method: "PATCH",

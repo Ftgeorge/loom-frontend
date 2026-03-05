@@ -11,13 +11,11 @@ import React, { useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
 
-const STEPS = ['Basics', 'Skills', 'Areas', 'Availability', 'Pricing'];
+const STEPS = ['Skills', 'Areas', 'Availability', 'Pricing'];
 
 export default function ArtisanOnboardingScreen() {
     const router = useRouter();
     const [step, setStep] = useState(0);
-    const [name, setName] = useState('');
-    const [phone, setPhone] = useState('');
     const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
     const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
     const [pricingStyle, setPricingStyle] = useState('estimate');
@@ -40,12 +38,7 @@ export default function ArtisanOnboardingScreen() {
     const handleComplete = async () => {
         setLoading(true);
         try {
-            // 1. Update user basic info (name, phone)
-            const [firstName, ...lastNameParts] = name.trim().split(' ');
-            const lastName = lastNameParts.join(' ');
-            await userApi.updateProfile({ first_name: firstName, last_name: lastName, phone });
-
-            // 2. Create Artisan Profile
+            // 1. Create Artisan Profile
             const profile = await artisanApi.createProfile({
                 bio: `Available for ${selectedSkills.join(', ')} in ${selectedAreas.join(', ')}.`,
                 yearsOfExperience: 1, // Default during onboarding
@@ -53,10 +46,8 @@ export default function ArtisanOnboardingScreen() {
 
             const profileId = profile.id;
 
-            // 3. Attach skills (sequentially for simplicity in onboarding)
+            // 2. Attach skills (sequentially for simplicity in onboarding)
             for (const skill of selectedSkills) {
-                // We need to map category ID back to a skill name. 
-                // For now, using the ID as name or finding the label.
                 const skillLabel = CATEGORIES.find(c => c.id === skill)?.label || skill;
                 await artisanApi.addSkill(profileId, skillLabel);
             }
@@ -72,7 +63,7 @@ export default function ArtisanOnboardingScreen() {
     return (
         <View className="flex-1 bg-background">
             <AppHeader
-                title="Set Up Profile"
+                title="Arisan Setup"
                 showBack
                 onBack={() => (step > 0 ? setStep(step - 1) : router.back())}
                 showNotification={false}
@@ -90,19 +81,6 @@ export default function ArtisanOnboardingScreen() {
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }} keyboardShouldPersistTaps="handled">
                 {step === 0 && (
                     <Animated.View entering={FadeInRight.springify()} className="p-8">
-                        <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Your basic info</Text>
-                        <AppTextInput label="Full Name" value={name} onChangeText={setName} placeholder="Your full name" />
-                        <PhoneInput label="Phone Number" value={phone} onChangeText={setPhone} placeholder="8012345678" />
-                        <TouchableOpacity className="h-[120px] rounded-[24px] border-2 border-surface bg-surface/30 border-dashed items-center justify-center gap-2 mb-2">
-                            <Ionicons name="camera-outline" size={32} color={Colors.muted} />
-                            <Text className="text-sm font-medium text-muted">Add profile photo</Text>
-                        </TouchableOpacity>
-                        <PrimaryButton title="Next" onPress={() => setStep(1)} disabled={!name} style={{ marginTop: 32 }} className="bg-graphite" />
-                    </Animated.View>
-                )}
-
-                {step === 1 && (
-                    <Animated.View entering={FadeInRight.springify()} className="p-8">
                         <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">What are your trades?</Text>
                         <Text className="text-base text-muted mb-6">Select all that apply</Text>
                         <View className="flex-row flex-wrap gap-2">
@@ -110,11 +88,11 @@ export default function ArtisanOnboardingScreen() {
                                 <Chip key={cat.id} label={cat.label} selected={selectedSkills.includes(cat.id)} onPress={() => toggleSkill(cat.id)} />
                             ))}
                         </View>
-                        <PrimaryButton title="Next" onPress={() => setStep(2)} disabled={selectedSkills.length === 0} style={{ marginTop: 32 }} className="bg-graphite" />
+                        <PrimaryButton title="Next" onPress={() => setStep(1)} disabled={selectedSkills.length === 0} style={{ marginTop: 32 }} className="bg-graphite" />
                     </Animated.View>
                 )}
 
-                {step === 2 && (
+                {step === 1 && (
                     <Animated.View entering={FadeInRight.springify()} className="p-8">
                         <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Service areas</Text>
                         <Text className="text-base text-muted mb-6">Where can clients find you?</Text>
@@ -123,11 +101,11 @@ export default function ArtisanOnboardingScreen() {
                                 <Chip key={area} label={area} selected={selectedAreas.includes(area)} onPress={() => toggleArea(area)} />
                             ))}
                         </View>
-                        <PrimaryButton title="Next" onPress={() => setStep(3)} disabled={selectedAreas.length === 0} style={{ marginTop: 32 }} className="bg-graphite" />
+                        <PrimaryButton title="Next" onPress={() => setStep(2)} disabled={selectedAreas.length === 0} style={{ marginTop: 32 }} className="bg-graphite" />
                     </Animated.View>
                 )}
 
-                {step === 3 && (
+                {step === 2 && (
                     <Animated.View entering={FadeInRight.springify()} className="p-8">
                         <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Your availability</Text>
                         <Text className="text-base text-muted mb-6">Select your working days</Text>
@@ -142,11 +120,11 @@ export default function ArtisanOnboardingScreen() {
                                 </TouchableOpacity>
                             ))}
                         </View>
-                        <PrimaryButton title="Next" onPress={() => setStep(4)} style={{ marginTop: 32 }} className="bg-graphite" />
+                        <PrimaryButton title="Next" onPress={() => setStep(3)} style={{ marginTop: 32 }} className="bg-graphite" />
                     </Animated.View>
                 )}
 
-                {step === 4 && (
+                {step === 3 && (
                     <Animated.View entering={FadeInRight.springify()} className="p-8">
                         <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Pricing style</Text>
                         <Text className="text-base text-muted mb-6">How do you prefer to charge?</Text>

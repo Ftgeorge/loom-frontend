@@ -1,3 +1,4 @@
+import { mapArtisan } from '@/services/mappers';
 import { AppHeader } from '@/components/AppHeader';
 import { Avatar, RatingStars } from '@/components/ui/AvatarRating';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
@@ -32,33 +33,7 @@ export default function ArtisanProfileScreen() {
             // GET /artisans/:id
             const row: any = await artisanApi.getById(id);
             if (row) {
-                const normalised: Artisan = {
-                    id: row.artisan_profile_id ?? row.id,
-                    name: `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim() || 'Artisan',
-                    phone: row.phone ?? '',
-                    avatar: row.avatar_url ?? undefined,
-                    skills: row.skills ?? [],
-                    rating: Number(row.avg_rating ?? 4.5),
-                    reviewCount: Number(row.ratings_count ?? 0),
-                    verified: Boolean(row.verified),
-                    distance: Number(row.distance_km ?? 0),
-                    availability: row.availability ?? 'online',
-                    priceRange: { min: Number(row.price_min ?? 5000), max: Number(row.price_max ?? 50000) },
-                    bio: row.bio ?? '',
-                    location: { area: row.area ?? '', city: row.city ?? '', state: row.state ?? '' },
-                    serviceAreas: row.service_areas ?? [],
-                    pricingStyle: row.pricing_style ?? 'estimate',
-                    reviews: (row.reviews as any[] || []).map((r: any): ArtisanReview => ({
-                        id: r.id,
-                        clientName: r.customer_name ?? 'Client',
-                        rating: r.rating,
-                        comment: r.comment ?? '',
-                        tags: [],
-                        createdAt: r.created_at,
-                    })),
-                    completedJobs: Number(row.completed_jobs ?? 0),
-                    joinedDate: row.joined_date ?? new Date().toISOString().split('T')[0],
-                };
+                const normalised: Artisan = mapArtisan(row);
                 setArtisan(normalised);
             } else {
                 setError(true);

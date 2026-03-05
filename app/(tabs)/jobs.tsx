@@ -1,3 +1,4 @@
+import { mapJob } from '@/services/mappers';
 import { AppHeader } from '@/components/AppHeader';
 import { RequestCard } from '@/components/ui/RequestCard';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
@@ -27,23 +28,10 @@ export default function JobsScreen() {
             setLoading(true);
             // GET /jobs — artisan role sees open + their assigned jobs
             const res = await jobApi.list({ limit: 50 });
-            const mapped = (res.results as any[]).map((row: any): JobRequest => ({
-                id: row.id,
-                clientId: row.customer_id,
-                clientName: row.customer_email ?? 'Client',
-                category: (row.title ?? 'other') as any,
-                description: row.description,
-                budget: 0,
-                urgency: 'today',
-                location: { area: row.location ?? '', city: '', state: '' },
-                status: row.status === 'open' ? 'submitted'
-                    : row.status === 'assigned' ? 'matched'
-                        : row.status === 'completed' ? 'completed'
-                            : 'cancelled',
-                createdAt: row.created_at,
-            }));
+            const mapped = (res.results as any[]).map(mapJob);
             setJobs(mapped);
-        } catch {
+        } catch (err) {
+            console.error('[Jobs] Error fetching jobs:', err);
             setError(true);
         } finally {
             setLoading(false);

@@ -5,7 +5,7 @@ import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
 import { StatusTimeline, getArtisanJobSteps } from '@/components/ui/StatusTimeline';
 import { jobApi } from '@/services/api';
-
+import { mapJob } from '@/services/mappers';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { ArtisanJobStatus, JobRequest } from '@/types';
 import { formatNaira } from '@/utils/helpers';
@@ -26,29 +26,14 @@ export default function JobDetailsScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            const row = await jobApi.getById(id || '') as any;
+            if (!id) return;
+            const row = await jobApi.getById(id) as any;
             if (row) {
-                const mapped: JobRequest = {
-                    id: row.id,
-                    clientId: row.customer_id,
-                    clientName: row.customer_first_name
-                        ? `${row.customer_first_name} ${row.customer_last_name ?? ''}`.trim()
-                        : row.customer_email ?? 'Client',
-                    category: (row.title ?? 'other') as any,
-                    description: row.description,
-                    budget: 0,
-                    urgency: 'today' as const,
-                    location: { area: row.location ?? '', city: '', state: '' },
-                    status: (row.status === 'open' ? 'submitted'
-                        : row.status === 'assigned' ? 'matched'
-                            : row.status === 'completed' ? 'completed'
-                                : 'cancelled') as any,
-                    createdAt: row.created_at,
-                };
-                setJob(mapped);
+                setJob(mapJob(row));
                 setArtisanStatus('new');
             }
-        } catch {
+        } catch (err) {
+            console.error('[JobDetails] Error:', err);
             setError(true);
         } finally {
             setLoading(false);
@@ -222,4 +207,3 @@ function DetailItem({ label, value, capitalize }: { label: string; value: string
         </View>
     );
 }
-

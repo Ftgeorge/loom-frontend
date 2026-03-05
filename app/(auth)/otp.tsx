@@ -35,7 +35,7 @@ export default function OTPScreen() {
         try {
             await authApi.verifyOtp(code);
             setEmailVerified(true);
-            router.replace(user?.role === 'artisan' ? '/(tabs)/dashboard' : '/(tabs)/home');
+            router.replace('/profile-completion');
         } catch (err: any) {
             setError(err.message ?? 'Invalid or expired code. Please try again.');
         } finally {

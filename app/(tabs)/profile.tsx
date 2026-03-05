@@ -113,7 +113,7 @@ export default function ProfileScreen() {
             {user?.name}
           </Text>
           <Text style={[Typography.body, { marginTop: 4, color: Colors.textSecondary, fontWeight: '500' }]}>
-            {isArtisan ? "Artisan" : "Client"} • {user?.location.city}
+            {isArtisan ? "Artisan" : "Client"} • {user?.location?.city || "Set location"}
           </Text>
           <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 4 }]}>{user?.phone}</Text>
         </View>

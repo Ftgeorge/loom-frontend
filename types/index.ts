@@ -62,7 +62,8 @@ export interface User {
     role: UserRole;
     languagePref: Language;
     avatar?: string;
-    location: Location;
+    location?: Location;
+    rating?: number;
     createdAt: string;
 }
 

@@ -6,7 +6,7 @@ import { useAppStore } from '@/store';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { CategoryId, Urgency } from '@/types';
 import { CATEGORIES } from '@/types';
-import { formatNaira } from '@/utils/helpers';
+import { JobRequestSchema, mapZodErrors, formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -35,42 +35,50 @@ export default function PostJobScreen() {
     const [step, setStep] = useState(0);
     const [category, setCategory] = useState<string>('');
     const [description, setDescription] = useState('');
-    const [address, setAddress] = useState(user?.location.area || '');
+    const [address, setAddress] = useState(user?.location?.area || '');
     const [budget, setBudget] = useState(10000);
     const [urgency, setUrgency] = useState<Urgency>('today');
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const steps = ['Type', 'Deets', 'Place', 'Review'];
 
     const handleSubmit = async () => {
+        // Final validation
+        const result = JobRequestSchema.safeParse({
+            category,
+            description,
+            budget,
+            urgency,
+            address,
+        });
+
+        if (!result.success) {
+            const errs = mapZodErrors(result.error);
+            setErrors(errs);
+            // Go to step with error
+            if (errs.category) setStep(0);
+            else if (errs.description) setStep(1);
+            else if (errs.address || errs.budget) setStep(2);
+            return;
+        }
+
         setLoading(true);
         try {
             // POST /jobs — backend schema: { title, description, location }
             const backendJob = await jobApi.create({
-                skill: category || 'not_sure',
+                skill: category,
                 description,
                 budget,
                 location: `${address}, ${user?.location?.city || 'Abuja'}`,
                 urgency,
             });
-            // Also keep a local copy in the store for immediate UI feedback
-            addJob({
-                id: backendJob.id,
-                clientId: user?.id || 'u1',
-                clientName: user?.name || 'User',
-                category: (category || 'not_sure') as CategoryId | 'not_sure',
-                description,
-                budget,
-                urgency,
-                location: {
-                    area: address,
-                    city: user?.location?.city || 'Abuja',
-                    state: user?.location?.state || 'FCT',
-                },
-                status: (backendJob.status as any) || 'submitted',
-                createdAt: new Date().toISOString(),
-            });
+
+            // Map the response to our frontend type
+            const { mapJob } = require('@/services/mappers');
+            addJob(mapJob(backendJob));
+
             setSubmitted(true);
         } catch (err: any) {
             Alert.alert('Error', err.message ?? 'Something went wrong. Please try again.');
@@ -147,12 +155,15 @@ export default function PostJobScreen() {
                                 <TouchableOpacity
                                     key={cat.id}
                                     activeOpacity={0.8}
-                                    onPress={() => setCategory(cat.id)}
+                                    onPress={() => {
+                                        setCategory(cat.id);
+                                        setErrors(prev => ({ ...prev, category: '' }));
+                                    }}
                                     style={{
                                         width: (width - 48 - 12) / 2,
                                         backgroundColor: category === cat.id ? Colors.primaryLight : Colors.surface,
                                         borderWidth: 1.5,
-                                        borderColor: category === cat.id ? Colors.primary : Colors.cardBorder,
+                                        borderColor: category === cat.id ? Colors.primary : (errors.category ? Colors.error : Colors.cardBorder),
                                         borderRadius: Radius.lg,
                                         padding: 20,
                                         alignItems: 'center',
@@ -171,11 +182,17 @@ export default function PostJobScreen() {
                                 </TouchableOpacity>
                             ))}
                         </View>
+                        {errors.category && <Text style={[Typography.bodySmall, { color: Colors.error, marginTop: 12 }]}>{errors.category}</Text>}
 
                         <PrimaryButton
                             title="Continue"
-                            onPress={() => setStep(1)}
-                            disabled={!category}
+                            onPress={() => {
+                                if (!category) {
+                                    setErrors({ category: 'Please select a category' });
+                                } else {
+                                    setStep(1);
+                                }
+                            }}
                             style={{ marginTop: 40 }}
                         />
                     </Animated.View>
@@ -191,7 +208,7 @@ export default function PostJobScreen() {
                             backgroundColor: Colors.surface,
                             borderRadius: Radius.lg,
                             borderWidth: 1.5,
-                            borderColor: Colors.cardBorder,
+                            borderColor: errors.description ? Colors.error : Colors.cardBorder,
                             padding: 16,
                             minHeight: 180,
                             ...Shadows.sm
@@ -203,7 +220,10 @@ export default function PostJobScreen() {
                                 multiline
                                 autoFocus
                                 value={description}
-                                onChangeText={setDescription}
+                                onChangeText={(val) => {
+                                    setDescription(val);
+                                    if (val.length >= 10) setErrors(prev => ({ ...prev, description: '' }));
+                                }}
                             />
 
                             <View style={{ flexDirection: 'row', borderTopWidth: 1, borderTopColor: Colors.cardBorder, paddingTop: 12, gap: 12 }}>
@@ -217,11 +237,17 @@ export default function PostJobScreen() {
                                 </TouchableOpacity>
                             </View>
                         </View>
+                        {errors.description && <Text style={[Typography.bodySmall, { color: Colors.error, marginTop: 12 }]}>{errors.description}</Text>}
 
                         <PrimaryButton
                             title="Continue"
-                            onPress={() => setStep(2)}
-                            disabled={description.length < 5}
+                            onPress={() => {
+                                if (description.length < 10) {
+                                    setErrors({ description: 'At least 10 characters needed' });
+                                } else {
+                                    setStep(2);
+                                }
+                            }}
                             style={{ marginTop: 40 }}
                         />
                     </Animated.View>
@@ -240,22 +266,26 @@ export default function PostJobScreen() {
                             backgroundColor: Colors.surface,
                             borderRadius: Radius.lg,
                             borderWidth: 1.5,
-                            borderColor: Colors.cardBorder,
+                            borderColor: errors.address ? Colors.error : Colors.cardBorder,
                             paddingHorizontal: 16,
                             height: 56,
-                            marginBottom: 24,
+                            marginBottom: 8,
                             gap: 12
                         }}>
                             <Ionicons name="location" size={20} color={Colors.primary} />
                             <TextInput
                                 style={[Typography.body, { flex: 1, color: Colors.text }]}
                                 value={address}
-                                onChangeText={setAddress}
+                                onChangeText={(val) => {
+                                    setAddress(val);
+                                    if (val.length > 3) setErrors(prev => ({ ...prev, address: '' }));
+                                }}
                                 placeholder="Area, City"
                             />
                         </View>
+                        {errors.address && <Text style={[Typography.bodySmall, { color: Colors.error, marginBottom: 16 }]}>{errors.address}</Text>}
 
-                        <Text style={[Typography.label, { marginBottom: 16 }]}>Estimated Budget</Text>
+                        <Text style={[Typography.label, { marginBottom: 16, marginTop: 16 }]}>Estimated Budget</Text>
                         <View style={{
                             backgroundColor: Colors.surface,
                             borderRadius: Radius.xl,
@@ -300,8 +330,13 @@ export default function PostJobScreen() {
 
                         <PrimaryButton
                             title="Review Request"
-                            onPress={() => setStep(3)}
-                            disabled={!address}
+                            onPress={() => {
+                                if (!address || address.length < 3) {
+                                    setErrors({ address: 'Please enter a valid address' });
+                                } else {
+                                    setStep(3);
+                                }
+                            }}
                             style={{ marginTop: 48 }}
                         />
                     </Animated.View>
@@ -370,4 +405,3 @@ export default function PostJobScreen() {
         </View>
     );
 }
-

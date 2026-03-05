@@ -5,9 +5,9 @@ import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { EmptyState, ErrorState } from '@/components/ui/StateComponents';
 import { AppTextInput } from '@/components/ui/TextInputs';
 import { artisanApi } from '@/services/api';
-import { MOCK_ARTISANS } from '@/services/mockApi';
+import { mapArtisan } from '@/services/mappers';
 import { Colors, Typography } from '@/theme';
-import type { Artisan, CategoryId } from '@/types';
+import type { Artisan } from '@/types';
 import { CATEGORIES } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -15,41 +15,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-/**
- * Maps backend artisan search results to frontend Artisan shape.
- * The backend returns DB rows; this normalises them.
- */
-function normaliseArtisan(row: any): Artisan {
-    const id = row.artisan_profile_id ?? row.id ?? row.user_id;
-    return {
-        id,
-        name: `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim() || 'Artisan',
-        phone: row.phone ?? '',
-        avatar: row.avatar_url ?? undefined,
-        skills: row.skills ?? [],
-        rating: Number(row.avg_rating ?? 4.5),
-        reviewCount: Number(row.ratings_count ?? row.review_count ?? 0),
-        verified: Boolean(row.verified),
-        distance: Number(row.distance_km ?? 0),
-        availability: row.availability ?? 'online',
-        priceRange: {
-            min: Number(row.price_min ?? 5000),
-            max: Number(row.price_max ?? 50000),
-        },
-        bio: row.bio ?? '',
-        location: {
-            area: row.area ?? '',
-            city: row.city ?? '',
-            state: row.state ?? '',
-        },
-        serviceAreas: row.service_areas ?? [],
-        pricingStyle: row.pricing_style ?? 'estimate',
-        reviews: [],
-        completedJobs: Number(row.completed_jobs ?? 0),
-        joinedDate: row.joined_date ?? new Date().toISOString().split('T')[0],
-    };
-}
 
 export default function SearchScreen() {
     const router = useRouter();
@@ -69,33 +34,27 @@ export default function SearchScreen() {
             setLoading(true);
             setError(false);
 
+            let results: Artisan[] = [];
             if (cat) {
-                // Real backend: GET /artisans/search?skill=<category>
                 const res = await artisanApi.search({ skill: cat, limit: 30 });
-                const results = (res.results as any[]).map(normaliseArtisan);
-                // Client-side filter by free-text query if provided
-                const filtered = q
-                    ? results.filter(
-                        (a) =>
-                            a.name.toLowerCase().includes(q.toLowerCase()) ||
-                            a.bio.toLowerCase().includes(q.toLowerCase())
-                    )
-                    : results;
-                setArtisans(filtered);
+                results = (res.results as any[]).map(mapArtisan);
             } else {
-                // No category selected — no "list all" endpoint exists.
-                // Filter from mock data by free-text query for now.
-                const filtered = q
-                    ? MOCK_ARTISANS.filter(
-                        (a) =>
-                            a.name.toLowerCase().includes(q.toLowerCase()) ||
-                            a.bio.toLowerCase().includes(q.toLowerCase()) ||
-                            a.skills.some((s) => s.toLowerCase().includes(q.toLowerCase()))
-                    )
-                    : MOCK_ARTISANS;
-                setArtisans(filtered as Artisan[]);
+                const res = await artisanApi.list({ limit: 30 });
+                results = (res.results as any[]).map(mapArtisan);
             }
-        } catch {
+
+            // Client-side filter by free-text query if provided
+            const filtered = q
+                ? results.filter(
+                    (a) =>
+                        a.name.toLowerCase().includes(q.toLowerCase()) ||
+                        a.bio.toLowerCase().includes(q.toLowerCase()) ||
+                        a.skills.some((s) => s.toLowerCase().includes(q.toLowerCase()))
+                )
+                : results;
+            setArtisans(filtered);
+        } catch (err) {
+            console.error('[Search] Error fetching artisans:', err);
             setError(true);
         } finally {
             setLoading(false);

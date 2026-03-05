@@ -3,7 +3,7 @@ import { useAppStore } from "@/store";
 import { Colors } from "@/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
   interpolate,
@@ -74,20 +74,17 @@ export default function SplashScreen() {
     );
   }, []);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isAuthenticated) {
-        router.replace(
-          user?.role === "artisan" ? "/(tabs)/dashboard" : "/(tabs)/home",
-        );
-      } else if (hasCompletedOnboarding) {
-        router.replace("/role-selection");
-      } else {
-        router.replace("/onboarding");
-      }
-    }, 3500); // Allow animation to settle
-    return () => clearTimeout(timer);
-  }, []);
+  const handleContinue = () => {
+    if (isAuthenticated) {
+      router.replace(
+        user?.role === "artisan" ? "/(tabs)/dashboard" : "/(tabs)/home",
+      );
+    } else if (hasCompletedOnboarding) {
+      router.replace("/role-selection");
+    } else {
+      router.replace("/onboarding");
+    }
+  };
 
   const taglineStyle = useAnimatedStyle(() => ({
     opacity: taglineOpacity.value,
@@ -125,8 +122,15 @@ export default function SplashScreen() {
         </Animated.Text>
       </View>
 
-      <Animated.View style={[styles.indicatorWrap, indicatorStyle]}>
-        <ActivityIndicator color={Colors.white} size="small" />
+      <Animated.View style={[styles.footer, indicatorStyle]}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleContinue}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.buttonText}>Get Started</Text>
+          <ActivityIndicator color={Colors.white} size="small" style={{ marginLeft: 12 }} />
+        </TouchableOpacity>
       </Animated.View>
     </View>
   );
@@ -148,8 +152,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   letter: {
-    fontFamily: "System",
-    fontWeight: "700",
+    fontFamily: "MontserratAlternates-Bold",
     fontSize: 72,
     color: Colors.white,
     letterSpacing: -4,
@@ -158,15 +161,34 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: "rgba(255,255,255,0.7)",
     marginTop: 8,
-    fontFamily: "System",
-    fontWeight: "600",
+    fontFamily: "MontserratAlternates-Medium",
     letterSpacing: 4,
     textTransform: 'uppercase',
   },
-  indicatorWrap: {
+  footer: {
     position: "absolute",
-    bottom: 60,
+    bottom: 80,
+    width: '100%',
+    paddingHorizontal: 40,
   },
+  button: {
+    backgroundColor: Colors.accent,
+    height: 56,
+    borderRadius: 28,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  buttonText: {
+    color: Colors.white,
+    fontSize: 16,
+    fontFamily: "MontserratAlternates-Bold",
+  }
 });
 
 
