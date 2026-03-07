@@ -84,6 +84,10 @@ export default function MatchedArtisansScreen() {
                 }
                 keyExtractor={(item) => item.id}
                 contentContainerStyle={{ paddingBottom: 100 }}
+                initialNumToRender={8}
+                maxToRenderPerBatch={10}
+                windowSize={5}
+                removeClippedSubviews={true}
                 renderItem={({ item, index }) => (
                     <Animated.View
                         entering={FadeInDown.delay(index * 100)}

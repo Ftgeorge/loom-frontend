@@ -1,19 +1,5 @@
-/**
- * LoomThread – animated, decorative thread curves for backgrounds.
- *
- * Usage:
- *   <LoomThread />                        // default – two subtle diagonal threads
- *   <LoomThread variant="dense" />        // three threads, dashed + solid
- *   <LoomThread variant="minimal" />      // single thin thread
- *   <LoomThread color="#F59E0B" />         // custom color override
- *   <LoomThread animated={false} />       // static, no motion
- *
- * The component renders as an absolutely-positioned overlay with pointerEvents="none"
- * so it never blocks touches.  Drop it inside any container or at screen level.
- */
-
 import { Colors } from "@/theme";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import Animated, {
     Easing,
@@ -21,16 +7,19 @@ import Animated, {
     useAnimatedProps,
     useSharedValue,
     withDelay,
+    withRepeat,
     withTiming,
 } from "react-native-reanimated";
 import Svg, {
     Defs,
+    G,
     LinearGradient,
     Path,
     Stop,
 } from "react-native-svg";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
+const AnimatedG = Animated.createAnimatedComponent(G);
 
 const { width: W, height: H } = Dimensions.get("window");
 
@@ -113,6 +102,7 @@ function AnimatedThread({
     gradientId,
     delay,
     animated,
+    index
 }: {
     d: string;
     strokeWidth: number;
@@ -120,34 +110,60 @@ function AnimatedThread({
     gradientId: string;
     delay: number;
     animated: boolean;
+    index: number;
 }) {
     const progress = useSharedValue(0);
+    const float = useSharedValue(0);
 
     useEffect(() => {
         if (animated) {
             progress.value = withDelay(
                 delay,
-                withTiming(1, { duration: 1200, easing: Easing.out(Easing.cubic) }),
+                withTiming(1, { duration: 1500, easing: Easing.out(Easing.cubic) }),
+            );
+
+            float.value = withDelay(
+                delay + 1000,
+                withRepeat(
+                    withTiming(1, {
+                        duration: 6000 + (index * 1000),
+                        easing: Easing.inOut(Easing.sin)
+                    }),
+                    -1,
+                    true
+                )
             );
         } else {
             progress.value = 1;
         }
     }, []);
 
+    const PATH_LENGTH = 2000;
+
     const animatedProps = useAnimatedProps(() => ({
-        strokeOpacity: interpolate(progress.value, [0, 1], [0, 1]),
+        strokeOpacity: interpolate(progress.value, [0, 0.1, 1], [0, 1, 1]),
+        strokeDashoffset: interpolate(progress.value, [0, 1], [PATH_LENGTH, 0]),
+    }));
+
+    const animatedGProps = useAnimatedProps(() => ({
+        transform: [
+            { translateY: interpolate(float.value, [0, 1], [-15, 15]) },
+            { translateX: interpolate(float.value, [0, 1], [-5, 5]) },
+        ],
     }));
 
     return (
-        <AnimatedPath
-            d={d}
-            fill="none"
-            stroke={`url(#${gradientId})`}
-            strokeWidth={strokeWidth}
-            strokeDasharray={dasharray}
-            strokeLinecap="round"
-            animatedProps={animatedProps}
-        />
+        <AnimatedG animatedProps={animatedGProps}>
+            <AnimatedPath
+                d={d}
+                fill="none"
+                stroke={`url(#${gradientId})`}
+                strokeWidth={strokeWidth}
+                strokeDasharray={dasharray || PATH_LENGTH}
+                strokeLinecap="round"
+                animatedProps={animatedProps}
+            />
+        </AnimatedG>
     );
 }
 
@@ -156,28 +172,22 @@ function AnimatedThread({
 export type LoomThreadVariant = "default" | "dense" | "minimal" | "complex";
 
 interface LoomThreadProps {
-    /** Visual variant – controls number and style of threads */
     variant?: LoomThreadVariant;
-    /** Base colour for the gradient (defaults to primary) */
     color?: string;
-    /** Secondary colour at the tail of the gradient */
     colorEnd?: string;
-    /** Overall opacity multiplier (0 – 1, default 1) */
     opacity?: number;
-    /** Whether threads fade in on mount (default true) */
     animated?: boolean;
-    /** Scaling factor for the paths */
     scale?: number;
 }
 
-export function LoomThread({
+export const LoomThread = React.memo(({
     variant = "default",
     color,
     colorEnd,
     opacity = 1,
     animated = true,
     scale = 1,
-}: LoomThreadProps) {
+}: LoomThreadProps) => {
     const baseColor = color ?? Colors.primary;
     const endColor = colorEnd ?? Colors.accent;
     const paths = threadPaths[variant];
@@ -207,6 +217,7 @@ export function LoomThread({
                 {paths.map((p, i) => (
                     <AnimatedThread
                         key={i}
+                        index={i}
                         d={p.d}
                         strokeWidth={p.strokeWidth}
                         dasharray={p.dasharray}
@@ -218,5 +229,5 @@ export function LoomThread({
             </Svg>
         </View>
     );
-}
+});
 

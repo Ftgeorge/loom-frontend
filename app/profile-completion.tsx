@@ -4,7 +4,7 @@ import { Chip } from '@/components/ui/CardChipBadge';
 import { AppTextInput } from '@/components/ui/TextInputs';
 import { userApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Typography } from '@/theme';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { CATEGORIES } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -38,16 +38,12 @@ export default function ProfileCompletionScreen() {
 
         setLoading(true);
         try {
-            // In a real app, we might save selectedInterests too. 
-            // For now we'll save the location as it's the core requirement.
             await userApi.updateProfile({
                 city,
                 state,
                 area,
-                // We could extend the backend to support interests array if needed
             });
 
-            // Re-sign in to update local user state
             if (user) {
                 signIn(user.role as any, {
                     ...user,
@@ -61,7 +57,7 @@ export default function ProfileCompletionScreen() {
                 router.replace('/(tabs)/home');
             }
         } catch (err: any) {
-            Alert.alert('Error', err.message || 'Failed to update profile');
+            Alert.alert('Error', err.message || 'Could not update your profile');
         } finally {
             setLoading(false);
         }
@@ -109,56 +105,89 @@ export default function ProfileCompletionScreen() {
 
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }} keyboardShouldPersistTaps="handled">
                 {activeStep === 0 && (
-                    <Animated.View entering={FadeInRight} style={{ padding: 32 }}>
+                    <Animated.View entering={FadeInUp.springify()} style={{ padding: 32 }}>
+                        <View style={{ alignItems: 'center', marginBottom: 40 }}>
+                            <TouchableOpacity
+                                activeOpacity={0.8}
+                                style={{
+                                    width: 140,
+                                    height: 140,
+                                    borderRadius: 70,
+                                    backgroundColor: Colors.white,
+                                    borderWidth: 1.5,
+                                    borderColor: Colors.primary,
+                                    borderStyle: 'dashed',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: 4,
+                                    ...Shadows.md
+                                }}
+                            >
+                                <View style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    borderRadius: 70,
+                                    backgroundColor: Colors.primaryLight,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    overflow: 'hidden'
+                                }}>
+                                    <Ionicons name="person" size={60} color={Colors.primary} />
+                                </View>
+                                <View style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    right: 4,
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: 20,
+                                    backgroundColor: Colors.accent,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderWidth: 3,
+                                    borderColor: Colors.white,
+                                    ...Shadows.sm
+                                }}>
+                                    <Ionicons name="camera" size={20} color={Colors.white} />
+                                </View>
+                            </TouchableOpacity>
+                            <Text style={[Typography.h3, { marginTop: 20, fontSize: 20 }]}>Add Profile Photo</Text>
+                            <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 4 }]}>Help people recognize you</Text>
+                        </View>
+
                         <Text style={{ fontSize: 24, fontWeight: '800', color: Colors.text, marginBottom: 8 }}>
                             Where are you based?
                         </Text>
                         <Text style={{ fontSize: 16, color: Colors.textSecondary, lineHeight: 24, marginBottom: 32 }}>
-                            This helps us show you artisans in your neighborhood.
+                            This helps us show you pros in your neighborhood.
                         </Text>
-
-                        <TouchableOpacity
-                            style={{
-                                height: 120,
-                                borderRadius: 24,
-                                backgroundColor: Colors.surface,
-                                borderWidth: 1,
-                                borderColor: Colors.cardBorder,
-                                borderStyle: 'dashed',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginBottom: 32
-                            }}
-                        >
-                            <View style={{ width: 50, height: 50, borderRadius: 25, backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-                                <Ionicons name="camera" size={24} color={Colors.primary} />
-                            </View>
-                            <Text style={{ fontWeight: '600', color: Colors.textSecondary, fontSize: 13 }}>Add Photo</Text>
-                        </TouchableOpacity>
 
                         <AppTextInput
                             label="State"
                             placeholder="e.g. Lagos"
                             value={state}
                             onChangeText={setState}
+                            containerStyle={{ borderRadius: Radius.xs }}
                         />
                         <AppTextInput
                             label="City"
                             placeholder="e.g. Ikeja"
                             value={city}
                             onChangeText={setCity}
+                            containerStyle={{ borderRadius: Radius.xs }}
                         />
                         <AppTextInput
                             label="Area / Neighborhood"
                             placeholder="e.g. Opebi"
                             value={area}
                             onChangeText={setArea}
+                            containerStyle={{ borderRadius: Radius.xs }}
                         />
 
                         <PrimaryButton
                             title="Continue"
                             onPress={nextStep}
-                            style={{ marginTop: 24 }}
+                            style={{ marginTop: 24, height: 60, borderRadius: Radius.md }}
                         />
                     </Animated.View>
                 )}

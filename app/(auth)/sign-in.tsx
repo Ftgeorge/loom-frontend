@@ -4,7 +4,7 @@ import { LoomThread } from "@/components/ui/LoomThread";
 import { AppTextInput, PasswordInput } from "@/components/ui/TextInputs";
 import { authApi } from "@/services/api";
 import { useAppStore } from "@/store";
-import { Colors, Typography } from "@/theme";
+import { Colors, Radius, Shadows, Typography } from "@/theme";
 import { SignInSchema, mapZodErrors } from "@/utils/helpers";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -37,7 +37,7 @@ export default function SignInScreen() {
 
     try {
       const res = await authApi.login({
-        email: form.phone, // field accepts email or phone
+        email: form.phone,
         password: form.password,
       });
 
@@ -55,7 +55,7 @@ export default function SignInScreen() {
         res.user.role === "artisan" ? "/(tabs)/dashboard" : "/(tabs)/home"
       );
     } catch (err: any) {
-      Alert.alert("Sign In Failed", err.message ?? "Please try again.");
+      Alert.alert("Authentication Failed", err.message ?? "Credentials could not be verified.");
     } finally {
       setLoading(false);
     }
@@ -66,67 +66,81 @@ export default function SignInScreen() {
       style={{ flex: 1, backgroundColor: Colors.background }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={{ position: "absolute", top: 0, right: 0, left: 0, bottom: 0, opacity: 0.4 }}>
-        <LoomThread variant="complex" scale={1.2} animated />
-      </View>
+      <LoomThread variant="minimal" scale={1.2} animated opacity={0.3} />
 
       <ScrollView
-        contentContainerStyle={{ padding: 32, paddingTop: 100 }}
+        contentContainerStyle={{ padding: 32, paddingTop: 80 }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <BackButton onPress={() => router.back()} />
 
-        <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 40, marginTop: 24 }}>
-          <Text style={Typography.h1}>Welcome Back</Text>
-          <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 8 }]}>
-            Sign in to continue using Loom.
+        <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 48, marginTop: 32 }}>
+          <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>WELCOME BACK</Text>
+          <Text style={[Typography.h1, { fontSize: 32 }]}>Sign in to your{"\n"}Account</Text>
+          <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 12, lineHeight: 22 }]}>
+            Enter your email and password to access your account.
           </Text>
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(200)}>
+        <Animated.View entering={FadeInDown.delay(200).springify()}>
           <AppTextInput
-            label="Email"
+            label="EMAIL OR PHONE"
             placeholder="you@email.com"
             value={form.phone}
             onChangeText={(phone) => setForm({ ...form, phone })}
             error={errors.phone}
             keyboardType="email-address"
             autoCapitalize="none"
+            containerStyle={{ borderRadius: Radius.xs }}
           />
           <PasswordInput
-            label="Password"
+            label="PASSWORD"
             placeholder="Enter your password"
             value={form.password}
             onChangeText={(password) => setForm({ ...form, password })}
             error={errors.password}
+            containerStyle={{ borderRadius: Radius.xs }}
           />
 
           <TouchableOpacity
-            style={{ alignSelf: "flex-end", paddingVertical: 8 }}
+            style={{ alignSelf: "flex-end", paddingVertical: 12 }}
             onPress={() => router.push("/(auth)/forgot-password")}
           >
-            <Text style={[Typography.bodySmall, { color: Colors.primary, fontWeight: "600", textDecorationLine: "underline" }]}>
-              Forgot Password?
+            <Text style={[Typography.label, { color: Colors.primary, fontSize: 10, textTransform: 'none' }]}>
+              Forgot password? <Text style={{ fontWeight: '800' }}>RESET</Text>
             </Text>
           </TouchableOpacity>
 
           <PrimaryButton
-            title="Sign In"
+            title="SIGN IN"
             onPress={handleSignIn}
             loading={loading}
-            style={{ marginTop: 24 }}
+            style={{ marginTop: 32, height: 60, borderRadius: Radius.md }}
           />
         </Animated.View>
 
-        <Animated.View entering={FadeInDown.delay(300)}>
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 48, gap: 6 }}>
-            <Text style={[Typography.body, { color: Colors.textSecondary }]}>
-              Don't have an account?
+        <Animated.View entering={FadeInDown.delay(300).springify()}>
+          <View style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: 64,
+            padding: 20,
+            backgroundColor: Colors.white,
+            borderRadius: Radius.xs,
+            borderWidth: 1,
+            borderColor: Colors.cardBorder
+          }}>
+            <Text style={[Typography.label, { color: Colors.muted, fontSize: 10, textTransform: 'none' }]}>
+              New to Loom?{" "}
+              <Text
+                onPress={() => router.push("/(auth)/sign-up")}
+                style={{ color: Colors.primary, fontWeight: "800" }}
+              >
+                CREATE ACCOUNT
+              </Text>
             </Text>
-            <TouchableOpacity onPress={() => router.push("/(auth)/sign-up")}>
-              <Text style={[Typography.body, { color: Colors.primary, fontWeight: "700" }]}>Sign Up</Text>
-            </TouchableOpacity>
           </View>
         </Animated.View>
       </ScrollView>

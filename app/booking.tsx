@@ -2,6 +2,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
+import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -39,63 +40,89 @@ export default function BookingScreen() {
 
     const handleConfirm = async () => {
         setLoading(true);
-        await new Promise((r) => setTimeout(r, 1000));
+        // Simulate mission initialization
+        await new Promise((r) => setTimeout(r, 1200));
         setLoading(false);
-        router.back();
+        router.push('/(tabs)/requests');
     };
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <LoomThread variant="minimal" opacity={0.6} animated />
-            <AppHeader title="Schedule Booking" showBack onBack={() => router.back()} showNotification={false} />
+            <LoomThread variant="minimal" opacity={0.3} animated />
+            <AppHeader title="Book Service" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView
-                contentContainerStyle={{ padding: 24, paddingBottom: 120 }}
+                contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
                 showsVerticalScrollIndicator={false}
             >
-                <Animated.View entering={FadeInDown.delay(100)}>
-                    <Text style={[Typography.h3, { marginBottom: 16 }]}>Select Date</Text>
+                {/* Protocol Header */}
+                <Animated.View entering={FadeInDown.springify()} style={{ marginBottom: 40 }}>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>AVAILABILITY</Text>
+                    <Text style={[Typography.h1, { fontSize: 32 }]}>Select Day</Text>
+                    <Text style={[Typography.body, { color: Colors.muted, marginTop: 12, lineHeight: 22 }]}>
+                        Choose a date and time that works best for your service.
+                    </Text>
+                </Animated.View>
+
+                {/* Date Selection */}
+                <Animated.View entering={FadeInDown.delay(100).springify()}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                        <Ionicons name="calendar-outline" size={14} color={Colors.primary} />
+                        <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>CHOOSE DATE</Text>
+                    </View>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -24 }}>
-                        <View style={{ flexDirection: 'row', paddingHorizontal: 24, gap: 10 }}>
+                        <View style={{ flexDirection: 'row', paddingHorizontal: 24, gap: 12 }}>
                             {DAYS.map((d) => (
                                 <TouchableOpacity
                                     key={d.date}
                                     activeOpacity={0.8}
                                     onPress={() => setSelectedDate(d.date)}
                                     style={{
-                                        width: 70,
-                                        height: 90,
+                                        width: 72,
+                                        height: 100,
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        borderRadius: Radius.lg,
-                                        backgroundColor: selectedDate === d.date ? Colors.accent : Colors.surface,
+                                        borderRadius: Radius.md,
+                                        backgroundColor: selectedDate === d.date ? Colors.primary : Colors.white,
                                         borderWidth: 1.5,
-                                        borderColor: selectedDate === d.date ? Colors.accent : Colors.cardBorder,
+                                        borderColor: selectedDate === d.date ? Colors.primary : Colors.cardBorder,
                                         ...Shadows.sm
                                     }}
                                 >
+                                    <View style={{
+                                        position: 'absolute',
+                                        top: 8,
+                                        width: 12,
+                                        height: 1,
+                                        backgroundColor: selectedDate === d.date ? Colors.accent : Colors.cardBorder,
+                                    }} />
                                     <Text style={[Typography.label, {
-                                        color: selectedDate === d.date ? Colors.white : Colors.muted,
-                                        fontSize: 10,
-                                        textTransform: 'none'
+                                        color: selectedDate === d.date ? 'rgba(255,255,255,0.6)' : Colors.muted,
+                                        fontSize: 9,
+                                        textTransform: 'uppercase'
                                     }]}>{d.day}</Text>
                                     <Text style={[Typography.h2, {
                                         color: selectedDate === d.date ? Colors.white : Colors.text,
+                                        fontSize: 24,
                                         marginVertical: 4
                                     }]}>{d.num}</Text>
                                     <Text style={[Typography.label, {
-                                        color: selectedDate === d.date ? Colors.white : Colors.muted,
-                                        fontSize: 10,
-                                        textTransform: 'none'
-                                    }]}>{d.month}</Text>
+                                        color: selectedDate === d.date ? Colors.accent : Colors.primary,
+                                        fontSize: 9,
+                                        fontWeight: '800'
+                                    }]}>{d.month.toUpperCase()}</Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
                     </ScrollView>
                 </Animated.View>
 
-                <Animated.View entering={FadeInDown.delay(200)} style={{ marginTop: 40 }}>
-                    <Text style={[Typography.h3, { marginBottom: 16 }]}>Select Time</Text>
+                {/* Time Selection */}
+                <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginTop: 40 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                        <Ionicons name="time-outline" size={14} color={Colors.primary} />
+                        <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>SELECT TIME</Text>
+                    </View>
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
                         {TIME_SLOTS.map((t) => (
                             <TouchableOpacity
@@ -105,35 +132,41 @@ export default function BookingScreen() {
                                 style={{
                                     paddingHorizontal: 16,
                                     paddingVertical: 12,
-                                    borderRadius: Radius.full,
-                                    backgroundColor: selectedTime === t ? Colors.accentLight : Colors.surface,
+                                    borderRadius: Radius.xs,
+                                    backgroundColor: selectedTime === t ? Colors.accent : Colors.white,
                                     borderWidth: 1.5,
                                     borderColor: selectedTime === t ? Colors.accent : Colors.cardBorder,
+                                    ...Shadows.sm
                                 }}
                             >
-                                <Text style={[Typography.bodySmall, {
-                                    fontFamily: selectedTime === t ? 'MontserratAlternates-SemiBold' : 'MontserratAlternates',
-                                    color: selectedTime === t ? Colors.accent : Colors.textSecondary
+                                <Text style={[Typography.label, {
+                                    fontSize: 10,
+                                    color: selectedTime === t ? Colors.white : Colors.primary,
+                                    fontWeight: '800'
                                 }]}>{t}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>
                 </Animated.View>
 
-                <Animated.View entering={FadeInDown.delay(300)} style={{ marginTop: 40 }}>
-                    <Text style={[Typography.h3, { marginBottom: 16 }]}>Job Details (Optional)</Text>
+                {/* Mission Data */}
+                <Animated.View entering={FadeInDown.delay(300).springify()} style={{ marginTop: 40 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                        <Ionicons name="document-text-outline" size={14} color={Colors.primary} />
+                        <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>SERVICE DETAILS</Text>
+                    </View>
                     <View style={{
-                        backgroundColor: Colors.surface,
-                        borderRadius: Radius.lg,
+                        backgroundColor: Colors.white,
+                        borderRadius: Radius.md,
                         borderWidth: 1.5,
                         borderColor: Colors.cardBorder,
                         padding: 16,
-                        minHeight: 120,
+                        minHeight: 140,
                         ...Shadows.sm
                     }}>
                         <TextInput
-                            style={[Typography.body, { color: Colors.text, textAlignVertical: 'top' }]}
-                            placeholder="Tell the pro more about the job or any gate access codes..."
+                            style={[Typography.body, { color: Colors.text, textAlignVertical: 'top', fontSize: 14 }]}
+                            placeholder="Tell the pro more about what you need..."
                             placeholderTextColor={Colors.muted}
                             multiline
                             value={notes}
@@ -142,17 +175,28 @@ export default function BookingScreen() {
                     </View>
                 </Animated.View>
 
-                <Animated.View entering={FadeInDown.delay(400)} style={{ marginTop: 48 }}>
+                {/* Protocol Deployment */}
+                <Animated.View entering={FadeInDown.delay(400).springify()} style={{ marginTop: 48 }}>
                     <PrimaryButton
-                        title="Confirm Booking"
+                        title="CONFIRM BOOKING"
                         onPress={handleConfirm}
                         loading={loading}
                         disabled={!selectedTime}
                         variant="accent"
+                        style={{ height: 64, borderRadius: Radius.md, ...Shadows.md }}
                     />
-                    <Text style={[Typography.bodySmall, { textAlign: 'center', marginTop: 16, color: Colors.muted }]}>
-                        Cancellation is free up to 2 hours before the job.
-                    </Text>
+                    <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        marginTop: 20
+                    }}>
+                        <Ionicons name="shield-checkmark" size={12} color={Colors.success} />
+                        <Text style={[Typography.label, { textAlign: 'center', color: Colors.muted, fontSize: 8, textTransform: 'none' }]}>
+                            PROFESSIONAL SERVICE GUARANTEED
+                        </Text>
+                    </View>
                 </Animated.View>
             </ScrollView>
         </View>

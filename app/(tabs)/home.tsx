@@ -36,7 +36,7 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 export default function ClientHomeScreen() {
     const router = useRouter();
-    const { user, language } = useAppStore();
+    const { user, language, jobs } = useAppStore();
     const [artisans, setArtisans] = useState<Artisan[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -45,7 +45,6 @@ export default function ClientHomeScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            // GET /artisans — browse all artisans, sorted by rating
             const res = await artisanApi.list({ limit: 30 });
             const normalised = (res.results as any[]).map(mapArtisan);
             setArtisans(normalised);
@@ -61,16 +60,20 @@ export default function ClientHomeScreen() {
 
     const onRefresh = () => { setRefreshing(true); load(); };
 
-    const topRated = artisans
+    const topRated = React.useMemo(() => artisans
         .filter((a) => a.availability === 'online')
         .sort((a, b) => b.rating - a.rating)
-        .slice(0, 6);
+        .slice(0, 6), [artisans]);
+
+    const activeJobs = React.useMemo(() => jobs.filter(j =>
+        ['matched', 'scheduled', 'in_progress'].includes(j.status)
+    ).slice(0, 1), [jobs]);
 
     const greeting = typeof getGreeting === 'function' ? getGreeting() : "Hello";
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <LoomThread variant="minimal" opacity={0.65} animated />
+            <LoomThread variant="minimal" opacity={0.2} animated />
             <AppHeader showLocation showNotification onNotification={() => router.push('/notifications')} />
 
             <ScrollView
@@ -78,93 +81,128 @@ export default function ClientHomeScreen() {
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Greeting */}
-                <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 32 }}>
-                    <Text style={Typography.h1}>
-                        {greeting}, {user?.name?.split(' ')[0] || 'there'} 👋
-                    </Text>
-                    <Text style={[Typography.body, { marginTop: 4, color: Colors.textSecondary }]}>
-                        Find trusted pros for your home needs.
-                    </Text>
-                </Animated.View>
+                {/* Greeting & Header */}
+                <View style={{ marginBottom: 40 }}>
+                    <Animated.View entering={FadeInDown.delay(100).springify()}>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>WELCOME BACK</Text>
+                        <Text style={[Typography.h1, { fontSize: 36, letterSpacing: -1 }]}>
+                            {user?.name?.split(' ')[0]?.toUpperCase() || 'USER'}
+                        </Text>
+                        <View style={{ height: 2, width: 40, backgroundColor: Colors.accent, marginTop: 16 }} />
+                    </Animated.View>
+                </View>
 
-                {/* Search Bar */}
-                <Animated.View entering={FadeInDown.delay(200)}>
+                {/* DYNAMIC ACTIVITY HUB: Active Mission Status */}
+                {activeJobs.length > 0 && (
+                    <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginBottom: 48 }}>
+                        <TouchableOpacity
+                            style={{
+                                backgroundColor: Colors.primary,
+                                borderRadius: Radius.md,
+                                padding: 24,
+                                ...Shadows.lg,
+                                borderWidth: 1,
+                                borderColor: Colors.primary,
+                                position: 'relative',
+                                overflow: 'hidden'
+                            }}
+                            onPress={() => router.push({ pathname: '/request-details', params: { id: activeJobs[0].id } })}
+                            activeOpacity={0.9}
+                        >
+                            {/* Grid decorative background */}
+                            <View style={{ position: 'absolute', right: -30, bottom: -30, opacity: 0.15 }}>
+                                <Ionicons name="shield-checkmark" size={160} color={Colors.white} />
+                            </View>
+
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                                <View style={{ backgroundColor: Colors.accent, paddingHorizontal: 10, paddingVertical: 5, borderRadius: Radius.xs }}>
+                                    <Text style={[Typography.label, { color: Colors.white, fontSize: 9, fontWeight: '900' }]}>ACTIVE JOB</Text>
+                                </View>
+                                <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: Colors.accent, marginLeft: 12 }} />
+                                <Text style={[Typography.label, { color: Colors.white, marginLeft: 8, opacity: 0.6, fontSize: 9 }]}>
+                                    TRACKING STATUS
+                                </Text>
+                            </View>
+
+                            <Text style={[Typography.h2, { color: Colors.white, fontSize: 24, marginBottom: 8 }]}>
+                                {CATEGORIES.find(c => c.id === activeJobs[0].category)?.label?.toUpperCase() || 'GENERAL REPAIR'}
+                            </Text>
+
+                            <View style={{ marginTop: 20 }}>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                                    <Text style={[Typography.label, { color: Colors.white, fontSize: 9, opacity: 0.8 }]}>JOB PROGRESS</Text>
+                                    <Text style={[Typography.label, { color: Colors.accent, fontSize: 9, fontWeight: '900' }]}>75% COMPLETE</Text>
+                                </View>
+                                <View style={{ height: 6, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden' }}>
+                                    <View style={{ width: '75%', height: '100%', backgroundColor: Colors.accent }} />
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    </Animated.View>
+                )}
+
+                {/* Search / Signal Broadcast */}
+                <Animated.View entering={FadeInDown.delay(300).springify()}>
                     <TouchableOpacity
                         style={{
                             flexDirection: 'row',
                             alignItems: 'center',
-                            backgroundColor: Colors.surface,
-                            height: 60,
+                            backgroundColor: Colors.white,
+                            height: 72,
                             borderRadius: Radius.md,
                             paddingHorizontal: 20,
-                            borderWidth: 1,
+                            borderWidth: 1.5,
                             borderColor: Colors.cardBorder,
-                            marginBottom: 40,
-                            ...Shadows.sm
+                            marginBottom: 48,
+                            ...Shadows.md
                         }}
                         onPress={() => router.push({ pathname: '/search', params: { category: 'all' } })}
                         activeOpacity={0.9}
                     >
-                        <Ionicons name="search" size={20} color={Colors.muted} />
-                        <Text style={[Typography.body, { flex: 1, marginLeft: 12, color: Colors.muted }]}>
-                            Search for plumbers, tailors...
+                        <Ionicons name="search" size={24} color={Colors.primary} />
+                        <Text style={[Typography.body, { flex: 1, marginLeft: 16, color: Colors.muted, fontWeight: '500' }]}>
+                            SEARCH FOR VERIFIED PROS...
                         </Text>
                         <View style={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: 16,
-                            backgroundColor: Colors.accentLight,
+                            width: 40,
+                            height: 40,
+                            borderRadius: Radius.xs,
+                            backgroundColor: Colors.surface,
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            borderWidth: 1,
+                            borderColor: Colors.cardBorder
                         }}>
-                            <Ionicons name="options-outline" size={16} color={Colors.accent} />
+                            <Ionicons name="options-outline" size={20} color={Colors.primary} />
                         </View>
                     </TouchableOpacity>
                 </Animated.View>
 
-                {/* Post Job CTA */}
-                <Animated.View entering={FadeInDown.delay(300)}>
-                    <TouchableOpacity
-                        style={{
-                            backgroundColor: Colors.accent,
-                            borderRadius: Radius.lg,
-                            padding: 24,
-                            marginBottom: 48,
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            ...Shadows.lg,
-                            shadowColor: Colors.accent // Match shadow to color
-                        }}
-                        onPress={() => router.push('/post-job')}
-                        activeOpacity={0.9}
-                    >
-                        <View style={{ flex: 1, paddingRight: 16 }}>
-                            <Text style={[Typography.h2, { color: Colors.white, fontSize: 20 }]}>Need something custom?</Text>
-                            <Text style={[Typography.bodySmall, { color: Colors.accentLight, marginTop: 4, opacity: 0.9 }]}>Post a request and let top pros find you.</Text>
+                {/* Discovery Modules */}
+                <View style={{ marginBottom: 56 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                        <View>
+                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>CATEGORIES</Text>
+                            <Text style={[Typography.h3, { fontSize: 20 }]}>Service Types</Text>
                         </View>
-                        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' }}>
-                            <Ionicons name="arrow-forward" size={20} color={Colors.white} />
-                        </View>
-                    </TouchableOpacity>
-                </Animated.View>
+                        <TouchableOpacity style={{ padding: 8, backgroundColor: Colors.white, borderRadius: Radius.xs, borderWidth: 1, borderColor: Colors.cardBorder }} onPress={() => router.push('/search')}>
+                            <Text style={[Typography.label, { color: Colors.accent, fontSize: 9 }]}>VIEW ALL</Text>
+                        </TouchableOpacity>
+                    </View>
 
-                {/* Categories */}
-                <View style={{ marginBottom: 48 }}>
-                    <Text style={[Typography.h3, { marginBottom: 20 }]}>Popular Services</Text>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 12 }}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -24 }} contentContainerStyle={{ paddingHorizontal: 24, gap: 14 }}>
                         {CATEGORIES.map((cat, index) => (
                             <TouchableOpacity
                                 key={cat.id}
                                 style={{
-                                    width: '22%',
-                                    aspectRatio: 1,
-                                    backgroundColor: Colors.surface,
+                                    width: 110,
+                                    height: 140,
+                                    backgroundColor: Colors.white,
                                     borderRadius: Radius.md,
+                                    padding: 16,
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    borderWidth: 1,
+                                    borderWidth: 1.5,
                                     borderColor: Colors.cardBorder,
                                     ...Shadows.sm
                                 }}
@@ -172,39 +210,44 @@ export default function ClientHomeScreen() {
                                 activeOpacity={0.8}
                             >
                                 <View style={{
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: 20,
-                                    backgroundColor: Colors.background,
+                                    width: 52,
+                                    height: 52,
+                                    borderRadius: Radius.xs,
+                                    backgroundColor: Colors.surface,
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    marginBottom: 8
+                                    marginBottom: 16,
+                                    borderWidth: 1,
+                                    borderColor: Colors.cardBorder
                                 }}>
                                     <Ionicons
                                         name={CATEGORY_ICONS[cat.id] as any || 'construct-outline'}
-                                        size={20}
+                                        size={24}
                                         color={Colors.primary}
                                     />
                                 </View>
-                                <Text style={[Typography.label, { fontSize: 9, textAlign: 'center', color: Colors.text, textTransform: 'none' }]}>
-                                    {cat.label}
+                                <Text style={[Typography.label, { fontSize: 9, textAlign: 'center', color: Colors.primary, fontWeight: '700' }]}>
+                                    {cat.label.toUpperCase()}
                                 </Text>
                             </TouchableOpacity>
                         ))}
-                    </View>
+                    </ScrollView>
                 </View>
 
-                {/* Top Rated Horizontal Scroll */}
-                <View style={{ marginBottom: 48 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-                        <Text style={Typography.h3}>{t('topRated', language)}</Text>
-                        <TouchableOpacity onPress={() => router.push('/search')}>
-                            <Text style={[Typography.label, { color: Colors.primary, textTransform: 'none' }]}>View All</Text>
+                {/* Top Rated Operatives */}
+                <View style={{ marginBottom: 56 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+                        <View>
+                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>TOP RATED</Text>
+                            <Text style={[Typography.h3, { fontSize: 20 }]}>Recommended Pros</Text>
+                        </View>
+                        <TouchableOpacity style={{ padding: 8, backgroundColor: Colors.white, borderRadius: Radius.xs, borderWidth: 1, borderColor: Colors.cardBorder }} onPress={() => router.push('/search')}>
+                            <Text style={[Typography.label, { color: Colors.primary, fontSize: 9 }]}>VIEW ALL</Text>
                         </TouchableOpacity>
                     </View>
 
                     {loading ? (
-                        <SkeletonHorizontalList count={3} />
+                        <SkeletonHorizontalList count={2} />
                     ) : error ? (
                         <ErrorState onRetry={load} />
                     ) : (
@@ -215,8 +258,12 @@ export default function ClientHomeScreen() {
                             style={{ marginHorizontal: -24 }}
                             contentContainerStyle={{ paddingHorizontal: 24, gap: 16 }}
                             keyExtractor={(item) => item.id}
+                            initialNumToRender={3}
+                            maxToRenderPerBatch={3}
+                            windowSize={3}
+                            removeClippedSubviews={true}
                             renderItem={({ item, index }) => (
-                                <Animated.View entering={FadeInRight.delay(400 + index * 100)}>
+                                <Animated.View entering={FadeInRight.delay(400 + index * 100).springify()}>
                                     <ArtisanCard
                                         artisan={item}
                                         onPress={() => router.push({ pathname: '/artisan-profile', params: { id: item.id } })}
@@ -227,15 +274,47 @@ export default function ClientHomeScreen() {
                     )}
                 </View>
 
-                {/* Pros Near You */}
+                {/* Custom Broadcast CTA */}
+                <Animated.View entering={FadeInDown.delay(500).springify()} style={{ marginBottom: 56 }}>
+                    <TouchableOpacity
+                        style={{
+                            backgroundColor: Colors.white,
+                            borderRadius: Radius.md,
+                            padding: 30,
+                            borderWidth: 2,
+                            borderColor: Colors.accent,
+                            borderStyle: 'dashed',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            ...Shadows.md
+                        }}
+                        onPress={() => router.push('/post-job')}
+                        activeOpacity={0.9}
+                    >
+                        <View style={{ flex: 1, paddingRight: 20 }}>
+                            <Text style={[Typography.label, { color: Colors.accent, marginBottom: 8, fontWeight: '900' }]}>CUSTOM REQUEST</Text>
+                            <Text style={[Typography.h3, { color: Colors.primary, fontSize: 22, lineHeight: 28 }]}>Post a Custom Job Task</Text>
+                            <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 8 }]}>Describe your specific needs and get quotes from verified pros in your area.</Text>
+                        </View>
+                        <View style={{ backgroundColor: Colors.accent, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' }}>
+                            <Ionicons name="add" size={32} color={Colors.white} />
+                        </View>
+                    </TouchableOpacity>
+                </Animated.View>
+
+                {/* Nearby Pulse */}
                 <View>
-                    <Text style={[Typography.h3, { marginBottom: 20 }]}>Pros Near You</Text>
+                    <View style={{ marginBottom: 24 }}>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>NEARBY PROS</Text>
+                        <Text style={[Typography.h3, { fontSize: 20 }]}>Available Pros Near You</Text>
+                    </View>
                     {loading ? (
                         <SkeletonList count={3} />
                     ) : (
                         <View style={{ gap: 16 }}>
                             {artisans.slice(0, 5).map((art, index) => (
-                                <Animated.View key={art.id} entering={FadeInDown.delay(600 + index * 100)}>
+                                <Animated.View key={art.id} entering={FadeInDown.delay(600 + index * 100).springify()}>
                                     <ArtisanCard
                                         artisan={art}
                                         onPress={() => router.push({ pathname: '/artisan-profile', params: { id: art.id } })}

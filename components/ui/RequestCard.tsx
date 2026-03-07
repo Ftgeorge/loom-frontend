@@ -1,4 +1,4 @@
-import { Colors, Radius, Typography } from '@/theme';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { JobRequest } from '@/types';
 import { formatNaira, timeAgo } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,9 +6,9 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { Badge, Card } from './CardChipBadge';
 
-const STATUS_VARIANTS: Record<string, 'default' | 'success' | 'warn'> = {
-    submitted: 'default',
-    matched: 'default',
+const STATUS_VARIANTS: Record<string, 'default' | 'success' | 'warn' | 'accent'> = {
+    submitted: 'accent',
+    matched: 'accent',
     scheduled: 'success',
     in_progress: 'warn',
     completed: 'success',
@@ -16,12 +16,12 @@ const STATUS_VARIANTS: Record<string, 'default' | 'success' | 'warn'> = {
 };
 
 const STATUS_LABELS: Record<string, string> = {
-    submitted: 'New',
-    matched: 'Matched',
-    scheduled: 'Scheduled',
-    in_progress: 'Active',
-    completed: 'Done',
-    cancelled: 'Cancelled',
+    submitted: 'INITIATED',
+    matched: 'PROTOCOL ACTIVE',
+    scheduled: 'DEPLOYED',
+    in_progress: 'OPERATIONAL',
+    completed: 'RESOLVED',
+    cancelled: 'TERMINATED',
 };
 
 interface RequestCardProps {
@@ -30,21 +30,23 @@ interface RequestCardProps {
     isArtisanView?: boolean;
 }
 
-export function RequestCard({ job, onPress, isArtisanView }: RequestCardProps) {
+export const RequestCard = React.memo(({ job, onPress, isArtisanView }: RequestCardProps) => {
     const statusVariant = STATUS_VARIANTS[job.status] ?? 'default';
 
     return (
-        <Card onPress={onPress} style={{ padding: 20 }}>
+        <Card onPress={onPress} style={{ padding: 24, ...Shadows.sm, borderColor: Colors.cardBorder, borderWidth: 1.5, backgroundColor: Colors.white }}>
             {/* Header: Category + Status */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <View style={{
-                    backgroundColor: Colors.primaryLight,
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                    borderRadius: Radius.md
+                    backgroundColor: Colors.surface,
+                    paddingHorizontal: 10,
+                    paddingVertical: 5,
+                    borderRadius: Radius.xs,
+                    borderWidth: 1,
+                    borderColor: Colors.cardBorder
                 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>
-                        {job.category === 'not_sure' ? 'Other' : job.category.replace('_', ' ')}
+                    <Text style={[Typography.label, { color: Colors.primary, fontSize: 8, fontWeight: '900' }]}>
+                        {job.category === 'not_sure' ? 'GENERAL SECTOR' : job.category.toUpperCase().replace('_', ' / ')}
                     </Text>
                 </View>
                 <Badge
@@ -55,53 +57,63 @@ export function RequestCard({ job, onPress, isArtisanView }: RequestCardProps) {
 
             {/* Description */}
             <Text
-                style={[Typography.bodyLarge, { marginBottom: 12, color: Colors.text }]}
+                style={[Typography.h3, { marginBottom: 16, color: Colors.primary, fontSize: 18, lineHeight: 26 }]}
                 numberOfLines={2}
             >
                 {job.description}
             </Text>
 
-            {/* Meta Info */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 16 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Ionicons name="location-outline" size={14} color={Colors.muted} />
-                    <Text style={[Typography.bodySmall, { color: Colors.muted }]}>{job.location.area}</Text>
+            {/* Technical Meta */}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 24, marginBottom: 20 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Ionicons name="location-outline" size={14} color={Colors.primary} />
+                    <Text style={[Typography.label, { color: Colors.primary, fontSize: 10, fontWeight: '700' }]}>{job.location.area.toUpperCase()}</Text>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <Ionicons name="wallet-outline" size={14} color={Colors.muted} />
-                    <Text style={[Typography.bodySmall, { color: Colors.muted }]}>{formatNaira(job.budget)}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Ionicons name="card-outline" size={14} color={Colors.accent} />
+                    <Text style={[Typography.label, { color: Colors.accent, fontSize: 10, fontWeight: '900' }]}>{formatNaira(job.budget).toUpperCase()}</Text>
                 </View>
             </View>
 
-            {/* Footer: User Info + Time */}
+            {/* Footer: Operative Info + Time */}
             <View style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                paddingTop: 16,
-                borderTopWidth: 1,
-                borderTopColor: Colors.cardBorder
+                paddingTop: 20,
+                borderTopWidth: 1.5,
+                borderTopColor: Colors.gray100
             }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                     <View style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: 14,
-                        backgroundColor: Colors.background,
+                        width: 36,
+                        height: 36,
+                        borderRadius: Radius.xs,
+                        backgroundColor: Colors.surface,
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        borderWidth: 1,
+                        borderColor: Colors.cardBorder
                     }}>
-                        <Ionicons name="person" size={14} color={Colors.muted} />
+                        <Ionicons name="person-outline" size={16} color={Colors.primary} />
                     </View>
-                    <Text style={[Typography.bodySmall, { fontFamily: 'MontserratAlternates-SemiBold', color: Colors.text }]}>
-                        {isArtisanView ? job.clientName : job.artisanName || 'Unassigned'}
+                    <View>
+                        <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>
+                            {isArtisanView ? 'CLIENT IDENTITY' : 'OPERATIVE ASSIGNED'}
+                        </Text>
+                        <Text style={[Typography.bodySmall, { color: Colors.primary, fontSize: 13, fontWeight: '700' }]}>
+                            {isArtisanView ? job.clientName.toUpperCase() : (job.artisanName || 'PENDING ASSIGNMENT').toUpperCase()}
+                        </Text>
+                    </View>
+                </View>
+                <View style={{ alignItems: 'flex-end' }}>
+                    <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>SYSTEM SIGNAL</Text>
+                    <Text style={[Typography.bodySmall, { color: Colors.primary, fontSize: 10, fontWeight: '700' }]}>
+                        {timeAgo(job.createdAt).toUpperCase()}
                     </Text>
                 </View>
-                <Text style={[Typography.bodySmall, { color: Colors.muted, fontSize: 11 }]}>
-                    {timeAgo(job.createdAt)}
-                </Text>
             </View>
         </Card>
     );
-}
+});
 

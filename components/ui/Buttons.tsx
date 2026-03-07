@@ -3,6 +3,7 @@ import React from 'react';
 import {
     ActivityIndicator,
     Image,
+    StyleProp,
     Text,
     TextStyle,
     TouchableOpacity,
@@ -17,8 +18,8 @@ interface Props {
     onPress: () => void;
     loading?: boolean;
     disabled?: boolean;
-    style?: ViewStyle;
-    textStyle?: TextStyle;
+    style?: StyleProp<ViewStyle>;
+    textStyle?: StyleProp<TextStyle>;
     icon?: React.ReactNode;
     className?: string;
     image?: any;

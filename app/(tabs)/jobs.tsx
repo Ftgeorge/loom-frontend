@@ -1,18 +1,21 @@
-import { mapJob } from '@/services/mappers';
 import { AppHeader } from '@/components/AppHeader';
+import { LoomThread } from '@/components/ui/LoomThread';
 import { RequestCard } from '@/components/ui/RequestCard';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { EmptyState, ErrorState } from '@/components/ui/StateComponents';
 import { t } from '@/i18n';
 import { jobApi } from '@/services/api';
+import { mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
+import { Colors, Radius, Typography } from '@/theme';
 import type { JobRequest } from '@/types';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import { FlatList, Text, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
-const SEGMENTS = ['New', 'Active', 'Completed'];
+const SEGMENTS = ['INCOMING', 'ACTIVE', 'HISTORY'];
 
 export default function JobsScreen() {
     const router = useRouter();
@@ -26,7 +29,6 @@ export default function JobsScreen() {
         try {
             setError(false);
             setLoading(true);
-            // GET /jobs — artisan role sees open + their assigned jobs
             const res = await jobApi.list({ limit: 50 });
             const mapped = (res.results as any[]).map(mapJob);
             setJobs(mapped);
@@ -47,32 +49,65 @@ export default function JobsScreen() {
     });
 
     return (
-        <View className="flex-1 bg-background">
-            <AppHeader title={t('jobs', language)} onNotification={() => router.push('/notifications')} />
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <LoomThread variant="minimal" opacity={0.2} animated />
+            <AppHeader title="My Jobs" onNotification={() => router.push('/notifications')} />
 
-            <View className="px-5 py-4">
-                <SegmentedControl segments={SEGMENTS} selected={segIdx} onSelect={setSegIdx} />
+            <View style={{ paddingHorizontal: 24, paddingVertical: 20 }}>
+                <View style={{ marginBottom: 16 }}>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>JOB LIST</Text>
+                    <Text style={[Typography.h3, { fontSize: 20 }]}>Service Requests</Text>
+                </View>
+                <SegmentedControl
+                    segments={SEGMENTS}
+                    selected={segIdx}
+                    onSelect={setSegIdx}
+                />
             </View>
 
             {loading ? (
-                <View className="p-5"><SkeletonList count={3} type="request" /></View>
+                <View style={{ padding: 24 }}><SkeletonList count={3} type="request" /></View>
             ) : error ? (
                 <ErrorState onRetry={load} />
             ) : filtered.length === 0 ? (
-                <EmptyState icon="briefcase-outline" title="No jobs yet" message="New job requests will appear here when clients post them." />
+                <View style={{ flex: 1, justifyContent: 'center', padding: 24 }}>
+                    <View style={{
+                        padding: 48,
+                        alignItems: 'center',
+                        borderStyle: 'dashed',
+                        backgroundColor: Colors.surface,
+                        borderColor: Colors.cardBorder,
+                        borderRadius: Radius.md,
+                        borderWidth: 1.5
+                    }}>
+                        <Text style={[Typography.h3, { textAlign: 'center', color: Colors.primary }]}>
+                            {segIdx === 0 ? 'NO NEW REQUESTS' : segIdx === 1 ? 'NO ACTIVE JOBS' : 'NO JOB HISTORY'}
+                        </Text>
+                        <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted, marginTop: 12, lineHeight: 20 }]}>
+                            {segIdx === 0
+                                ? 'You have no new job requests at the moment. We will notify you when a new job arrives.'
+                                : segIdx === 1
+                                    ? 'You do not have any jobs currently in progress.'
+                                    : 'You have not completed any jobs yet.'}
+                        </Text>
+                    </View>
+                </View>
             ) : (
                 <FlatList
                     data={filtered}
                     keyExtractor={(item) => item.id}
-                    contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
-                    renderItem={({ item }) => (
-                        <RequestCard
-                            job={item}
-                            isArtisanView
-                            onPress={() => router.push({ pathname: '/job-details', params: { id: item.id } })}
-                        />
+                    contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
+                    showsVerticalScrollIndicator={false}
+                    renderItem={({ item, index }) => (
+                        <Animated.View entering={FadeInDown.delay(index * 100).springify()}>
+                            <RequestCard
+                                job={item}
+                                isArtisanView
+                                onPress={() => router.push({ pathname: '/job-details', params: { id: item.id } })}
+                            />
+                        </Animated.View>
                     )}
-                    ItemSeparatorComponent={() => <View className="h-4" />}
+                    ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
                 />
             )}
         </View>

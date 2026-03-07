@@ -16,7 +16,7 @@ import {
     TextInput, TouchableOpacity,
     View,
 } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInLeft, FadeInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const QUICK_REPLIES = [
@@ -93,133 +93,148 @@ export default function ChatScreen() {
         }
     };
 
-    const isMe = (msg: Message) => msg.senderId === (user?.id || 'u1');
+    const isMe = useCallback((msg: Message) => msg.senderId === (user?.id || 'u1'), [user?.id]);
 
     return (
         <KeyboardAvoidingView
             style={{ flex: 1, backgroundColor: Colors.background }}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={0}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
+            <LoomThread variant="minimal" opacity={0.3} animated />
             <AppHeader
-                title={thread?.participantName || 'Chat'}
+                title={thread?.participantName || 'Signal'}
                 showBack
                 onBack={() => router.back()}
                 showNotification={false}
             />
-            <LoomThread variant="minimal" opacity={0.5} animated />
 
             <FlatList
                 ref={listRef}
                 data={messages}
                 keyExtractor={(item) => item.id}
-                contentContainerStyle={{ padding: 20, paddingBottom: 16, flexGrow: 1, justifyContent: 'flex-end' }}
-                renderItem={({ item }) => (
-                    <Animated.View
-                        entering={FadeIn}
-                        style={{
-                            maxWidth: '80%',
-                            paddingHorizontal: 16,
-                            paddingVertical: 12,
-                            borderRadius: 20,
-                            marginBottom: 8,
-                            backgroundColor: isMe(item) ? Colors.accent : Colors.surface,
-                            alignSelf: isMe(item) ? 'flex-end' : 'flex-start',
-                            borderBottomRightRadius: isMe(item) ? 4 : 20,
-                            borderBottomLeftRadius: isMe(item) ? 20 : 4,
-                            borderWidth: isMe(item) ? 0 : 1,
-                            borderColor: Colors.cardBorder,
-                            ...Shadows.sm
-                        }}
-                    >
-                        <Text style={[Typography.body, { color: isMe(item) ? Colors.white : Colors.text, fontSize: 15 }]}>{item.text}</Text>
-                        <Text style={[Typography.label, {
-                            fontSize: 9,
-                            marginTop: 4,
-                            color: isMe(item) ? 'rgba(255,255,255,0.7)' : Colors.muted,
-                            alignSelf: 'flex-end'
-                        }]}>
-                            {formatTime(item.timestamp)}
-                        </Text>
-                    </Animated.View>
-                )}
-                onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: false })}
+                contentContainerStyle={{ padding: 24, paddingBottom: 24, flexGrow: 1, justifyContent: 'flex-end' }}
+                showsVerticalScrollIndicator={false}
+                initialNumToRender={20}
+                maxToRenderPerBatch={20}
+                windowSize={5}
+                removeClippedSubviews={Platform.OS === 'android'}
+                renderItem={({ item, index }) => {
+                    const mine = isMe(item);
+                    return (
+                        <Animated.View
+                            entering={mine ? FadeInRight.delay(50).springify() : FadeInLeft.delay(50).springify()}
+                            style={{
+                                maxWidth: '85%',
+                                paddingHorizontal: 16,
+                                paddingVertical: 12,
+                                borderRadius: Radius.md,
+                                marginBottom: 12,
+                                backgroundColor: mine ? Colors.accent : Colors.white,
+                                alignSelf: mine ? 'flex-end' : 'flex-start',
+                                borderTopRightRadius: mine ? 2 : Radius.md,
+                                borderTopLeftRadius: mine ? Radius.md : 2,
+                                borderWidth: 1,
+                                borderColor: mine ? Colors.accent : Colors.cardBorder,
+                                ...Shadows.sm
+                            }}
+                        >
+                            <Text style={[Typography.body, { color: mine ? Colors.white : Colors.text, fontSize: 15, lineHeight: 22 }]}>
+                                {item.text}
+                            </Text>
+                            <Text style={[Typography.label, {
+                                fontSize: 9,
+                                marginTop: 6,
+                                color: mine ? 'rgba(255,255,255,0.6)' : Colors.muted,
+                                alignSelf: mine ? 'flex-end' : 'flex-start',
+                                letterSpacing: 0,
+                                textTransform: 'none'
+                            }]}>
+                                {formatTime(item.timestamp)}
+                            </Text>
+                        </Animated.View>
+                    );
+                }}
+                onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
             />
 
-            {/* Quick Replies */}
-            <View>
+            {/* Tactical Replies */}
+            <View style={{ backgroundColor: 'transparent' }}>
                 <FlatList
                     data={QUICK_REPLIES}
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 12, gap: 8 }}
+                    contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 16, gap: 10 }}
                     keyExtractor={(item) => item}
                     renderItem={({ item }) => (
                         <TouchableOpacity
                             onPress={() => handleSend(item)}
                             style={{
                                 paddingHorizontal: 16,
-                                paddingVertical: 8,
-                                borderRadius: Radius.full,
-                                backgroundColor: Colors.surface,
+                                paddingVertical: 10,
+                                borderRadius: Radius.xs,
+                                backgroundColor: 'rgba(255,255,255,0.8)',
                                 borderWidth: 1,
                                 borderColor: Colors.cardBorder,
                                 ...Shadows.sm
                             }}
                         >
-                            <Text style={[Typography.bodySmall, { color: Colors.textSecondary, fontFamily: 'MontserratAlternates-Medium' }]}>{item}</Text>
+                            <Text style={[Typography.label, { color: Colors.primary, fontSize: 9, textTransform: 'none', letterSpacing: 0 }]}>{item}</Text>
                         </TouchableOpacity>
                     )}
                 />
             </View>
 
-            {/* Input Area */}
+            {/* Comm Input */}
             <View style={{
                 flexDirection: 'row',
-                alignItems: 'flex-end',
+                alignItems: 'center',
                 paddingHorizontal: 16,
-                paddingTop: 12,
+                paddingTop: 16,
                 paddingBottom: Math.max(insets.bottom, 16),
-                backgroundColor: Colors.surface,
+                backgroundColor: Colors.white,
                 borderTopWidth: 1,
                 borderTopColor: Colors.cardBorder,
-                gap: 12
+                gap: 12,
+                ...Shadows.lg
             }}>
-                <TouchableOpacity style={{ paddingBottom: 10 }}>
-                    <Ionicons name="add-circle-outline" size={28} color={Colors.accent} />
+                <TouchableOpacity style={{ padding: 4 }}>
+                    <Ionicons name="attach-outline" size={26} color={Colors.muted} />
                 </TouchableOpacity>
+
                 <View style={{
                     flex: 1,
                     backgroundColor: Colors.background,
-                    borderRadius: Radius.lg,
-                    borderWidth: 1,
+                    borderRadius: Radius.md,
+                    borderWidth: 1.5,
                     borderColor: Colors.cardBorder,
-                    minHeight: 44,
+                    minHeight: 48,
                     maxHeight: 120,
                     paddingHorizontal: 16,
-                    paddingVertical: 8,
+                    paddingVertical: 10,
                     justifyContent: 'center'
                 }}>
                     <TextInput
                         style={[Typography.body, { color: Colors.text, fontSize: 15 }]}
-                        placeholder="Type a message..."
+                        placeholder="Encrypted signal..."
                         placeholderTextColor={Colors.muted}
                         value={text}
                         onChangeText={setText}
                         multiline
                     />
                 </View>
+
                 <TouchableOpacity
                     onPress={() => handleSend()}
                     disabled={!text.trim()}
                     style={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: 22,
-                        backgroundColor: text.trim() ? Colors.accent : Colors.cardBorder + '50',
+                        width: 48,
+                        height: 48,
+                        borderRadius: Radius.md,
+                        backgroundColor: text.trim() ? Colors.primary : Colors.gray200,
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginBottom: 1
+                        ...Shadows.md
                     }}
                 >
                     <Ionicons name="send" size={20} color={text.trim() ? Colors.white : Colors.muted} />

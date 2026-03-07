@@ -4,7 +4,7 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { AppTextInput, PasswordInput, PhoneInput } from '@/components/ui/TextInputs';
 import { authApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Typography } from '@/theme';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { SignUpSchema, mapZodErrors } from '@/utils/helpers';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -36,7 +36,6 @@ export default function SignUpScreen() {
                 phone: form.phone,
             });
 
-            // Log in immediately to get a token so we can call /auth/request-otp
             const loginRes = await authApi.login({
                 email: form.email || `${form.phone}@loom.ng`,
                 password: form.password,
@@ -53,10 +52,9 @@ export default function SignUpScreen() {
                 loginRes.token
             );
 
-            // Navigate to OTP verification
             router.push({ pathname: '/(auth)/otp', params: { email: form.email } });
         } catch (err: any) {
-            Alert.alert('Sign Up Failed', err.message ?? 'Please try again.');
+            Alert.alert('Registration Failed', err.message || 'Could not create your account.');
         } finally {
             setLoading(false);
         }
@@ -67,9 +65,7 @@ export default function SignUpScreen() {
             style={{ flex: 1, backgroundColor: Colors.background }}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.4 }}>
-                <LoomThread variant="dense" scale={1.2} animated />
-            </View>
+            <LoomThread variant="dense" scale={1.2} animated opacity={0.2} />
 
             <ScrollView
                 contentContainerStyle={{ padding: 32, paddingTop: 80 }}
@@ -78,71 +74,88 @@ export default function SignUpScreen() {
             >
                 <BackButton onPress={() => router.back()} />
 
-                <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 32, marginTop: 24 }}>
-                    <Text style={Typography.h1}>Create Account</Text>
-                    <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 8 }]}>
+                <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 40, marginTop: 32 }}>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>CREATE ACCOUNT</Text>
+                    <Text style={[Typography.h1, { fontSize: 32 }]}>Join the network</Text>
+                    <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 12, lineHeight: 22 }]}>
                         {user?.role === 'artisan'
-                            ? 'Join as an artisan and start getting jobs.'
-                            : 'Find trusted artisans near you.'}
+                            ? 'Register as a professional to join the service network.'
+                            : 'Create your profile to start booking services and find pros.'}
                     </Text>
                 </Animated.View>
 
-                <Animated.View entering={FadeInDown.delay(200)}>
+                <Animated.View entering={FadeInDown.delay(200).springify()}>
                     <AppTextInput
-                        label="Full Name"
+                        label="FULL NAME"
                         placeholder="e.g. Chinedu Okafor"
                         value={form.name}
                         onChangeText={(name) => setForm({ ...form, name })}
                         error={errors.name}
                         autoCapitalize="words"
+                        containerStyle={{ borderRadius: Radius.xs }}
                     />
                     <PhoneInput
-                        label="Phone Number"
+                        label="PHONE NUMBER"
                         placeholder="8012345678"
                         value={form.phone}
                         onChangeText={(phone) => setForm({ ...form, phone })}
                         error={errors.phone}
+                        containerStyle={{ borderRadius: Radius.xs }}
                     />
                     <AppTextInput
-                        label="Email"
+                        label="EMAIL ADDRESS"
                         placeholder="chinedu@email.com"
                         value={form.email}
                         onChangeText={(email) => setForm({ ...form, email })}
                         error={errors.email}
                         keyboardType="email-address"
                         autoCapitalize="none"
+                        containerStyle={{ borderRadius: Radius.xs }}
                     />
                     <PasswordInput
-                        label="Password"
+                        label="CREATE PASSWORD"
                         placeholder="At least 6 characters"
                         value={form.password}
                         onChangeText={(password) => setForm({ ...form, password })}
                         error={errors.password}
+                        containerStyle={{ borderRadius: Radius.xs }}
                     />
 
                     <PrimaryButton
-                        title="Create Account"
+                        title="SIGN UP"
                         onPress={handleSignUp}
                         loading={loading}
-                        style={{ marginTop: 24 }}
+                        style={{ marginTop: 32, height: 60, borderRadius: Radius.md }}
                     />
                 </Animated.View>
 
-                <Animated.View entering={FadeInDown.delay(300)}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 40, gap: 6 }}>
-                        <Text style={[Typography.body, { color: Colors.textSecondary }]}>
-                            Already have an account?
+                <Animated.View entering={FadeInDown.delay(300).springify()}>
+                    <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginTop: 48,
+                        padding: 16,
+                        backgroundColor: Colors.white,
+                        borderRadius: Radius.xs,
+                        borderWidth: 1,
+                        borderColor: Colors.cardBorder
+                    }}>
+                        <Text style={[Typography.label, { color: Colors.muted, fontSize: 10, textTransform: 'none' }]}>
+                            Already registered?{" "}
+                            <Text
+                                onPress={() => router.push('/(auth)/sign-in')}
+                                style={{ color: Colors.primary, fontWeight: '800' }}
+                            >
+                                SIGN IN
+                            </Text>
                         </Text>
-                        <TouchableOpacity onPress={() => router.push('/(auth)/sign-in')}>
-                            <Text style={[Typography.body, { color: Colors.primary, fontWeight: '700' }]}>Sign In</Text>
-                        </TouchableOpacity>
                     </View>
 
                     <View style={{ marginTop: 32, paddingBottom: 40 }}>
-                        <Text style={[Typography.bodySmall, { textAlign: 'center', fontSize: 11, lineHeight: 18 }]}>
-                            By signing up, you agree to our{' '}
-                            <Text style={{ color: Colors.primary, fontWeight: '600' }}>Terms of Service</Text> and{' '}
-                            <Text style={{ color: Colors.primary, fontWeight: '600' }}>Privacy Policy</Text>
+                        <Text style={[Typography.bodySmall, { textAlign: 'center', fontSize: 10, lineHeight: 18, color: Colors.muted }]}>
+                            BY REGISTERING, YOU ACCEPT THE{"\n"}
+                            <Text style={{ color: Colors.primary, fontWeight: '700' }}>TERMS OF SERVICE</Text> AND <Text style={{ color: Colors.primary, fontWeight: '700' }}>PRIVACY POLICY</Text>
                         </Text>
                     </View>
                 </Animated.View>

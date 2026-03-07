@@ -1,4 +1,4 @@
-import { Colors, Typography } from '@/theme';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { getInitials } from '@/utils/helpers';
 import React from 'react';
 import { Text, View } from 'react-native';
@@ -17,14 +17,17 @@ export function Avatar({ name, size = 48, uri }: AvatarProps) {
             style={{
                 width: size,
                 height: size,
-                borderRadius: size / 2,
-                backgroundColor: Colors.cardBorder + '50',
+                borderRadius: Radius.md, // Sharper, more premium
+                backgroundColor: Colors.primaryLight,
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                borderWidth: 1,
+                borderColor: Colors.primary + '20',
+                ...Shadows.sm
             }}
             accessibilityLabel={`${name}'s avatar`}
         >
-            <Text style={{ fontSize, fontWeight: '700', color: Colors.text }}>
+            <Text style={[Typography.h3, { fontSize, color: Colors.primary, fontWeight: '800' }]}>
                 {getInitials(name)}
             </Text>
         </View>
@@ -45,22 +48,24 @@ export function RatingStars({ rating, size = 16, showValue = true, count }: Rati
 
     return (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
-            {Array(fullStars)
-                .fill(0)
-                .map((_, i) => (
-                    <Text key={`f${i}`} style={{ fontSize: size, color: Colors.accent }}>★</Text>
-                ))}
-            {hasHalf && <Text style={{ fontSize: size, color: Colors.accent }}>★</Text>}
-            {Array(emptyStars)
-                .fill(0)
-                .map((_, i) => (
-                    <Text key={`e${i}`} style={{ fontSize: size, color: Colors.cardBorder }}>☆</Text>
-                ))}
+            <View style={{ flexDirection: 'row', gap: 1 }}>
+                {Array(fullStars)
+                    .fill(0)
+                    .map((_, i) => (
+                        <Text key={`f${i}`} style={{ fontSize: size, color: Colors.accent }}>★</Text>
+                    ))}
+                {hasHalf && <Text style={{ fontSize: size, color: Colors.accent }}>★</Text>}
+                {Array(emptyStars)
+                    .fill(0)
+                    .map((_, i) => (
+                        <Text key={`e${i}`} style={{ fontSize: size, color: Colors.gray300 }}>☆</Text>
+                    ))}
+            </View>
             {showValue && (
-                <Text style={[Typography.label, { color: Colors.primary, marginLeft: 4, textTransform: 'none' }]}>{rating.toFixed(1)}</Text>
+                <Text style={[Typography.label, { color: Colors.text, marginLeft: 6, textTransform: 'none', fontSize: 13 }]}>{rating.toFixed(1)}</Text>
             )}
             {count !== undefined && (
-                <Text style={[Typography.bodySmall, { fontSize: 10, marginLeft: 2 }]}>({count})</Text>
+                <Text style={[Typography.bodySmall, { fontSize: 11, color: Colors.muted, marginLeft: 2 }]}>({count})</Text>
             )}
         </View>
     );

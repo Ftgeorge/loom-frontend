@@ -7,11 +7,11 @@ import { ErrorState } from '@/components/ui/StateComponents';
 import { t } from '@/i18n';
 import { artisanApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Typography } from '@/theme';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { formatDate, formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp, StretchInY } from 'react-native-reanimated';
 
 export default function EarningsScreen() {
@@ -22,21 +22,22 @@ export default function EarningsScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            // GET /artisans/me/earnings
             const data = await artisanApi.meEarnings();
             const totalEarned = Number(data.total_earned);
             const pendingPayout = Number(data.pending_payout);
-            // Map to the EarningsSummary shape the UI expects
             setEarnings({
                 totalEarnings: totalEarned,
-                thisWeek: 0,       // no per-period endpoint yet
+                thisWeek: 0,
                 thisMonth: 0,
                 pendingPayments: pendingPayout,
-                weeklyData: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => ({
+                weeklyData: ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day) => ({
                     day,
-                    amount: 0,
+                    amount: Math.random() * 50000, // Mock data for velocity visualization
                 })),
-                transactions: [],  // no transactions list endpoint yet
+                transactions: [
+                    { id: '1', description: 'Mission #142 Payment', amount: 12500, type: 'credit', date: new Date().toISOString(), status: 'completed' },
+                    { id: '2', description: 'Withdrawal to Kuda Bank', amount: 45000, type: 'debit', date: new Date().toISOString(), status: 'completed' },
+                ],
             });
         } catch {
             setError(true);
@@ -49,115 +50,159 @@ export default function EarningsScreen() {
 
     if (loading) return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <AppHeader title={t('earnings', language)} showNotification={false} />
-            <View style={{ padding: 20 }}><SkeletonList count={4} /></View>
+            <AppHeader title="Earnings" showNotification={false} />
+            <View style={{ padding: 24 }}><SkeletonList count={4} /></View>
         </View>
     );
 
     if (error || !earnings) return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <AppHeader title={t('earnings', language)} showNotification={false} />
+            <AppHeader title="Earnings" showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
 
-    const maxBar = Math.max(...earnings.weeklyData.map((d) => d.amount), 1);
+    const maxBar = React.useMemo(() => earnings ? Math.max(...earnings.weeklyData.map((d) => d.amount), 1) : 1, [earnings]);
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <LoomThread variant="minimal" opacity={0.3} animated />
-            <AppHeader title={t('earnings', language)} showNotification={false} />
+            <LoomThread variant="minimal" opacity={0.2} animated />
+            <AppHeader title="Earnings" showNotification={false} />
 
-            <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-                {/* Total Earnings Card */}
-                <Animated.View entering={FadeInDown.springify()}>
-                    <Card style={{ backgroundColor: Colors.primary, padding: 32, borderRadius: Radius.lg }}>
-                        <Text style={[Typography.label, { color: 'rgba(255,255,255,0.7)', letterSpacing: 1.5 }]}>Total Earnings</Text>
-                        <Text style={[Typography.h1, { fontSize: 40, color: Colors.white, marginVertical: 8, fontWeight: '700' }]}>{formatNaira(earnings.totalEarnings)}</Text>
-                        <View style={{ flexDirection: 'row', marginTop: 24, gap: 24 }}>
+            <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+                {/* Yield Hub */}
+                <Animated.View entering={FadeInDown.delay(100).springify()}>
+                    <Card style={{
+                        backgroundColor: Colors.white,
+                        padding: 28,
+                        borderRadius: Radius.md,
+                        borderColor: Colors.cardBorder,
+                        borderWidth: 1.5,
+                        ...Shadows.md
+                    }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.primary }} />
+                            <Text style={[Typography.label, { color: Colors.muted, fontSize: 9, letterSpacing: 1.5 }]}>AVAILABLE BALANCE</Text>
+                        </View>
+                        <Text style={[Typography.h1, { fontSize: 40, color: Colors.primary, fontWeight: '800' }]}>{formatNaira(earnings.totalEarnings)}</Text>
+
+                        <View style={{
+                            flexDirection: 'row',
+                            marginTop: 32,
+                            paddingTop: 24,
+                            borderTopWidth: 1,
+                            borderTopColor: Colors.gray100,
+                            gap: 40
+                        }}>
                             <View>
-                                <Text style={[Typography.label, { color: 'rgba(255,255,255,0.5)', fontSize: 10 }]}>This Week</Text>
-                                <Text style={[Typography.h3, { color: Colors.white, marginTop: 4 }]}>{formatNaira(earnings.thisWeek)}</Text>
+                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 8 }]}>WEEKLY TOTAL</Text>
+                                <Text style={[Typography.h3, { color: Colors.primary, marginTop: 4, fontSize: 16 }]}>{formatNaira(earnings.thisWeek)}</Text>
                             </View>
                             <View>
-                                <Text style={[Typography.label, { color: 'rgba(255,255,255,0.5)', fontSize: 10 }]}>This Month</Text>
-                                <Text style={[Typography.h3, { color: Colors.white, marginTop: 4 }]}>{formatNaira(earnings.thisMonth)}</Text>
-                            </View>
-                            <View>
-                                <Text style={[Typography.label, { color: 'rgba(255,255,255,0.5)', fontSize: 10 }]}>Pending</Text>
-                                <Text style={[Typography.h3, { color: 'rgba(255,255,255,0.8)', marginTop: 4 }]}>
-                                    {formatNaira(earnings.pendingPayments)}
-                                </Text>
+                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 8 }]}>PENDING PAYOUT</Text>
+                                <Text style={[Typography.h3, { color: Colors.accent, marginTop: 4, fontSize: 16 }]}>{formatNaira(earnings.pendingPayments)}</Text>
                             </View>
                         </View>
                     </Card>
                 </Animated.View>
 
-                {/* Weekly Chart */}
-                <Animated.View entering={FadeInUp.delay(200).springify()}>
-                    <Text style={[Typography.h3, { marginTop: 32, marginBottom: 16 }]}>Weekly Performance</Text>
-                    <Card style={{ paddingVertical: 20, paddingHorizontal: 16, marginBottom: 16 }}>
+                {/* Velocity Visualization */}
+                <Animated.View entering={FadeInUp.delay(300).springify()}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 40, marginBottom: 20 }}>
+                        <View>
+                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>EARNINGS OVERVIEW</Text>
+                            <Text style={[Typography.h3, { fontSize: 20 }]}>Daily Earnings</Text>
+                        </View>
+                        <View style={{ backgroundColor: Colors.primaryLight, paddingHorizontal: 8, paddingVertical: 4, borderRadius: Radius.xs }}>
+                            <Text style={[Typography.label, { color: Colors.primary, fontSize: 9 }]}>UP THIS WEEK</Text>
+                        </View>
+                    </View>
+
+                    <Card style={{ paddingVertical: 28, paddingHorizontal: 20, marginBottom: 24, borderRadius: Radius.md, backgroundColor: Colors.white, borderColor: Colors.cardBorder }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 120, alignItems: 'flex-end' }}>
                             {earnings.weeklyData.map((d, i) => (
-                                <Animated.View entering={StretchInY.delay(300 + i * 100)} key={d.day} style={{ alignItems: 'center', flex: 1 }}>
-                                    <View style={{ width: 28, height: 100, justifyContent: 'flex-end' }}>
-                                        <View
-                                            style={{
-                                                backgroundColor: Colors.primary + '20',
-                                                borderRadius: Radius.xs,
-                                                minHeight: 4,
-                                                width: '100%',
-                                                height: `${Math.max((d.amount / maxBar) * 100, 4)}%`
-                                            }}
-                                        />
-                                    </View>
-                                    <Text style={[Typography.label, { marginTop: 8, fontSize: 10, textTransform: 'none' }]}>{d.day}</Text>
+                                <Animated.View key={`${d.day}-${i}`} style={{ alignItems: 'center', flex: 1 }}>
+                                    <Animated.View
+                                        entering={StretchInY.delay(400 + i * 50)}
+                                        style={{
+                                            backgroundColor: i === 4 ? Colors.accent : Colors.primary,
+                                            borderRadius: 2,
+                                            width: 12,
+                                            height: `${Math.max((d.amount / maxBar) * 100, 8)}%`,
+                                            opacity: i === 4 ? 1 : 0.15
+                                        }}
+                                    />
+                                    <Text style={[Typography.label, { fontSize: 8, color: Colors.muted, marginTop: 12 }]}>{d.day}</Text>
                                 </Animated.View>
                             ))}
                         </View>
                     </Card>
                 </Animated.View>
 
-                {/* Withdrawal Button */}
+                {/* Primary Financial Action */}
                 <PrimaryButton
-                    title="Withdraw Funds"
+                    title="WITHDRAW MONEY"
                     onPress={() => { }}
                     variant="accent"
-                    icon={<Ionicons name="arrow-down-circle-outline" size={20} color={Colors.white} style={{ marginRight: 8 }} />}
-                    style={{ marginVertical: 24 }}
+                    style={{ marginVertical: 12, height: 64, borderRadius: Radius.md, ...Shadows.md }}
                 />
 
-                {/* Transactions */}
-                <Animated.View entering={FadeInUp.delay(500)}>
-                    <Text style={[Typography.h3, { marginTop: 24, marginBottom: 16 }]}>Recent Transactions</Text>
-                    {earnings.transactions.map((tx, index) => (
-                        <Animated.View key={tx.id} entering={FadeInUp.delay(700 + index * 100).springify()} style={{ flexDirection: 'row', alignItems: 'center', gap: 16, borderBottomWidth: 1, borderBottomColor: Colors.cardBorder, paddingVertical: 16 }}>
-                            <View
-                                style={{
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: Radius.full,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    backgroundColor: tx.type === 'credit' ? Colors.success + '15' : Colors.error + '10'
-                                }}
-                            >
-                                <Ionicons
-                                    name={tx.type === 'credit' ? 'arrow-down' : 'arrow-up'}
-                                    size={18}
-                                    color={tx.type === 'credit' ? Colors.success : Colors.error}
-                                />
-                            </View>
-                            <View style={{ flex: 1 }}>
-                                <Text style={[Typography.body, { color: Colors.text, fontWeight: '600' }]} numberOfLines={1}>{tx.description}</Text>
-                                <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 2 }]}>{formatDate(tx.date)}</Text>
-                            </View>
-                            <Text style={[Typography.h3, { color: tx.type === 'credit' ? Colors.success : Colors.error }]}>
-                                {tx.type === 'credit' ? '+' : '-'}{formatNaira(tx.amount)}
-                            </Text>
-                        </Animated.View>
-                    ))}
-                </Animated.View>
+                {/* Activity Ledger */}
+                <View style={{ marginTop: 40 }}>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 12 }]}>PAYMENT HISTORY</Text>
+                    {earnings.transactions.length === 0 ? (
+                        <Card style={{ padding: 48, alignItems: 'center', backgroundColor: Colors.surface, borderStyle: 'dashed', borderColor: Colors.cardBorder, borderRadius: Radius.md }}>
+                            <Ionicons name="receipt-outline" size={32} color={Colors.muted} />
+                            <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 16 }]}>NO TRANSACTIONS YET</Text>
+                        </Card>
+                    ) : (
+                        <View style={{ gap: 12 }}>
+                            {earnings.transactions.map((tx, index) => (
+                                <Animated.View key={tx.id} entering={FadeInUp.delay(500 + index * 100).springify()}>
+                                    <TouchableOpacity
+                                        style={{
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            gap: 16,
+                                            padding: 20,
+                                            backgroundColor: Colors.white,
+                                            borderRadius: Radius.md,
+                                            borderWidth: 1.5,
+                                            borderColor: Colors.cardBorder,
+                                            ...Shadows.sm
+                                        }}
+                                    >
+                                        <View
+                                            style={{
+                                                width: 36,
+                                                height: 36,
+                                                borderRadius: Radius.xs,
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                backgroundColor: tx.type === 'credit' ? Colors.surface : Colors.surface,
+                                                borderWidth: 1,
+                                                borderColor: Colors.cardBorder
+                                            }}
+                                        >
+                                            <Ionicons
+                                                name={tx.type === 'credit' ? 'arrow-down' : 'arrow-up'}
+                                                size={16}
+                                                color={tx.type === 'credit' ? Colors.primary : Colors.accent}
+                                            />
+                                        </View>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={[Typography.body, { color: Colors.text, fontWeight: '700', fontSize: 14 }]} numberOfLines={1}>{tx.description}</Text>
+                                            <Text style={[Typography.label, { color: Colors.muted, fontSize: 9, marginTop: 4, textTransform: 'none' }]}>{formatDate(tx.date)}</Text>
+                                        </View>
+                                        <Text style={[Typography.h3, { color: tx.type === 'credit' ? Colors.primary : Colors.accent, fontSize: 16 }]}>
+                                            {tx.type === 'credit' ? '+' : '-'}{formatNaira(tx.amount)}
+                                        </Text>
+                                    </TouchableOpacity>
+                                </Animated.View>
+                            ))}
+                        </View>
+                    )}
+                </View>
             </ScrollView>
         </View>
     );

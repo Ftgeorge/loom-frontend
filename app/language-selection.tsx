@@ -1,7 +1,9 @@
+import { LoomThread } from '@/components/ui/LoomThread';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { languageNames, t } from '@/i18n';
 import { useAppStore } from '@/store';
 import { Language } from '@/types';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -20,49 +22,74 @@ export default function LanguageSelectionScreen() {
     };
 
     return (
-        <View className="flex-1 bg-background pt-20 px-6">
-            <Animated.View entering={FadeInDown.delay(100)} className="mb-10">
-                <Text className="text-[32px] font-extrabold tracking-tight text-graphite mb-3">
-                    {t('language', selected)}
-                </Text>
-                <Text className="text-base text-muted leading-relaxed">
-                    Choose your preferred language for using the app. You can always change this later in settings.
-                </Text>
-            </Animated.View>
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <LoomThread variant="minimal" animated opacity={0.3} />
 
-            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-                <View className="gap-4">
+            <ScrollView
+                contentContainerStyle={{ padding: 32, paddingTop: 100, flexGrow: 1 }}
+                showsVerticalScrollIndicator={false}
+            >
+                <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 48 }}>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 12 }]}>SYSTEM PREFERENCE</Text>
+                    <Text style={[Typography.h1, { fontSize: 32, lineHeight: 38 }]}>
+                        Select Operational{"\n"}Dialect
+                    </Text>
+                    <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 12, lineHeight: 22 }]}>
+                        Choose the primary communication protocol for the interface.
+                    </Text>
+                </Animated.View>
+
+                <View style={{ gap: 16, flex: 1 }}>
                     {LANGUAGES.map((lang, index) => (
                         <Animated.View key={lang} entering={FadeInDown.delay(150 + index * 100).springify()}>
                             <TouchableOpacity
-                                activeOpacity={0.7}
+                                activeOpacity={0.8}
                                 onPress={() => setSelected(lang)}
-                                className={`flex-row items-center justify-between p-6 rounded-[20px] border-[1.5px] ${selected === lang
-                                    ? 'border-graphite bg-surface shadow-sm'
-                                    : 'border-transparent bg-surface'
-                                    }`}
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    padding: 24,
+                                    borderRadius: Radius.md,
+                                    borderWidth: 1.5,
+                                    borderColor: selected === lang ? Colors.primary : Colors.cardBorder,
+                                    backgroundColor: selected === lang ? Colors.white : Colors.surface,
+                                    ...Shadows.sm
+                                }}
                             >
-                                <Text className={`text-lg font-bold ${selected === lang ? 'text-graphite' : 'text-muted'
-                                    }`}>
+                                <Text style={[
+                                    Typography.h3,
+                                    { color: selected === lang ? Colors.primary : Colors.muted, fontSize: 18 }
+                                ]}>
                                     {languageNames[lang]}
                                 </Text>
-                                <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${selected === lang ? 'border-graphite' : 'border-surface bg-background'
-                                    }`}>
-                                    {selected === lang && <View className="w-3 h-3 rounded-full bg-graphite" />}
+                                <View style={{
+                                    width: 24,
+                                    height: 24,
+                                    borderRadius: Radius.xs,
+                                    borderWidth: 2,
+                                    borderColor: selected === lang ? Colors.primary : Colors.gray200,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    backgroundColor: selected === lang ? Colors.primaryLight : 'transparent'
+                                }}>
+                                    {selected === lang && (
+                                        <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: Colors.primary }} />
+                                    )}
                                 </View>
                             </TouchableOpacity>
                         </Animated.View>
                     ))}
                 </View>
-            </ScrollView>
 
-            <Animated.View entering={FadeInUp.delay(500)} className="pb-12 pt-4">
-                <PrimaryButton
-                    title={t('confirm', selected)}
-                    onPress={handleContinue}
-                    className="w-full bg-graphite"
-                />
-            </Animated.View>
+                <Animated.View entering={FadeInUp.delay(500).springify()} style={{ paddingBottom: 40, paddingTop: 24 }}>
+                    <PrimaryButton
+                        title="INITIALIZE DIALECT"
+                        onPress={handleContinue}
+                        style={{ height: 64, borderRadius: Radius.md }}
+                    />
+                </Animated.View>
+            </ScrollView>
         </View >
     );
 }

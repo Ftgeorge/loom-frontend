@@ -1,17 +1,20 @@
 import { AppHeader } from '@/components/AppHeader';
+import { LoomThread } from '@/components/ui/LoomThread';
 import { RequestCard } from '@/components/ui/RequestCard';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { EmptyState, ErrorState } from '@/components/ui/StateComponents';
 import { t } from '@/i18n';
 import { jobApi } from '@/services/api';
+import { mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
+import { Colors, Radius, Typography } from '@/theme';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
-const SEGMENTS = ['Active', 'Completed', 'Cancelled'];
-const FILTERS = ['active', 'completed', 'cancelled'];
+const SEGMENTS = ['ACTIVE', 'ARCHIVED', 'VOIDED'];
 
 export default function RequestsScreen() {
     const router = useRouter();
@@ -24,68 +27,94 @@ export default function RequestsScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            // GET /jobs — customer role sees their own requests, filtered by status
-            const statusMap: Record<number, string | undefined> = { 0: 'assigned', 1: 'completed', 2: 'cancelled' };
-            const res = await jobApi.list({ status: statusMap[segIdx], limit: 30 });
-            const mapped = (res.results as any[]).map((row: any) => ({
-                id: row.id,
-                clientId: row.customer_id,
-                clientName: row.customer_email ?? 'You',
-                category: (row.title ?? 'other') as any,
-                description: row.description,
-                budget: 0,
-                urgency: 'today' as const,
-                location: { area: row.location ?? '', city: '', state: '' },
-                status: (row.status === 'open' ? 'submitted'
-                    : row.status === 'assigned' ? 'matched'
-                        : row.status === 'completed' ? 'completed'
-                            : 'cancelled') as any,
-                createdAt: row.created_at,
-            }));
+            if (!refreshing) setLoading(true);
+
+            const statusMap: Record<number, string | undefined> = {
+                0: 'assigned', // Active/Assigned
+                1: 'completed', // Completed
+                2: 'cancelled'  // Cancelled
+            };
+
+            const res = await jobApi.list({
+                status: statusMap[segIdx],
+                limit: 30
+            });
+
+            const mapped = (res.results as any[]).map(mapJob);
             setJobs(mapped);
-        } catch {
+        } catch (err) {
+            console.error('[Requests] Error fetching jobs:', err);
             setError(true);
         } finally {
             setLoading(false);
             setRefreshing(false);
         }
-    }, [segIdx]);
+    }, [segIdx, refreshing, setJobs]);
 
-    useEffect(() => { setLoading(true); load(); }, [load]);
+    useEffect(() => { load(); }, [load]);
 
     return (
-        <View className="flex-1 bg-background">
-            <AppHeader title={t('requests', language)} onNotification={() => router.push('/notifications')} />
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <LoomThread variant="minimal" opacity={0.2} animated />
+            <AppHeader title="Mission Console" onNotification={() => router.push('/notifications')} />
 
-            <View className="px-5 py-4">
-                <SegmentedControl segments={SEGMENTS} selected={segIdx} onSelect={setSegIdx} />
+            <View style={{ paddingHorizontal: 24, paddingVertical: 20 }}>
+                <View style={{ marginBottom: 16 }}>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>SIGNAL REGISTRY</Text>
+                    <Text style={[Typography.h3, { fontSize: 20 }]}>Project Ledger</Text>
+                </View>
+                <SegmentedControl
+                    segments={SEGMENTS}
+                    selected={segIdx}
+                    onSelect={setSegIdx}
+                />
             </View>
 
             {loading ? (
-                <View className="p-5"><SkeletonList count={3} type="request" /></View>
+                <View style={{ padding: 24 }}><SkeletonList count={3} type="request" /></View>
             ) : error ? (
                 <ErrorState onRetry={load} />
             ) : jobs.length === 0 ? (
-                <EmptyState
-                    icon="document-text-outline"
-                    title={t('noRequests', language)}
-                    message={t('postFirstJob', language)}
-                    actionLabel={t('postJob', language)}
-                    onAction={() => router.push('/post-job')}
-                />
+                <View style={{ flex: 1, justifyContent: 'center', padding: 24 }}>
+                    <View style={{
+                        padding: 48,
+                        alignItems: 'center',
+                        borderStyle: 'dashed',
+                        backgroundColor: Colors.white,
+                        borderColor: Colors.cardBorder,
+                        borderRadius: Radius.md,
+                        borderWidth: 1.5
+                    }}>
+                        <Text style={[Typography.h3, { textAlign: 'center', color: Colors.primary }]}>
+                            {segIdx === 0 ? 'GRID SILENT' : segIdx === 1 ? 'NO ARCHIVED DATA' : 'VOID REGISTRY EMPTY'}
+                        </Text>
+                        <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted, marginTop: 12, lineHeight: 20 }]}>
+                            {segIdx === 0
+                                ? 'No active mission protocols currently broadcasting in this sector.'
+                                : 'No historical data found in this log selection.'}
+                        </Text>
+                    </View>
+                </View>
             ) : (
                 <FlatList
                     data={jobs}
                     keyExtractor={(item) => item.id}
-                    contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
-                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} />}
-                    renderItem={({ item }) => (
-                        <RequestCard
-                            job={item}
-                            onPress={() => router.push({ pathname: '/request-details', params: { id: item.id } })}
-                        />
+                    contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
+                    showsVerticalScrollIndicator={false}
+                    initialNumToRender={10}
+                    maxToRenderPerBatch={10}
+                    windowSize={5}
+                    removeClippedSubviews={true}
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={Colors.primary} />}
+                    renderItem={({ item, index }) => (
+                        <Animated.View entering={FadeInDown.delay(index * 100).springify()}>
+                            <RequestCard
+                                job={item}
+                                onPress={() => router.push({ pathname: '/request-details', params: { id: item.id } })}
+                            />
+                        </Animated.View>
                     )}
-                    ItemSeparatorComponent={() => <View className="h-4" />}
+                    ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
                 />
             )}
         </View>

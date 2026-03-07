@@ -1,9 +1,9 @@
 import { LoomThread } from '@/components/ui/LoomThread';
 import { useAppStore } from "@/store";
-import { Colors } from "@/theme";
+import { Colors, Radius, Shadows, Typography } from "@/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
   interpolate,
@@ -12,6 +12,8 @@ import Animated, {
   withDelay,
   withTiming
 } from "react-native-reanimated";
+
+const { width } = Dimensions.get('window');
 
 const LETTERS = ["L", "o", "o", "m"];
 const LETTER_DELAY = 100;
@@ -33,7 +35,7 @@ function AnimatedLetter({
       index * LETTER_DELAY,
       withTiming(1, {
         duration: LETTER_DURATION,
-        easing: Easing.bezier(0.16, 1, 0.3, 1), // Custom 'graceful' ease
+        easing: Easing.bezier(0.16, 1, 0.3, 1),
       }),
     );
   }, []);
@@ -41,8 +43,8 @@ function AnimatedLetter({
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: progress.value,
     transform: [
-      { translateY: interpolate(progress.value, [0, 1], [30, 0]) },
-      { scale: interpolate(progress.value, [0, 1], [0.8, 1]) },
+      { translateY: interpolate(progress.value, [0, 1], [40, 0]) },
+      { scale: interpolate(progress.value, [0, 1], [0.5, 1]) },
     ],
   }));
 
@@ -65,13 +67,20 @@ export default function SplashScreen() {
   useEffect(() => {
     taglineOpacity.value = withDelay(
       TAGLINE_DELAY,
-      withTiming(1, { duration: 1000, easing: Easing.out(Easing.exp) }),
+      withTiming(1, { duration: 1200, easing: Easing.out(Easing.exp) }),
     );
 
     indicatorOpacity.value = withDelay(
       INDICATOR_DELAY,
-      withTiming(1, { duration: 800, easing: Easing.out(Easing.exp) }),
+      withTiming(1, { duration: 1000, easing: Easing.out(Easing.exp) }),
     );
+
+    // Auto-navigation timer (3.5 seconds)
+    const timer = setTimeout(() => {
+      handleContinue();
+    }, 3500);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handleContinue = () => {
@@ -89,7 +98,7 @@ export default function SplashScreen() {
   const taglineStyle = useAnimatedStyle(() => ({
     opacity: taglineOpacity.value,
     transform: [
-      { translateY: interpolate(taglineOpacity.value, [0, 1], [15, 0]) },
+      { translateY: interpolate(taglineOpacity.value, [0, 1], [20, 0]) },
     ],
   }));
 
@@ -99,14 +108,12 @@ export default function SplashScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Decorative Threads */}
       <View style={StyleSheet.absoluteFill}>
         <LoomThread
           variant="complex"
-          color={Colors.accent} // Heritage Bronze
-          colorEnd={Colors.accent}
-          opacity={0.35}
-          scale={1.4}
+          color={Colors.accent}
+          opacity={0.15}
+          animated
         />
       </View>
 
@@ -117,20 +124,18 @@ export default function SplashScreen() {
           ))}
         </View>
 
-        <Animated.Text style={[styles.tagline, taglineStyle]}>
-          Reliable Artisan Connections
-        </Animated.Text>
+        <Animated.View style={[styles.taglineBox, taglineStyle]}>
+          <View style={styles.labelLine} />
+          <Text style={styles.tagline}>
+            PROFESSIONAL SERVICES. SIMPLIFIED.
+          </Text>
+          <View style={styles.labelLine} />
+        </Animated.View>
       </View>
 
       <Animated.View style={[styles.footer, indicatorStyle]}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handleContinue}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.buttonText}>Get Started</Text>
-          <ActivityIndicator color={Colors.white} size="small" style={{ marginLeft: 12 }} />
-        </TouchableOpacity>
+        <ActivityIndicator color={Colors.white} size="small" style={{ marginBottom: 20 }} />
+        <Text style={styles.version}>PREPARING YOUR EXPERIENCE...</Text>
       </Animated.View>
     </View>
   );
@@ -139,7 +144,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.primary, // Deep Forest Green
+    backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -153,41 +158,67 @@ const styles = StyleSheet.create({
   },
   letter: {
     fontFamily: "MontserratAlternates-Bold",
-    fontSize: 72,
+    fontSize: 84,
     color: Colors.white,
-    letterSpacing: -4,
+    letterSpacing: -6,
+  },
+  taglineBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 12,
+  },
+  labelLine: {
+    height: 1,
+    width: 20,
+    backgroundColor: Colors.accent,
+    opacity: 0.5,
   },
   tagline: {
-    fontSize: 11,
-    color: "rgba(255,255,255,0.7)",
-    marginTop: 8,
-    fontFamily: "MontserratAlternates-Medium",
-    letterSpacing: 4,
+    fontSize: 9,
+    color: Colors.accent,
+    fontFamily: "MontserratAlternates-Bold",
+    letterSpacing: 3,
     textTransform: 'uppercase',
   },
   footer: {
     position: "absolute",
-    bottom: 80,
+    bottom: 64,
     width: '100%',
     paddingHorizontal: 40,
+    alignItems: 'center',
   },
   button: {
-    backgroundColor: Colors.accent,
-    height: 56,
-    borderRadius: 28,
+    backgroundColor: Colors.white,
+    height: 64,
+    width: '100%',
+    borderRadius: Radius.md,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    ...Shadows.lg,
   },
   buttonText: {
-    color: Colors.white,
-    fontSize: 16,
+    color: Colors.primary,
+    fontSize: 12,
     fontFamily: "MontserratAlternates-Bold",
+    letterSpacing: 1,
+  },
+  btnIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: Radius.xs,
+    backgroundColor: Colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  version: {
+    marginTop: 24,
+    fontSize: 8,
+    color: 'rgba(255,255,255,0.3)',
+    fontFamily: "MontserratAlternates-Medium",
+    letterSpacing: 2,
   }
 });
 

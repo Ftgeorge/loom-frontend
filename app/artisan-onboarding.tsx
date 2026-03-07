@@ -1,9 +1,10 @@
 import { AppHeader } from '@/components/AppHeader';
+import { LoomThread } from '@/components/ui/LoomThread';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { Chip } from '@/components/ui/CardChipBadge';
-import { AppTextInput, PhoneInput } from '@/components/ui/TextInputs';
-import { artisanApi, userApi } from '@/services/api';
-import { Colors } from '@/theme';
+import { AppTextInput } from '@/components/ui/TextInputs';
+import { artisanApi } from '@/services/api';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { CATEGORIES } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -11,7 +12,7 @@ import React, { useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
 
-const STEPS = ['Skills', 'Areas', 'Availability', 'Pricing'];
+const STEPS = ['Specialties', 'Sectors', 'Cycle', 'Pricing'];
 
 export default function ArtisanOnboardingScreen() {
     const router = useRouter();
@@ -38,15 +39,12 @@ export default function ArtisanOnboardingScreen() {
     const handleComplete = async () => {
         setLoading(true);
         try {
-            // 1. Create Artisan Profile
             const profile = await artisanApi.createProfile({
                 bio: `Available for ${selectedSkills.join(', ')} in ${selectedAreas.join(', ')}.`,
-                yearsOfExperience: 1, // Default during onboarding
+                yearsOfExperience: 1,
             });
 
             const profileId = profile.id;
-
-            // 2. Attach skills (sequentially for simplicity in onboarding)
             for (const skill of selectedSkills) {
                 const skillLabel = CATEGORIES.find(c => c.id === skill)?.label || skill;
                 await artisanApi.addSkill(profileId, skillLabel);
@@ -54,103 +52,199 @@ export default function ArtisanOnboardingScreen() {
 
             router.replace('/(tabs)/dashboard');
         } catch (err: any) {
-            Alert.alert('Onboarding Error', err.message || 'Failed to save profile');
+            Alert.alert('Initialization Error', err.message || 'Failed to save operative profile');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <View className="flex-1 bg-background">
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <LoomThread variant="minimal" animated opacity={0.2} />
             <AppHeader
-                title="Arisan Setup"
+                title="Professional Setup"
                 showBack
                 onBack={() => (step > 0 ? setStep(step - 1) : router.back())}
                 showNotification={false}
             />
 
-            <View className="flex-row px-5 py-4 gap-1">
+            <View style={{ flexDirection: 'row', paddingVertical: 16, gap: 4, paddingHorizontal: 20 }}>
                 {STEPS.map((s, i) => (
-                    <View key={s} className="flex-1 items-center gap-1">
-                        <View className={`h-[3px] w-full rounded-[2px] ${i <= step ? 'bg-graphite' : 'bg-surface'}`} />
-                        <Text className={`text-[10px] uppercase tracking-widest ${i === step ? 'text-graphite font-bold' : 'text-muted font-medium'}`}>{s}</Text>
+                    <View key={s} style={{ flex: 1, gap: 4 }}>
+                        <View style={{
+                            height: 4,
+                            borderRadius: 2,
+                            backgroundColor: i <= step ? Colors.primary : Colors.gray100
+                        }} />
+                        <Text style={[
+                            Typography.label,
+                            {
+                                fontSize: 8,
+                                textAlign: 'center',
+                                color: i === step ? Colors.primary : Colors.muted,
+                                opacity: i === step ? 1 : 0.5
+                            }
+                        ]}>{s.toUpperCase()}</Text>
                     </View>
                 ))}
             </View>
 
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }} keyboardShouldPersistTaps="handled">
                 {step === 0 && (
-                    <Animated.View entering={FadeInRight.springify()} className="p-8">
-                        <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">What are your trades?</Text>
-                        <Text className="text-base text-muted mb-6">Select all that apply</Text>
-                        <View className="flex-row flex-wrap gap-2">
+                    <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 01</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>Choose your Skills</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Which technical specialties do you offer to the network?</Text>
+
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
                             {CATEGORIES.map((cat) => (
-                                <Chip key={cat.id} label={cat.label} selected={selectedSkills.includes(cat.id)} onPress={() => toggleSkill(cat.id)} />
+                                <Chip
+                                    key={cat.id}
+                                    label={cat.label}
+                                    selected={selectedSkills.includes(cat.id)}
+                                    onPress={() => toggleSkill(cat.id)}
+                                    containerStyle={{
+                                        paddingHorizontal: 16,
+                                        paddingVertical: 10,
+                                        borderRadius: Radius.xs,
+                                        borderColor: selectedSkills.includes(cat.id) ? Colors.primary : Colors.cardBorder
+                                    }}
+                                />
                             ))}
                         </View>
-                        <PrimaryButton title="Next" onPress={() => setStep(1)} disabled={selectedSkills.length === 0} style={{ marginTop: 32 }} className="bg-graphite" />
+                        <PrimaryButton
+                            title="CONTINUE"
+                            onPress={() => setStep(1)}
+                            disabled={selectedSkills.length === 0}
+                            style={{ marginTop: 48, height: 60, borderRadius: Radius.md }}
+                        />
                     </Animated.View>
                 )}
 
                 {step === 1 && (
-                    <Animated.View entering={FadeInRight.springify()} className="p-8">
-                        <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Service areas</Text>
-                        <Text className="text-base text-muted mb-6">Where can clients find you?</Text>
-                        <View className="flex-row flex-wrap gap-2">
+                    <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 02</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>Service Areas</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Select the areas where you can work on-site.</Text>
+
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
                             {areas.map((area) => (
-                                <Chip key={area} label={area} selected={selectedAreas.includes(area)} onPress={() => toggleArea(area)} />
+                                <Chip
+                                    key={area}
+                                    label={area}
+                                    selected={selectedAreas.includes(area)}
+                                    onPress={() => toggleArea(area)}
+                                    containerStyle={{
+                                        paddingHorizontal: 16,
+                                        paddingVertical: 10,
+                                        borderRadius: Radius.xs,
+                                        borderColor: selectedAreas.includes(area) ? Colors.primary : Colors.cardBorder
+                                    }}
+                                />
                             ))}
                         </View>
-                        <PrimaryButton title="Next" onPress={() => setStep(2)} disabled={selectedAreas.length === 0} style={{ marginTop: 32 }} className="bg-graphite" />
+                        <PrimaryButton
+                            title="CONTINUE"
+                            onPress={() => setStep(2)}
+                            disabled={selectedAreas.length === 0}
+                            style={{ marginTop: 48, height: 60, borderRadius: Radius.md }}
+                        />
                     </Animated.View>
                 )}
 
                 {step === 2 && (
-                    <Animated.View entering={FadeInRight.springify()} className="p-8">
-                        <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Your availability</Text>
-                        <Text className="text-base text-muted mb-6">Select your working days</Text>
-                        <View className="flex-row flex-wrap gap-2">
+                    <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 03</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>Work Schedule</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Select the days you are available to work.</Text>
+
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
                             {days.map((d) => (
                                 <TouchableOpacity
                                     key={d}
-                                    className={`w-[46px] h-[46px] rounded-[23px] border-[1.5px] items-center justify-center ${selectedDays.includes(d) ? 'border-graphite bg-surface shadow-sm' : 'border-surface bg-background'}`}
+                                    style={{
+                                        width: 54,
+                                        height: 54,
+                                        borderRadius: Radius.xs,
+                                        borderWidth: 1.5,
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        backgroundColor: selectedDays.includes(d) ? Colors.primaryLight : Colors.white,
+                                        borderColor: selectedDays.includes(d) ? Colors.primary : Colors.cardBorder,
+                                        ...Shadows.sm
+                                    }}
                                     onPress={() => toggleDay(d)}
                                 >
-                                    <Text className={`text-sm ${selectedDays.includes(d) ? 'text-graphite font-bold' : 'text-muted font-medium'}`}>{d}</Text>
+                                    <Text style={[
+                                        Typography.label,
+                                        { color: selectedDays.includes(d) ? Colors.primary : Colors.muted, fontSize: 12 }
+                                    ]}>{d.toUpperCase()}</Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
-                        <PrimaryButton title="Next" onPress={() => setStep(3)} style={{ marginTop: 32 }} className="bg-graphite" />
+                        <PrimaryButton
+                            title="CONTINUE"
+                            onPress={() => setStep(3)}
+                            style={{ marginTop: 56, height: 60, borderRadius: Radius.md }}
+                        />
                     </Animated.View>
                 )}
 
                 {step === 3 && (
-                    <Animated.View entering={FadeInRight.springify()} className="p-8">
-                        <Text className="text-[22px] font-extrabold tracking-tight mb-2 text-graphite">Pricing style</Text>
-                        <Text className="text-base text-muted mb-6">How do you prefer to charge?</Text>
+                    <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 04</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>Pricing</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>How would you like to set your service prices?</Text>
+
                         {[
-                            { value: 'fixed', label: 'Fixed Price', desc: 'Set a fixed price per job' },
-                            { value: 'estimate', label: 'Estimate', desc: 'Give clients a price range' },
-                            { value: 'hourly', label: 'Hourly Rate', desc: 'Charge by the hour' },
+                            { value: 'fixed', label: 'FIXED PRICE', desc: 'Secure jobs with a set cost' },
+                            { value: 'estimate', label: 'VARIABLE ESTIMATE', desc: 'Provide an estimated range per job' },
+                            { value: 'hourly', label: 'HOURLY RATE', desc: 'Charge based on hours worked' },
                         ].map((opt) => (
                             <TouchableOpacity
                                 key={opt.value}
-                                className={`flex-row items-center gap-4 p-5 rounded-[20px] border-[1.5px] mb-4 shadow-sm ${pricingStyle === opt.value ? 'border-graphite bg-surface' : 'border-surface bg-background'}`}
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: 16,
+                                    padding: 24,
+                                    borderRadius: Radius.md,
+                                    borderWidth: 1.5,
+                                    marginBottom: 16,
+                                    backgroundColor: Colors.white,
+                                    borderColor: pricingStyle === opt.value ? Colors.primary : Colors.cardBorder,
+                                    ...Shadows.sm
+                                }}
                                 onPress={() => setPricingStyle(opt.value)}
                             >
-                                <View>
-                                    <View className={`w-[22px] h-[22px] rounded-[11px] border-2 items-center justify-center ${pricingStyle === opt.value ? 'border-graphite' : 'border-surface'}`}>
-                                        {pricingStyle === opt.value && <View className="w-2.5 h-2.5 rounded-full bg-graphite" />}
-                                    </View>
+                                <View style={{
+                                    width: 24,
+                                    height: 24,
+                                    borderRadius: Radius.xs,
+                                    borderWidth: 2,
+                                    borderColor: pricingStyle === opt.value ? Colors.primary : Colors.gray200,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    backgroundColor: pricingStyle === opt.value ? Colors.primaryLight : 'transparent'
+                                }}>
+                                    {pricingStyle === opt.value && (
+                                        <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: Colors.primary }} />
+                                    )}
                                 </View>
-                                <View>
-                                    <Text className="text-base font-bold text-graphite">{opt.label}</Text>
-                                    <Text className="text-xs text-muted mt-0.5">{opt.desc}</Text>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={[Typography.h3, { color: Colors.primary, fontSize: 16 }]}>{opt.label}</Text>
+                                    <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 4, lineHeight: 18 }]}>{opt.desc}</Text>
                                 </View>
                             </TouchableOpacity>
                         ))}
 
-                        <PrimaryButton title="Complete Setup" onPress={handleComplete} loading={loading} style={{ marginTop: 32 }} className="bg-graphite" />
+                        <PrimaryButton
+                            title="COMPLETE SETUP"
+                            onPress={handleComplete}
+                            loading={loading}
+                            style={{ marginTop: 48, height: 64, borderRadius: Radius.md }}
+                            variant="accent"
+                        />
                     </Animated.View>
                 )}
             </ScrollView>

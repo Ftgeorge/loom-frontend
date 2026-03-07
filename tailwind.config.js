@@ -9,28 +9,33 @@ module.exports = {
         extend: {
             colors: {
                 primary: {
-                    DEFAULT: '#7C3AED', // Electric Violet
+                    DEFAULT: '#064E3B', // Obsidian Forest
+                    dark: '#022C22',
+                    light: '#ECFDF5',
                 },
-                graphite: {
-                    DEFAULT: '#121212', // Deep Graphite
+                secondary: {
+                    DEFAULT: '#059669', // Loom Green
                 },
-                background: '#FDFDFD', // Linen White
-                surface: '#F1F5F9', // Ghost Gray
-                muted: '#64748B', // Slate Mist
-                success: '#0D9488', // Teal Glow
-                error: '#D64545',
-                info: '#3B82F6',
-                warning: '#F59E0B',
+                accent: {
+                    DEFAULT: '#92400E', // Burnt Bronze
+                    light: '#FEF3C7',
+                    dark: '#78350F',
+                },
+                background: '#FBFBF9', // Stone Linen
+                surface: '#FFFFFF',
+                muted: '#57534E', // Stone 600
+                success: '#059669',
+                error: '#991B1B',
+                info: '#0369A1',
+                warning: '#D97706',
+                ink: '#1C1917', // Stone 900
             },
             fontFamily: {
-                sans: ['MontserratAlternates', 'System'],
-                serif: ['MontserratAlternates', 'System'],
-                montserrat: ['MontserratAlternates'],
+                sans: ['MontserratAlternates-Regular', 'System'],
+                montserrat: ['MontserratAlternates-Regular'],
                 'montserrat-medium': ['MontserratAlternates-Medium'],
                 'montserrat-semibold': ['MontserratAlternates-SemiBold'],
                 'montserrat-bold': ['MontserratAlternates-Bold'],
-                'montserrat-italic': ['MontserratAlternates-Italic'],
-                'montserrat-bolditalic': ['MontserratAlternates-BoldItalic'],
             },
         },
     },
