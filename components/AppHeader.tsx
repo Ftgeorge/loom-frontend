@@ -47,10 +47,10 @@ export function AppHeader({
                     justifyContent: 'space-between',
                     paddingHorizontal: 24,
                     paddingBottom: 16,
-                    backgroundColor: Colors.background,
+                    backgroundColor: Colors.canvas,
                     paddingTop: insets.top + 12,
-                    borderBottomWidth: 1.5,
-                    borderBottomColor: Colors.cardBorder + '80'
+                    borderBottomWidth: 1,
+                    borderBottomColor: Colors.divider,
                 }}
             >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
@@ -68,28 +68,28 @@ export function AppHeader({
                             style={{
                                 flexDirection: 'row',
                                 alignItems: 'center',
-                                backgroundColor: Colors.white,
+                                backgroundColor: Colors.surface,
                                 paddingHorizontal: 12,
                                 paddingVertical: 8,
-                                borderRadius: Radius.xs,
-                                gap: 8,
-                                borderWidth: 1.5,
+                                borderRadius: Radius.full,
+                                gap: 6,
+                                borderWidth: 1,
                                 borderColor: Colors.cardBorder,
-                                ...Shadows.sm
+                                ...Shadows.xs
                             }}
                             activeOpacity={0.8}
                             onPress={() => setShowPicker(true)}
                         >
-                            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.accent }} />
-                            <Text style={[Typography.label, { color: Colors.primary, fontSize: 10, fontWeight: '700' }]}>
-                                {selectedCity.toUpperCase()}
+                            <Ionicons name="location" size={12} color={Colors.primary} />
+                            <Text style={{ fontSize: 12, fontFamily: 'Inter-SemiBold', color: Colors.ink }}>
+                                {selectedCity}
                             </Text>
-                            <Ionicons name="chevron-down" size={12} color={Colors.primary} />
+                            <Ionicons name="chevron-down" size={12} color={Colors.muted} />
                         </TouchableOpacity>
                     )}
                     {title && !showLocation && (
-                        <Text style={[Typography.label, { flex: 1, fontSize: 13, color: Colors.primary, letterSpacing: 1 }]} numberOfLines={1}>
-                            {title.toUpperCase()}
+                        <Text style={{ fontSize: 16, fontFamily: 'PlusJakartaSans-SemiBold', color: Colors.ink, flex: 1 }} numberOfLines={1}>
+                            {title}
                         </Text>
                     )}
                 </View>
@@ -105,25 +105,26 @@ export function AppHeader({
                                 height: 40,
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                borderRadius: Radius.xs,
-                                backgroundColor: Colors.white,
-                                borderWidth: 1.5,
+                                borderRadius: Radius.md,
+                                backgroundColor: Colors.surface,
+                                borderWidth: 1,
                                 borderColor: Colors.cardBorder,
-                                position: 'relative'
+                                position: 'relative',
+                                ...Shadows.xs,
                             }}
                         >
-                            <Ionicons name="notifications" size={18} color={Colors.primary} />
+                            <Ionicons name="notifications" size={18} color={Colors.ink} />
                             {unread > 0 && (
                                 <View style={{
                                     position: 'absolute',
-                                    top: -2,
-                                    right: -2,
-                                    backgroundColor: Colors.accent,
-                                    width: 10,
-                                    height: 10,
-                                    borderRadius: 5,
-                                    borderWidth: 2,
-                                    borderColor: Colors.white,
+                                    top: 6,
+                                    right: 6,
+                                    backgroundColor: Colors.violet,
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: 4,
+                                    borderWidth: 1.5,
+                                    borderColor: Colors.surface,
                                 }} />
                             )}
                         </TouchableOpacity>
@@ -160,8 +161,8 @@ export function AppHeader({
                             backgroundColor: Colors.surface
                         }}>
                             <View>
-                                <Text style={[Typography.label, { fontSize: 10, color: Colors.primary, marginBottom: 4 }]}>LOCATION BEACON</Text>
-                                <Text style={[Typography.h3, { fontSize: 20 }]}>Select Sector</Text>
+                                <Text style={[Typography.label, { fontSize: 10, color: Colors.violet, marginBottom: 4 }]}>Your City</Text>
+                                <Text style={[Typography.h3, { fontSize: 20 }]}>Where are you?</Text>
                             </View>
                             <TouchableOpacity onPress={() => setShowPicker(false)} style={{ padding: 8 }}>
                                 <Ionicons name="close" size={24} color={Colors.primary} />

@@ -5,34 +5,31 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import '../global.css';
 
-SplashScreen.preventAutoHideAsync();
+import {
+  PlusJakartaSans_400Regular,
+  PlusJakartaSans_600SemiBold,
+  PlusJakartaSans_700Bold,
+  PlusJakartaSans_800ExtraBold,
+} from '@expo-google-fonts/plus-jakarta-sans';
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
 
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 import BackgroundThread from '@/components/ui/BackgroundThread';
 import { View } from 'react-native';
 
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    MontserratAlternates: require('../assets/font/MontserratAlternates-Regular.ttf'),
-    'MontserratAlternates-Bold': require('../assets/font/MontserratAlternates-Bold.ttf'),
-    'MontserratAlternates-Italic': require('../assets/font/MontserratAlternates-Italic.ttf'),
-    'MontserratAlternates-BoldItalic': require('../assets/font/MontserratAlternates-BoldItalic.ttf'),
-    'MontserratAlternates-Medium': require('../assets/font/MontserratAlternates-Medium.ttf'),
-    'MontserratAlternates-SemiBold': require('../assets/font/MontserratAlternates-SemiBold.ttf'),
-  });
+SplashScreen.preventAutoHideAsync();
 
-  useEffect(() => {
-    if (loaded || error) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, error]);
-
-  if (!loaded && !error) {
-    return null;
-  }
-
+// ─── Inner layout — reads from ThemeContext ─────────────────────────────────
+function AppContent() {
+  const { isDark, colors } = useTheme();
   return (
-    <View style={{ flex: 1 }}>
-      <StatusBar style="dark" />
+    <View style={{ flex: 1, backgroundColor: colors.canvas }}>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <BackgroundThread />
       <Stack
         screenOptions={{
@@ -62,5 +59,35 @@ export default function RootLayout() {
         <Stack.Screen name="matched-artisans" options={{ presentation: 'card' }} />
       </Stack>
     </View>
+  );
+}
+
+// ─── Root Layout — provides fonts + theme ──────────────────────────────────
+export default function RootLayout() {
+  const [loaded, error] = useFonts({
+    'PlusJakartaSans-Regular': PlusJakartaSans_400Regular,
+    'PlusJakartaSans-SemiBold': PlusJakartaSans_600SemiBold,
+    'PlusJakartaSans-Bold': PlusJakartaSans_700Bold,
+    'PlusJakartaSans-ExtraBold': PlusJakartaSans_800ExtraBold,
+    'Inter-Regular': Inter_400Regular,
+    'Inter-Medium': Inter_500Medium,
+    'Inter-SemiBold': Inter_600SemiBold,
+    'Inter-Bold': Inter_700Bold,
+  });
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
+
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }

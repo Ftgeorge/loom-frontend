@@ -55,9 +55,9 @@ export default function JobDetailsScreen() {
     };
 
     const handleDecline = () => {
-        Alert.alert('DECLINE MISSION', 'Confirm rejection of this mission request? This cannot be undone.', [
-            { text: 'ABORT', style: 'cancel' },
-            { text: 'CONFIRM REJECTION', style: 'destructive', onPress: () => router.back() },
+        Alert.alert('Skip Job', 'Are you sure you don\'t want this job? This cannot be undone.', [
+            { text: 'No', style: 'cancel' },
+            { text: 'Skip', style: 'destructive', onPress: () => router.back() },
         ]);
     };
 
@@ -75,22 +75,22 @@ export default function JobDetailsScreen() {
     };
 
     const statusActions: Record<string, { label: string; next: ArtisanJobStatus }> = {
-        accepted: { label: "INITIATE DEPLOYMENT", next: 'on_the_way' },
-        on_the_way: { label: 'ARRIVED @ SECTOR', next: 'in_progress' },
-        in_progress: { label: 'MISSION COMPLETE', next: 'completed' },
+        accepted: { label: "ON MY WAY", next: 'on_the_way' },
+        on_the_way: { label: "I'M HERE", next: 'in_progress' },
+        in_progress: { label: "ALL DONE", next: 'completed' },
     };
 
     if (loading) return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.4} />
-            <AppHeader title="Mission Manifest" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="The Gig" showBack onBack={() => router.back()} showNotification={false} />
             <View style={{ padding: 24 }}><SkeletonList count={3} type="request" /></View>
         </View>
     );
 
     if (error || !job) return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <AppHeader title="Mission Manifest" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="The Gig" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
@@ -98,7 +98,7 @@ export default function JobDetailsScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.2} animated />
-            <AppHeader title="Mission Manifest" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="The Gig" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView
                 contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
@@ -106,7 +106,7 @@ export default function JobDetailsScreen() {
             >
                 {/* Mission Summary */}
                 <Animated.View entering={FadeInDown.springify()} style={{ marginBottom: 40 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>MISSION MANIFEST</Text>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>THE GIG</Text>
                     <Text style={[Typography.h1, { fontSize: 32 }]}>{job.category.toUpperCase().replace('_', ' / ')}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16 }}>
                         <View style={{
@@ -127,7 +127,7 @@ export default function JobDetailsScreen() {
                 {artisanStatus !== 'new' && artisanStatus !== 'declined' && (
                     <Animated.View entering={FadeInDown.delay(100).springify()}>
                         <Card style={{ marginBottom: 24, padding: 24, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.cardBorder, ...Shadows.sm }}>
-                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 20 }]}>PROTOCOL PROGRESS</Text>
+                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 20 }]}>STATUS</Text>
                             <StatusTimeline steps={getArtisanJobSteps(artisanStatus)} />
                         </Card>
                     </Animated.View>
@@ -136,14 +136,14 @@ export default function JobDetailsScreen() {
                 {/* Client Identity */}
                 <Animated.View entering={FadeInDown.delay(200).springify()}>
                     <Card style={{ padding: 24, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.cardBorder, ...Shadows.sm }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 24 }]}>MISSION DATA</Text>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 24 }]}>THE INFO</Text>
 
-                        <DetailItem label="CLIENT IDENTITY" value={job.clientName.toUpperCase()} />
-                        <DetailItem label="SERVICE PARAMETERS" value={job.category.toUpperCase()} />
-                        <DetailItem label="MISSION OBJECTIVES" value={job.description} />
-                        <DetailItem label="GEOSPATIAL LOCK" value={`${job.location.area.toUpperCase()}, ${job.location.city.toUpperCase() || 'ABUJA'}`} />
-                        <DetailItem label="CONTRACTED YIELD" value={formatNaira(job.budget)} />
-                        <DetailItem label="MISSION PRIORITY" value={job.urgency.toUpperCase().replace('_', ' ')} />
+                        <DetailItem label="WHO?" value={job.clientName.toUpperCase()} />
+                        <DetailItem label="KIND" value={job.category.toUpperCase()} />
+                        <DetailItem label="GIST" value={job.description} />
+                        <DetailItem label="WHERE" value={`${job.location.area.toUpperCase()}, ${job.location.city.toUpperCase() || 'ABUJA'}`} />
+                        <DetailItem label="CASH" value={formatNaira(job.budget)} />
+                        <DetailItem label="WHEN" value={job.urgency.toUpperCase().replace('_', ' ')} />
                     </Card>
                 </Animated.View>
 
@@ -173,9 +173,9 @@ export default function JobDetailsScreen() {
                         }}>
                             <Ionicons name="location" size={24} color={Colors.white} />
                         </View>
-                        <Text style={[Typography.h3, { color: Colors.white }]}>ENGAGE GEOSPATIAL BEACON</Text>
+                        <Text style={[Typography.h3, { color: Colors.white }]}>MAP IT</Text>
                         <Text style={[Typography.label, { color: Colors.accent, marginTop: 8, fontSize: 8 }]}>
-                            NAVIGATE TO SECTOR: {job.location.area.toUpperCase()}
+                            GO TO: {job.location.area.toUpperCase()}
                         </Text>
                     </TouchableOpacity>
                 </Animated.View>
@@ -185,7 +185,7 @@ export default function JobDetailsScreen() {
                     {artisanStatus === 'new' && (
                         <View style={{ gap: 16 }}>
                             <PrimaryButton
-                                title="ACCEPT MISSION CONTRACT"
+                                title="I'M IN"
                                 onPress={handleAccept}
                                 variant="accent"
                                 style={{ height: 64, borderRadius: Radius.md }}
@@ -201,7 +201,7 @@ export default function JobDetailsScreen() {
                                 }}
                                 onPress={handleDecline}
                             >
-                                <Text style={[Typography.label, { color: Colors.error, fontWeight: '900' }]}>DECLINE REQUEST</Text>
+                                <Text style={[Typography.label, { color: Colors.error, fontWeight: '900' }]}>PASS</Text>
                             </TouchableOpacity>
                         </View>
                     )}
@@ -217,13 +217,13 @@ export default function JobDetailsScreen() {
 
                     <View style={{ flexDirection: 'row', gap: 12 }}>
                         <SecondaryButton
-                            title="SIGNAL CLIENT"
+                            title="HIT UP"
                             onPress={() => router.push({ pathname: '/chat', params: { threadId: 't1' } })}
                             style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
                             textStyle={[Typography.label, { color: Colors.primary }]}
                         />
                         <SecondaryButton
-                            title="COMM"
+                            title="RING"
                             onPress={() => { }}
                             style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
                             textStyle={[Typography.label, { color: Colors.primary }]}

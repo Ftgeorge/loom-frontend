@@ -12,7 +12,7 @@ import React, { useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
 
-const STEPS = ['Specialties', 'Sectors', 'Cycle', 'Pricing'];
+const STEPS = ['Skills', 'Areas', 'Days', 'Prices'];
 
 export default function ArtisanOnboardingScreen() {
     const router = useRouter();
@@ -62,7 +62,7 @@ export default function ArtisanOnboardingScreen() {
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" animated opacity={0.2} />
             <AppHeader
-                title="Professional Setup"
+                title="Setup your profile"
                 showBack
                 onBack={() => (step > 0 ? setStep(step - 1) : router.back())}
                 showNotification={false}
@@ -92,9 +92,9 @@ export default function ArtisanOnboardingScreen() {
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }} keyboardShouldPersistTaps="handled">
                 {step === 0 && (
                     <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 01</Text>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>Choose your Skills</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Which technical specialties do you offer to the network?</Text>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 1</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>What can you do?</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>What help do you provide?</Text>
 
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
                             {CATEGORIES.map((cat) => (
@@ -113,7 +113,7 @@ export default function ArtisanOnboardingScreen() {
                             ))}
                         </View>
                         <PrimaryButton
-                            title="CONTINUE"
+                            title="NEXT"
                             onPress={() => setStep(1)}
                             disabled={selectedSkills.length === 0}
                             style={{ marginTop: 48, height: 60, borderRadius: Radius.md }}
@@ -123,9 +123,9 @@ export default function ArtisanOnboardingScreen() {
 
                 {step === 1 && (
                     <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 02</Text>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>Service Areas</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Select the areas where you can work on-site.</Text>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 2</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>Where do you work?</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Pick the places where you can go for work.</Text>
 
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
                             {areas.map((area) => (
@@ -144,7 +144,7 @@ export default function ArtisanOnboardingScreen() {
                             ))}
                         </View>
                         <PrimaryButton
-                            title="CONTINUE"
+                            title="NEXT"
                             onPress={() => setStep(2)}
                             disabled={selectedAreas.length === 0}
                             style={{ marginTop: 48, height: 60, borderRadius: Radius.md }}
@@ -154,9 +154,9 @@ export default function ArtisanOnboardingScreen() {
 
                 {step === 2 && (
                     <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 03</Text>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>Work Schedule</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Select the days you are available to work.</Text>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 3</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>When are you free?</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Pick the days you can do work.</Text>
 
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
                             {days.map((d) => (
@@ -183,7 +183,7 @@ export default function ArtisanOnboardingScreen() {
                             ))}
                         </View>
                         <PrimaryButton
-                            title="CONTINUE"
+                            title="NEXT"
                             onPress={() => setStep(3)}
                             style={{ marginTop: 56, height: 60, borderRadius: Radius.md }}
                         />
@@ -192,14 +192,14 @@ export default function ArtisanOnboardingScreen() {
 
                 {step === 3 && (
                     <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 04</Text>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>Pricing</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>How would you like to set your service prices?</Text>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 4</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>How much?</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>How do you want to charge?</Text>
 
                         {[
-                            { value: 'fixed', label: 'FIXED PRICE', desc: 'Secure jobs with a set cost' },
-                            { value: 'estimate', label: 'VARIABLE ESTIMATE', desc: 'Provide an estimated range per job' },
-                            { value: 'hourly', label: 'HOURLY RATE', desc: 'Charge based on hours worked' },
+                            { value: 'fixed', label: 'SAME PRICE', desc: 'A set cost for the job' },
+                            { value: 'estimate', label: 'IT DEPENDS', desc: 'Give a price range' },
+                            { value: 'hourly', label: 'BY THE HOUR', desc: 'Charge for the time you spend' },
                         ].map((opt) => (
                             <TouchableOpacity
                                 key={opt.value}
@@ -239,7 +239,7 @@ export default function ArtisanOnboardingScreen() {
                         ))}
 
                         <PrimaryButton
-                            title="COMPLETE SETUP"
+                            title="FINISH"
                             onPress={handleComplete}
                             loading={loading}
                             style={{ marginTop: 48, height: 64, borderRadius: Radius.md }}

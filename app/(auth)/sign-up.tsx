@@ -75,18 +75,18 @@ export default function SignUpScreen() {
                 <BackButton onPress={() => router.back()} />
 
                 <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 40, marginTop: 32 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>CREATE ACCOUNT</Text>
-                    <Text style={[Typography.h1, { fontSize: 32 }]}>Join the network</Text>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>JOIN US</Text>
+                    <Text style={[Typography.h1, { fontSize: 32 }]}>Hop in</Text>
                     <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 12, lineHeight: 22 }]}>
                         {user?.role === 'artisan'
-                            ? 'Register as a professional to join the service network.'
-                            : 'Create your profile to start booking services and find pros.'}
+                            ? 'Join the crew and start earning.'
+                            : 'Get your profile set to find pros.'}
                     </Text>
                 </Animated.View>
 
                 <Animated.View entering={FadeInDown.delay(200).springify()}>
                     <AppTextInput
-                        label="FULL NAME"
+                        label="NAME"
                         placeholder="e.g. Chinedu Okafor"
                         value={form.name}
                         onChangeText={(name) => setForm({ ...form, name })}
@@ -95,7 +95,7 @@ export default function SignUpScreen() {
                         containerStyle={{ borderRadius: Radius.xs }}
                     />
                     <PhoneInput
-                        label="PHONE NUMBER"
+                        label="PHONE"
                         placeholder="8012345678"
                         value={form.phone}
                         onChangeText={(phone) => setForm({ ...form, phone })}
@@ -103,7 +103,7 @@ export default function SignUpScreen() {
                         containerStyle={{ borderRadius: Radius.xs }}
                     />
                     <AppTextInput
-                        label="EMAIL ADDRESS"
+                        label="EMAIL"
                         placeholder="chinedu@email.com"
                         value={form.email}
                         onChangeText={(email) => setForm({ ...form, email })}
@@ -113,8 +113,8 @@ export default function SignUpScreen() {
                         containerStyle={{ borderRadius: Radius.xs }}
                     />
                     <PasswordInput
-                        label="CREATE PASSWORD"
-                        placeholder="At least 6 characters"
+                        label="SECRET"
+                        placeholder="Keep it secret"
                         value={form.password}
                         onChangeText={(password) => setForm({ ...form, password })}
                         error={errors.password}
@@ -122,7 +122,7 @@ export default function SignUpScreen() {
                     />
 
                     <PrimaryButton
-                        title="SIGN UP"
+                        title="GO"
                         onPress={handleSignUp}
                         loading={loading}
                         style={{ marginTop: 32, height: 60, borderRadius: Radius.md }}
@@ -142,20 +142,20 @@ export default function SignUpScreen() {
                         borderColor: Colors.cardBorder
                     }}>
                         <Text style={[Typography.label, { color: Colors.muted, fontSize: 10, textTransform: 'none' }]}>
-                            Already registered?{" "}
+                            Been here?{" "}
                             <Text
                                 onPress={() => router.push('/(auth)/sign-in')}
                                 style={{ color: Colors.primary, fontWeight: '800' }}
                             >
-                                SIGN IN
+                                GET IN
                             </Text>
                         </Text>
                     </View>
 
                     <View style={{ marginTop: 32, paddingBottom: 40 }}>
                         <Text style={[Typography.bodySmall, { textAlign: 'center', fontSize: 10, lineHeight: 18, color: Colors.muted }]}>
-                            BY REGISTERING, YOU ACCEPT THE{"\n"}
-                            <Text style={{ color: Colors.primary, fontWeight: '700' }}>TERMS OF SERVICE</Text> AND <Text style={{ color: Colors.primary, fontWeight: '700' }}>PRIVACY POLICY</Text>
+                            BY JOINING, YOU ACCEPT THE{"\n"}
+                            <Text style={{ color: Colors.primary, fontWeight: '700' }}>THE RULES</Text> AND <Text style={{ color: Colors.primary, fontWeight: '700' }}>YOUR DATA</Text>
                         </Text>
                     </View>
                 </Animated.View>

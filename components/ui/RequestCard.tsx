@@ -6,22 +6,13 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { Badge, Card } from './CardChipBadge';
 
-const STATUS_VARIANTS: Record<string, 'default' | 'success' | 'warn' | 'accent'> = {
-    submitted: 'accent',
-    matched: 'accent',
-    scheduled: 'success',
-    in_progress: 'warn',
-    completed: 'success',
-    cancelled: 'default',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-    submitted: 'INITIATED',
-    matched: 'PROTOCOL ACTIVE',
-    scheduled: 'DEPLOYED',
-    in_progress: 'OPERATIONAL',
-    completed: 'RESOLVED',
-    cancelled: 'TERMINATED',
+const STATUS_CONFIG: Record<string, { label: string; variant: any; dot: string }> = {
+    submitted: { label: 'Open', variant: 'accent', dot: Colors.warning },
+    matched: { label: 'Matched', variant: 'violet', dot: Colors.violet },
+    scheduled: { label: 'Scheduled', variant: 'success', dot: Colors.success },
+    in_progress: { label: 'In Progress', variant: 'warn', dot: Colors.warning },
+    completed: { label: 'Done', variant: 'success', dot: Colors.success },
+    cancelled: { label: 'Cancelled', variant: 'default', dot: Colors.muted },
 };
 
 interface RequestCardProps {
@@ -31,89 +22,108 @@ interface RequestCardProps {
 }
 
 export const RequestCard = React.memo(({ job, onPress, isArtisanView }: RequestCardProps) => {
-    const statusVariant = STATUS_VARIANTS[job.status] ?? 'default';
+    const config = STATUS_CONFIG[job.status] ?? STATUS_CONFIG.submitted;
 
     return (
-        <Card onPress={onPress} style={{ padding: 24, ...Shadows.sm, borderColor: Colors.cardBorder, borderWidth: 1.5, backgroundColor: Colors.white }}>
-            {/* Header: Category + Status */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <Card
+            onPress={onPress}
+            style={{
+                padding: 20,
+                borderWidth: 1,
+                borderColor: Colors.cardBorder,
+                borderRadius: Radius.lg,
+                backgroundColor: Colors.surface,
+                ...Shadows.sm,
+            }}
+        >
+            {/* Header */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                 <View style={{
-                    backgroundColor: Colors.surface,
+                    backgroundColor: Colors.canvas,
                     paddingHorizontal: 10,
                     paddingVertical: 5,
-                    borderRadius: Radius.xs,
+                    borderRadius: 20,
                     borderWidth: 1,
-                    borderColor: Colors.cardBorder
+                    borderColor: Colors.cardBorder,
                 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, fontSize: 8, fontWeight: '900' }]}>
-                        {job.category === 'not_sure' ? 'GENERAL SECTOR' : job.category.toUpperCase().replace('_', ' / ')}
+                    <Text style={{
+                        fontSize: 10,
+                        fontFamily: 'Inter-SemiBold',
+                        color: Colors.ink,
+                    }}>
+                        {job.category === 'not_sure' ? 'General' : job.category.replace('_', ' ')}
                     </Text>
                 </View>
-                <Badge
-                    label={STATUS_LABELS[job.status]}
-                    variant={statusVariant}
-                />
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: config.dot }} />
+                    <Badge label={config.label} variant={config.variant} />
+                </View>
             </View>
 
             {/* Description */}
             <Text
-                style={[Typography.h3, { marginBottom: 16, color: Colors.primary, fontSize: 18, lineHeight: 26 }]}
+                style={{ fontSize: 16, fontFamily: 'PlusJakartaSans-SemiBold', color: Colors.ink, lineHeight: 22, marginBottom: 14 }}
                 numberOfLines={2}
             >
                 {job.description}
             </Text>
 
-            {/* Technical Meta */}
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 24, marginBottom: 20 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Ionicons name="location-outline" size={14} color={Colors.primary} />
-                    <Text style={[Typography.label, { color: Colors.primary, fontSize: 10, fontWeight: '700' }]}>{job.location.area.toUpperCase()}</Text>
+            {/* Meta pills */}
+            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+                <View style={{
+                    flexDirection: 'row', alignItems: 'center', gap: 4,
+                    backgroundColor: Colors.canvas, borderRadius: 20,
+                    paddingHorizontal: 10, paddingVertical: 5,
+                    borderWidth: 1, borderColor: Colors.cardBorder,
+                }}>
+                    <Ionicons name="location-outline" size={11} color={Colors.muted} />
+                    <Text style={{ fontSize: 11, fontFamily: 'Inter-Regular', color: Colors.textSecondary }}>
+                        {job.location.area}
+                    </Text>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Ionicons name="card-outline" size={14} color={Colors.accent} />
-                    <Text style={[Typography.label, { color: Colors.accent, fontSize: 10, fontWeight: '900' }]}>{formatNaira(job.budget).toUpperCase()}</Text>
+                <View style={{
+                    flexDirection: 'row', alignItems: 'center', gap: 4,
+                    backgroundColor: Colors.accentLight, borderRadius: 20,
+                    paddingHorizontal: 10, paddingVertical: 5,
+                }}>
+                    <Ionicons name="cash-outline" size={11} color={Colors.accent} />
+                    <Text style={{ fontSize: 11, fontFamily: 'Inter-SemiBold', color: Colors.accent }}>
+                        {formatNaira(job.budget)}
+                    </Text>
                 </View>
             </View>
 
-            {/* Footer: Operative Info + Time */}
+            {/* Footer */}
             <View style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                paddingTop: 20,
-                borderTopWidth: 1.5,
-                borderTopColor: Colors.gray100
+                paddingTop: 14,
+                borderTopWidth: 1,
+                borderTopColor: Colors.divider,
             }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     <View style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: Radius.xs,
-                        backgroundColor: Colors.surface,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderWidth: 1,
-                        borderColor: Colors.cardBorder
+                        width: 30, height: 30, borderRadius: 10,
+                        backgroundColor: Colors.canvas,
+                        alignItems: 'center', justifyContent: 'center',
+                        borderWidth: 1, borderColor: Colors.cardBorder,
                     }}>
-                        <Ionicons name="person-outline" size={16} color={Colors.primary} />
+                        <Ionicons name="person-outline" size={14} color={Colors.primary} />
                     </View>
                     <View>
-                        <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>
-                            {isArtisanView ? 'CLIENT IDENTITY' : 'OPERATIVE ASSIGNED'}
+                        <Text style={{ fontSize: 9, fontFamily: 'Inter-Regular', color: Colors.muted, marginBottom: 2 }}>
+                            {isArtisanView ? 'Client' : 'Assigned pro'}
                         </Text>
-                        <Text style={[Typography.bodySmall, { color: Colors.primary, fontSize: 13, fontWeight: '700' }]}>
-                            {isArtisanView ? job.clientName.toUpperCase() : (job.artisanName || 'PENDING ASSIGNMENT').toUpperCase()}
+                        <Text style={{ fontSize: 13, fontFamily: 'Inter-SemiBold', color: Colors.ink }}>
+                            {isArtisanView ? job.clientName : (job.artisanName || 'Matching...')}
                         </Text>
                     </View>
                 </View>
-                <View style={{ alignItems: 'flex-end' }}>
-                    <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>SYSTEM SIGNAL</Text>
-                    <Text style={[Typography.bodySmall, { color: Colors.primary, fontSize: 10, fontWeight: '700' }]}>
-                        {timeAgo(job.createdAt).toUpperCase()}
-                    </Text>
-                </View>
+                <Text style={{ fontSize: 11, fontFamily: 'Inter-Regular', color: Colors.muted }}>
+                    {timeAgo(job.createdAt)}
+                </Text>
             </View>
         </Card>
     );
 });
-

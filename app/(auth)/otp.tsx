@@ -80,9 +80,9 @@ export default function OTPScreen() {
                 <BackButton onPress={() => router.back()} />
 
                 <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 48, marginTop: 24, alignItems: 'center' }}>
-                    <Text style={Typography.h1}>Verify Email</Text>
+                    <Text style={Typography.h1}>Check your mail</Text>
                     <Text style={[Typography.body, { textAlign: 'center', marginTop: 12, color: Colors.textSecondary }]}>
-                        Enter the 6-digit code we sent to{'\n'}
+                        We sent a code to{'\n'}
                         <Text style={{ color: Colors.text, fontWeight: '600' }}>{maskedEmail}</Text>
                     </Text>
                 </Animated.View>
@@ -93,20 +93,20 @@ export default function OTPScreen() {
 
                 <Animated.View entering={FadeInDown.delay(300)} style={{ width: '100%', marginTop: 48 }}>
                     <PrimaryButton
-                        title="Confirm & Verify"
+                        title="Verify"
                         onPress={handleVerify}
                         loading={loading}
                     />
 
                     <SecondaryButton
-                        title={resendLoading ? 'Sending...' : 'Resend Code'}
+                        title={resendLoading ? 'Sending...' : 'Send again'}
                         onPress={handleResend}
                         style={{ marginTop: 16 }}
                     />
 
                     {resendSuccess && (
                         <Text style={[Typography.bodySmall, { textAlign: 'center', marginTop: 12, color: Colors.success }]}>
-                            ✓ A new code has been sent to {maskedEmail}
+                            ✓ Sent a new one to {maskedEmail}
                         </Text>
                     )}
 
@@ -119,7 +119,7 @@ export default function OTPScreen() {
                         borderColor: Colors.cardBorder
                     }}>
                         <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted }]}>
-                            Check your inbox and spam folder. The code expires in{' '}
+                            Don't see it? Check your spam. It expires in{' '}
                             <Text style={{ fontWeight: '600', color: Colors.text }}>10 minutes.</Text>
                         </Text>
                     </View>

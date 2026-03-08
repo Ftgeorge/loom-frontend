@@ -43,7 +43,7 @@ export default function PostJobScreen() {
     const [submitted, setSubmitted] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const steps = ['Type', 'Deets', 'Place', 'Review'];
+    const steps = ['Type', 'Info', 'Where', 'OK'];
 
     const handleSubmit = async () => {
         // Final validation
@@ -105,20 +105,20 @@ export default function PostJobScreen() {
                     <Ionicons name="shield-checkmark" size={64} color={Colors.primary} />
                 </Animated.View>
 
-                <Text style={[Typography.h1, { textAlign: 'center', fontSize: 32 }]}>Job Posted!</Text>
+                <Text style={[Typography.h1, { textAlign: 'center', fontSize: 32 }]}>Done!</Text>
                 <Text style={[Typography.body, { textAlign: 'center', marginTop: 16, color: Colors.muted, lineHeight: 24 }]}>
-                    Your request is now live. We're matching you with the best professionals in your area.
+                    Your job is out! We are looking for the best hands for you.
                 </Text>
 
                 <View style={{ width: '100%', marginTop: 56, gap: 12 }}>
                     <PrimaryButton
-                        title="View Matches"
+                        title="Who's in?"
                         onPress={() => router.push({ pathname: '/matched-artisans', params: { skill: category } })}
                         variant="accent"
                         style={{ height: 64, borderRadius: Radius.md, ...Shadows.md }}
                     />
                     <SecondaryButton
-                        title="Go to Home"
+                        title="Home"
                         onPress={() => router.back()}
                         style={{ height: 60, borderRadius: Radius.md, borderColor: Colors.primary }}
                         textStyle={{ color: Colors.primary }}
@@ -132,7 +132,7 @@ export default function PostJobScreen() {
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.3} animated />
             <AppHeader
-                title="Post a Job"
+                title="Need a hand?"
                 showBack
                 onBack={() => (step > 0 ? setStep(step - 1) : router.back())}
                 showNotification={false}
@@ -169,8 +169,8 @@ export default function PostJobScreen() {
                 {/* Step 1: Category */}
                 {step === 0 && (
                     <Animated.View entering={FadeInDown.springify()} style={{ paddingHorizontal: 24, paddingTop: 16 }}>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>Select Service</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 40 }]}>What kind of professional do you need?</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>What should we do?</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 40 }]}>Pick what you want.</Text>
 
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
                             {[...CATEGORIES, { id: 'not_sure', label: 'Other Support', icon: 'help-circle' }].map((cat) => (
@@ -222,7 +222,7 @@ export default function PostJobScreen() {
                         {errors.category && <Text style={[Typography.label, { color: Colors.error, marginTop: 16, fontSize: 10, textTransform: 'none' }]}>{errors.category}</Text>}
 
                         <PrimaryButton
-                            title="Continue"
+                            title="Go"
                             onPress={() => {
                                 if (!category) {
                                     setErrors({ category: 'Please select a service' });
@@ -239,8 +239,8 @@ export default function PostJobScreen() {
                 {/* Step 2: Description */}
                 {step === 1 && (
                     <Animated.View entering={FadeInDown.springify()} style={{ paddingHorizontal: 24, paddingTop: 16 }}>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>Job Details</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Describe what you need help with.</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>Tell us more</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Say everything we need to know.</Text>
 
                         <View style={{
                             backgroundColor: Colors.white,
@@ -253,7 +253,7 @@ export default function PostJobScreen() {
                         }}>
                             <TextInput
                                 style={[Typography.body, { color: Colors.text, textAlignVertical: 'top', height: 140, fontSize: 16 }]}
-                                placeholder='Type your message here...'
+                                placeholder='Write here...'
                                 placeholderTextColor={Colors.gray400}
                                 multiline
                                 autoFocus
@@ -278,7 +278,7 @@ export default function PostJobScreen() {
                         {errors.description && <Text style={[Typography.label, { color: Colors.error, marginTop: 16, fontSize: 10, textTransform: 'none' }]}>{errors.description}</Text>}
 
                         <PrimaryButton
-                            title="Continue to Location"
+                            title="Go"
                             onPress={() => {
                                 if (description.length < 10) {
                                     setErrors({ description: 'Please provide more details (min 10 chars)' });
@@ -294,10 +294,10 @@ export default function PostJobScreen() {
                 {/* Step 3: Location & Budget */}
                 {step === 2 && (
                     <Animated.View entering={FadeInDown.springify()} style={{ paddingHorizontal: 24, paddingTop: 16 }}>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>Logistics</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 40 }]}>Where and what is your budget?</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>Where & Cash</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 40 }]}>Where and how much cash?</Text>
 
-                        <Text style={[Typography.label, { marginBottom: 12, color: Colors.primary }]}>SERVICE ADDRESS</Text>
+                        <Text style={[Typography.label, { marginBottom: 12, color: Colors.primary }]}>WHERE?</Text>
                         <View style={{
                             flexDirection: 'row',
                             alignItems: 'center',
@@ -319,13 +319,13 @@ export default function PostJobScreen() {
                                     setAddress(val);
                                     if (val.length > 3) setErrors(prev => ({ ...prev, address: '' }));
                                 }}
-                                placeholder="Area, City"
+                                placeholder="Your area"
                                 placeholderTextColor={Colors.gray400}
                             />
                         </View>
                         {errors.address && <Text style={[Typography.label, { color: Colors.error, marginBottom: 16, fontSize: 10, textTransform: 'none' }]}>{errors.address}</Text>}
 
-                        <Text style={[Typography.label, { marginBottom: 16, marginTop: 32, color: Colors.primary }]}>ESTIMATED BUDGET</Text>
+                        <Text style={[Typography.label, { marginBottom: 16, marginTop: 32, color: Colors.primary }]}>CASH?</Text>
                         <View style={{
                             backgroundColor: Colors.white,
                             borderRadius: Radius.md,
@@ -351,12 +351,12 @@ export default function PostJobScreen() {
                                 </TouchableOpacity>
                             </View>
                             <Text style={[Typography.label, { marginTop: 24, color: Colors.muted, textTransform: 'none', letterSpacing: 0 }]}>
-                                Standard range: ₦5k — ₦45k
+                                Usual price: ₦5k — ₦45k
                             </Text>
                         </View>
 
                         <View style={{ marginTop: 40, gap: 16 }}>
-                            <Text style={[Typography.label, { color: Colors.primary }]}>URGENCY</Text>
+                            <Text style={[Typography.label, { color: Colors.primary }]}>WHEN?</Text>
                             <View style={{ flexDirection: 'row', gap: 10 }}>
                                 {URGENCY_OPTIONS.map((opt) => (
                                     <Chip
@@ -375,7 +375,7 @@ export default function PostJobScreen() {
                         </View>
 
                         <PrimaryButton
-                            title="Continue to Review"
+                            title="Check it"
                             onPress={() => {
                                 if (!address || address.length < 3) {
                                     setErrors({ address: 'Please provide an address' });
@@ -392,8 +392,8 @@ export default function PostJobScreen() {
                 {/* Step 4: Review */}
                 {step === 3 && (
                     <Animated.View entering={FadeInDown.springify()} style={{ paddingHorizontal: 24, paddingTop: 16 }}>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>Review Details</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Verify all details before posting your job.</Text>
+                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>Looks good?</Text>
+                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Look am one more time.</Text>
 
                         <Card style={{
                             gap: 32,
@@ -406,7 +406,7 @@ export default function PostJobScreen() {
                         }}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <View style={{ gap: 6 }}>
-                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>SERVICE TYPE</Text>
+                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>THE VIBE</Text>
                                     <Text style={[Typography.h3, { color: Colors.primary }]}>
                                         {CATEGORIES.find((c) => c.id === category)?.label || 'General Support'}
                                     </Text>
@@ -424,7 +424,7 @@ export default function PostJobScreen() {
                             </View>
 
                             <View style={{ gap: 8 }}>
-                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>DESCRIPTION</Text>
+                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>WHAT TO DO</Text>
                                 <Text style={[Typography.body, { color: Colors.text, lineHeight: 22 }]} numberOfLines={5}>{description}</Text>
                             </View>
 
@@ -432,11 +432,11 @@ export default function PostJobScreen() {
 
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                 <View style={{ gap: 6, flex: 1 }}>
-                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>LOCATION</Text>
+                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>WHERE</Text>
                                     <Text style={[Typography.body, { fontWeight: '700' }]}>{address}</Text>
                                 </View>
                                 <View style={{ gap: 6, alignItems: 'flex-end' }}>
-                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>PRIORITY</Text>
+                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>FAST?</Text>
                                     <Badge label={URGENCY_OPTIONS.find(o => o.value === urgency)?.label.split(' ')[1].toUpperCase()} variant={urgency === 'now' ? 'accent' : 'success'} />
                                 </View>
                             </View>
@@ -450,21 +450,21 @@ export default function PostJobScreen() {
                                 alignItems: 'center',
                                 ...Shadows.md
                             }}>
-                                <Text style={[Typography.label, { color: 'rgba(255,255,255,0.7)', fontSize: 10 }]}>TOTAL BUDGET</Text>
+                                <Text style={[Typography.label, { color: 'rgba(255,255,255,0.7)', fontSize: 10 }]}>YOU PAY</Text>
                                 <Text style={[Typography.h2, { color: Colors.white, fontSize: 26 }]}>{formatNaira(budget)}</Text>
                             </View>
                         </Card>
 
                         <View style={{ marginTop: 40, gap: 16 }}>
                             <PrimaryButton
-                                title="POST JOB NOW"
+                                title="LOOM IT"
                                 onPress={handleSubmit}
                                 loading={loading}
                                 variant="accent"
                                 style={{ height: 64, borderRadius: Radius.md, ...Shadows.md }}
                             />
                             <Text style={[Typography.label, { textAlign: 'center', color: Colors.muted, textTransform: 'none', letterSpacing: 0, fontSize: 10 }]}>
-                                Your details are safe and secure.
+                                Safe and sound.
                             </Text>
                         </View>
                     </Animated.View>

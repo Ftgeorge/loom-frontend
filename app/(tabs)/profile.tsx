@@ -29,10 +29,10 @@ export default function ProfileScreen() {
   }, [isArtisan]);
 
   const handleLogout = () => {
-    Alert.alert("Abandon Session", "Confirming termination of active operational cycle.", [
-      { text: "STAY ONLINE", style: "cancel" },
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+      { text: "Cancel", style: "cancel" },
       {
-        text: "TERMINATE",
+        text: "Sign Out",
         style: "destructive",
         onPress: () => {
           signOut();
@@ -47,47 +47,47 @@ export default function ProfileScreen() {
       ? [
         {
           icon: "eye-outline",
-          label: "Mission Visibility Preview",
+          label: "View My Profile",
           onPress: () => artisanId && router.push({ pathname: '/artisan-profile', params: { id: artisanId } }),
         },
-        { icon: "star-outline", label: "Performance Reports", onPress: () => { } },
+        { icon: "star-outline", label: "My Reviews", onPress: () => { } },
         {
           icon: "shield-checkmark-outline",
-          label: "Protocol Verification",
+          label: "Verification",
           onPress: () => { },
         },
         {
           icon: "construct-outline",
-          label: "Expertise Calibration",
+          label: "My Skills",
           onPress: () => router.push("/artisan-onboarding"),
         },
       ]
       : [
         {
           icon: "bookmark-outline",
-          label: `Bookmarked Operatives (${savedArtisans.length})`,
+          label: `Saved Professionals (${savedArtisans.length})`,
           onPress: () => { },
         },
-        { icon: "card-outline", label: "Financial Ledger", onPress: () => { } },
+        { icon: "card-outline", label: "Payment History", onPress: () => { } },
       ]),
     {
       icon: "settings-outline",
-      label: "System Configuration",
+      label: "Settings",
       onPress: () => router.push("/settings"),
     },
     {
       icon: "language-outline",
-      label: `Operational Dialect: ${languageNames[language]}`,
+      label: `Language: ${languageNames[language]}`,
       onPress: () => router.push("/settings"),
     },
     {
       icon: "help-circle-outline",
-      label: "Support Signal",
+      label: "Help & Support",
       onPress: () => router.push("/help"),
     },
     {
       icon: "log-out-outline",
-      label: "Terminate Session",
+      label: "Sign Out",
       onPress: handleLogout,
       danger: true,
     },
@@ -96,7 +96,7 @@ export default function ProfileScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <LoomThread variant="minimal" opacity={0.2} animated />
-      <AppHeader title="Command Center" showNotification={false} />
+      <AppHeader title="Profile" showNotification={false} />
 
       <ScrollView
         contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
@@ -131,7 +131,7 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          <Text style={[Typography.label, { color: Colors.primary, marginTop: 24, fontSize: 10, letterSpacing: 2 }]}>OPERATIVE IDENTITY</Text>
+          <Text style={[Typography.label, { color: Colors.primary, marginTop: 24, fontSize: 10, letterSpacing: 2 }]}>ME</Text>
           <Text style={[Typography.h1, { marginTop: 8, fontSize: 32 }]}>
             {user?.name?.toUpperCase()}
           </Text>
@@ -145,10 +145,10 @@ export default function ProfileScreen() {
               borderWidth: 1,
               borderColor: Colors.cardBorder
             }}>
-              <Text style={[Typography.label, { color: Colors.primary, fontSize: 9 }]}>{isArtisan ? "EXPERT MODE" : "COMMAND MODE"}</Text>
+              <Text style={[Typography.label, { color: Colors.primary, fontSize: 9 }]}>{isArtisan ? "PROFESSIONAL" : "CLIENT"}</Text>
             </View>
             <Text style={[Typography.bodySmall, { color: Colors.muted, fontWeight: '600' }]}>
-              {user?.location?.city?.toUpperCase() || "UNKNOWN SECTOR"}
+              {user?.location?.city?.toUpperCase() || "LOST"}
             </Text>
           </View>
         </Animated.View>
@@ -209,7 +209,7 @@ export default function ProfileScreen() {
         <View style={{ marginTop: 64, alignItems: 'center' }}>
           <View style={{ height: 1, width: 40, backgroundColor: Colors.cardBorder, marginBottom: 16 }} />
           <Text style={[Typography.label, { textAlign: 'center', opacity: 0.3, fontSize: 8, letterSpacing: 4 }]}>
-            LOOM PROTOCOL v4.0.0
+            LOOM v4.0.0
           </Text>
         </View>
       </ScrollView>

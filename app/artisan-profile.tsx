@@ -112,7 +112,7 @@ export default function ArtisanProfileScreen() {
                         )}
                     </View>
 
-                    <Text style={[Typography.label, { color: Colors.primary, marginTop: 24, fontSize: 10, letterSpacing: 2 }]}>PROFESSIONAL</Text>
+                    <Text style={[Typography.label, { color: Colors.primary, marginTop: 24, fontSize: 10, letterSpacing: 2 }]}>SHARP</Text>
                     <Text style={[Typography.h1, { marginTop: 8, fontSize: 32 }]}>{artisan.name.toUpperCase()}</Text>
                     <Text style={[Typography.body, { textAlign: 'center', marginTop: 12, color: Colors.muted, paddingHorizontal: 20, lineHeight: 22 }]}>
                         {artisan.bio}
@@ -146,12 +146,12 @@ export default function ArtisanProfileScreen() {
                         <View style={{ width: 1, height: 40, backgroundColor: Colors.gray100 }} />
                         <View style={{ alignItems: 'center' }}>
                             <Text style={[Typography.h1, { fontSize: 24, marginBottom: 4 }]}>{artisan.completedJobs}</Text>
-                            <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>JOBS</Text>
+                            <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>GIGS</Text>
                         </View>
                         <View style={{ width: 1, height: 40, backgroundColor: Colors.gray100 }} />
                         <View style={{ alignItems: 'center' }}>
                             <Text style={[Typography.h1, { fontSize: 24, marginBottom: 4 }]}>{artisan.distance}km</Text>
-                            <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>NEARBY</Text>
+                            <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>LOCATED</Text>
                         </View>
                     </Card>
 
@@ -165,7 +165,7 @@ export default function ArtisanProfileScreen() {
                     }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                             <View>
-                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 8, marginBottom: 8 }]}>PRICE RANGE</Text>
+                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 8, marginBottom: 8 }]}>CASH</Text>
                                 <Text style={[Typography.h2, { color: Colors.primary, fontSize: 22 }]}>
                                     {formatNaira(artisan.priceRange.min)} – {formatNaira(artisan.priceRange.max)}
                                 </Text>
@@ -183,7 +183,7 @@ export default function ArtisanProfileScreen() {
                             }}>
                                 <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: artisan.availability === 'online' ? Colors.white : Colors.muted }} />
                                 <Text style={[Typography.label, { color: artisan.availability === 'online' ? Colors.white : Colors.muted, fontSize: 8 }]}>
-                                    {artisan.availability === 'online' ? 'AVAILABLE' : 'BUSY'}
+                                    {artisan.availability === 'online' ? 'IN' : 'BUSY'}
                                 </Text>
                             </View>
                         </View>
@@ -194,11 +194,11 @@ export default function ArtisanProfileScreen() {
                 <View style={{ marginBottom: 40 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                         <View>
-                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>REVIEWS</Text>
-                            <Text style={[Typography.h3, { fontSize: 20 }]}>What clients say</Text>
+                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>GIST</Text>
+                            <Text style={[Typography.h3, { fontSize: 20 }]}>The Gist</Text>
                         </View>
                         <TouchableOpacity style={{ padding: 8, backgroundColor: Colors.white, borderRadius: Radius.xs, borderWidth: 1, borderColor: Colors.cardBorder }}>
-                            <Text style={[Typography.label, { color: Colors.accent, fontSize: 9 }]}>VIEW ALL</Text>
+                            <Text style={[Typography.label, { color: Colors.accent, fontSize: 9 }]}>ALL GISTS</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -240,7 +240,7 @@ export default function ArtisanProfileScreen() {
                 {/* Actions */}
                 <View style={{ gap: 12 }}>
                     <PrimaryButton
-                        title="BOOK NOW"
+                        title="LET'S GO"
                         onPress={() => router.push({ pathname: '/booking', params: { artisanId: artisan.id } })}
                         icon={<Ionicons name="calendar" size={20} color={Colors.white} style={{ marginRight: 8 }} />}
                         variant="accent"
@@ -248,14 +248,14 @@ export default function ArtisanProfileScreen() {
                     />
                     <View style={{ flexDirection: 'row', gap: 12 }}>
                         <SecondaryButton
-                            title="CHAT"
+                            title="HIT UP"
                             onPress={() => router.push({ pathname: '/chat', params: { threadId: 't1' } })}
                             style={{ flex: 1, height: 60, borderRadius: Radius.md, borderColor: Colors.primary, backgroundColor: Colors.white, borderWidth: 1.5 }}
                             textStyle={{ color: Colors.primary, fontSize: 11, letterSpacing: 1 }}
                             icon={<Ionicons name="chatbubbles-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />}
                         />
                         <SecondaryButton
-                            title="CALL"
+                            title="RING"
                             onPress={() => { }}
                             style={{ flex: 1, height: 60, borderRadius: Radius.md, borderColor: Colors.primary, backgroundColor: Colors.white, borderWidth: 1.5 }}
                             textStyle={{ color: Colors.primary, fontSize: 11, letterSpacing: 1 }}

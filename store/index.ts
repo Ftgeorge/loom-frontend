@@ -9,6 +9,7 @@ import type {
   User,
   UserRole,
 } from "@/types";
+import type { ThemeMode } from "@/theme";
 import { clearToken, saveToken } from "@/services/api";
 import { create } from "zustand";
 
@@ -71,6 +72,10 @@ interface AppState extends AuthState {
   // Location
   selectedCity: string;
   setSelectedCity: (city: string) => void;
+
+  // Theme
+  themeMode: ThemeMode | 'system';
+  setThemeMode: (mode: ThemeMode | 'system') => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -192,4 +197,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   // Location
   selectedCity: "Lagos",
   setSelectedCity: (city) => set({ selectedCity: city }),
+
+  // Theme
+  themeMode: 'system',
+  setThemeMode: (mode) => set({ themeMode: mode }),
 }));

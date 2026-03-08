@@ -77,16 +77,16 @@ export default function SignInScreen() {
 
         <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 48, marginTop: 32 }}>
           <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>WELCOME BACK</Text>
-          <Text style={[Typography.h1, { fontSize: 32 }]}>Sign in to your{"\n"}Account</Text>
+          <Text style={[Typography.h1, { fontSize: 32 }]}>Sign In to{"\n"}Your Account</Text>
           <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 12, lineHeight: 22 }]}>
-            Enter your email and password to access your account.
+            Enter your credentials to continue.
           </Text>
         </Animated.View>
 
         <Animated.View entering={FadeInDown.delay(200).springify()}>
           <AppTextInput
-            label="EMAIL OR PHONE"
-            placeholder="you@email.com"
+            label="Email or Phone"
+            placeholder="you@example.com"
             value={form.phone}
             onChangeText={(phone) => setForm({ ...form, phone })}
             error={errors.phone}
@@ -95,7 +95,7 @@ export default function SignInScreen() {
             containerStyle={{ borderRadius: Radius.xs }}
           />
           <PasswordInput
-            label="PASSWORD"
+            label="Password"
             placeholder="Enter your password"
             value={form.password}
             onChangeText={(password) => setForm({ ...form, password })}
@@ -108,12 +108,12 @@ export default function SignInScreen() {
             onPress={() => router.push("/(auth)/forgot-password")}
           >
             <Text style={[Typography.label, { color: Colors.primary, fontSize: 10, textTransform: 'none' }]}>
-              Forgot password? <Text style={{ fontWeight: '800' }}>RESET</Text>
+              Forgot password? <Text style={{ fontWeight: '800' }}>Reset it</Text>
             </Text>
           </TouchableOpacity>
 
           <PrimaryButton
-            title="SIGN IN"
+            title="Sign In"
             onPress={handleSignIn}
             loading={loading}
             style={{ marginTop: 32, height: 60, borderRadius: Radius.md }}
@@ -133,12 +133,12 @@ export default function SignInScreen() {
             borderColor: Colors.cardBorder
           }}>
             <Text style={[Typography.label, { color: Colors.muted, fontSize: 10, textTransform: 'none' }]}>
-              New to Loom?{" "}
+              Don't have an account?{" "}
               <Text
                 onPress={() => router.push("/(auth)/sign-up")}
                 style={{ color: Colors.primary, fontWeight: "800" }}
               >
-                CREATE ACCOUNT
+                Create Account
               </Text>
             </Text>
           </View>

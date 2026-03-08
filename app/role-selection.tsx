@@ -23,9 +23,9 @@ export default function RoleSelectionScreen() {
 
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 32, justifyContent: 'center' }}>
         <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 48 }}>
-          <Text style={[Typography.label, { color: Colors.primary, marginBottom: 12 }]}>GET STARTED</Text>
+          <Text style={[Typography.label, { color: Colors.primary, marginBottom: 12 }]}>LOOM</Text>
           <Text style={[Typography.h1, { fontSize: 32, lineHeight: 38 }]}>
-            How would you like{"\n"}to use Loom?
+            How can we{"\n"}help you?
           </Text>
         </Animated.View>
 
@@ -67,7 +67,7 @@ export default function RoleSelectionScreen() {
                 </View>
 
                 <View>
-                  <Text style={[Typography.label, { color: Colors.accent, fontSize: 10, marginBottom: 4 }]}>I NEED A SERVICE</Text>
+                  <Text style={[Typography.label, { color: Colors.accent, fontSize: 10, marginBottom: 4 }]}>CLIENT</Text>
                   <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>
                     {t("iNeedArtisan", language)}
                   </Text>
@@ -117,7 +117,7 @@ export default function RoleSelectionScreen() {
                 </View>
 
                 <View>
-                  <Text style={[Typography.label, { color: 'rgba(255,255,255,0.8)', fontSize: 10, marginBottom: 4 }]}>I AM A PROFESSIONAL</Text>
+                  <Text style={[Typography.label, { color: 'rgba(255,255,255,0.8)', fontSize: 10, marginBottom: 4 }]}>PROFESSIONAL</Text>
                   <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>
                     {t("iAmArtisan", language)}
                   </Text>
@@ -145,8 +145,8 @@ export default function RoleSelectionScreen() {
             onPress={() => router.push("/(auth)/sign-in")}
           >
             <Text style={[Typography.label, { color: Colors.muted, fontSize: 10, textTransform: 'none' }]}>
-              Already registered?{" "}
-              <Text style={{ color: Colors.primary, fontWeight: '800' }}>Sign In</Text>
+              Been here before?{" "}
+              <Text style={{ color: Colors.primary, fontWeight: '800' }}>Log In</Text>
             </Text>
           </TouchableOpacity>
         </Animated.View>

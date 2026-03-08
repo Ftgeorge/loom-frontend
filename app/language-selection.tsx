@@ -30,12 +30,12 @@ export default function LanguageSelectionScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 48 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 12 }]}>SYSTEM PREFERENCE</Text>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 12 }]}>LANGUAGE</Text>
                     <Text style={[Typography.h1, { fontSize: 32, lineHeight: 38 }]}>
-                        Select Operational{"\n"}Dialect
+                        Choose your language
                     </Text>
                     <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 12, lineHeight: 22 }]}>
-                        Choose the primary communication protocol for the interface.
+                        Pick the language you want to use.
                     </Text>
                 </Animated.View>
 
@@ -84,7 +84,7 @@ export default function LanguageSelectionScreen() {
 
                 <Animated.View entering={FadeInUp.delay(500).springify()} style={{ paddingBottom: 40, paddingTop: 24 }}>
                     <PrimaryButton
-                        title="INITIALIZE DIALECT"
+                        title="CONTINUE"
                         onPress={handleContinue}
                         style={{ height: 64, borderRadius: Radius.md }}
                     />

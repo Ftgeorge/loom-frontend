@@ -1,4 +1,4 @@
-import { Colors, Radius, Typography } from '@/theme';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import React from 'react';
 import {
     ActivityIndicator,
@@ -7,6 +7,7 @@ import {
     Text,
     TextStyle,
     TouchableOpacity,
+    View,
     ViewStyle,
 } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
@@ -23,7 +24,7 @@ interface Props {
     icon?: React.ReactNode;
     className?: string;
     image?: any;
-    variant?: 'primary' | 'secondary' | 'accent' | 'outlined';
+    variant?: 'primary' | 'secondary' | 'accent' | 'outlined' | 'violet' | 'ghost';
 }
 
 export function PrimaryButton({
@@ -43,20 +44,35 @@ export function PrimaryButton({
         transform: [{ scale: scale.value }],
     }));
 
-    const handlePressIn = () => { scale.value = withSpring(0.97); };
-    const handlePressOut = () => { scale.value = withSpring(1); };
+    const handlePressIn = () => { scale.value = withSpring(0.97, { damping: 15, stiffness: 300 }); };
+    const handlePressOut = () => { scale.value = withSpring(1, { damping: 15, stiffness: 300 }); };
 
-    const getBgColor = () => {
-        if (disabled) return '#CBD5E1'; // Slate 300
-        if (variant === 'accent') return Colors.accent;
-        if (variant === 'secondary') return Colors.primaryLight;
-        return Colors.primary;
+    const getStyles = () => {
+        if (disabled) return {
+            bg: Colors.gray200,
+            text: Colors.gray400,
+            border: 'transparent',
+        };
+        switch (variant) {
+            case 'accent': return { bg: Colors.accent, text: Colors.white, border: 'transparent' };
+            case 'secondary': return { bg: Colors.primaryLight, text: Colors.primary, border: 'transparent' };
+            case 'violet': return { bg: Colors.violet, text: Colors.white, border: 'transparent' };
+            case 'ghost': return { bg: 'transparent', text: Colors.primary, border: Colors.cardBorder };
+            case 'outlined': return { bg: Colors.surface, text: Colors.ink, border: Colors.cardBorder };
+            default: return { bg: Colors.primary, text: Colors.white, border: 'transparent' };
+        }
     };
 
-    const getTextColor = () => {
-        if (variant === 'secondary') return Colors.primary;
-        return Colors.white;
+    const getShadow = () => {
+        if (disabled) return {};
+        switch (variant) {
+            case 'violet': return Shadows.violet;
+            case 'primary': return Shadows.brand;
+            default: return Shadows.md;
+        }
     };
+
+    const { bg, text, border } = getStyles();
 
     return (
         <AnimatedTouchableOpacity
@@ -67,13 +83,17 @@ export function PrimaryButton({
             disabled={disabled || loading}
             style={[
                 {
-                    backgroundColor: getBgColor(),
+                    backgroundColor: bg,
                     borderRadius: Radius.md,
                     height: 56,
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
                     paddingHorizontal: 24,
+                    gap: 8,
+                    borderWidth: border !== 'transparent' ? 1.5 : 0,
+                    borderColor: border !== 'transparent' ? border : undefined,
+                    ...getShadow(),
                 },
                 style,
                 animatedStyle
@@ -81,14 +101,14 @@ export function PrimaryButton({
             className={className}
         >
             {loading ? (
-                <ActivityIndicator color={variant === 'secondary' ? Colors.primary : Colors.white} />
+                <ActivityIndicator color={text} />
             ) : (
                 <>
                     {icon}
                     <Text
                         style={[
                             Typography.button,
-                            { color: getTextColor() },
+                            { color: text },
                             textStyle
                         ]}
                     >
@@ -104,12 +124,23 @@ export function SecondaryButton(props: Props) {
     return <PrimaryButton {...props} variant="secondary" />;
 }
 
-export function OutlinedButton({ title, onPress, loading, disabled, style, textStyle, icon, className = '' }: Props) {
+export function VioletButton(props: Props) {
+    return <PrimaryButton {...props} variant="violet" />;
+}
+
+export function OutlinedButton({ title, onPress, loading, disabled, style, textStyle, icon }: Props) {
+    const scale = useSharedValue(1);
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+    }));
+
     return (
-        <TouchableOpacity
+        <AnimatedTouchableOpacity
             onPress={onPress}
+            onPressIn={() => { scale.value = withSpring(0.97, { damping: 15 }); }}
+            onPressOut={() => { scale.value = withSpring(1, { damping: 15 }); }}
             disabled={disabled || loading}
-            activeOpacity={0.7}
+            activeOpacity={1}
             style={[
                 {
                     height: 56,
@@ -120,20 +151,23 @@ export function OutlinedButton({ title, onPress, loading, disabled, style, textS
                     alignItems: 'center',
                     justifyContent: 'center',
                     paddingHorizontal: 20,
+                    gap: 8,
+                    backgroundColor: Colors.surface,
+                    ...Shadows.xs,
                 },
-                style
+                style,
+                animatedStyle,
             ]}
-            className={className}
         >
             {loading ? (
                 <ActivityIndicator color={Colors.primary} />
             ) : (
                 <>
                     {icon}
-                    <Text style={[Typography.button, { color: Colors.text }, textStyle]}>{title}</Text>
+                    <Text style={[Typography.button, { color: Colors.ink }, textStyle]}>{title}</Text>
                 </>
             )}
-        </TouchableOpacity>
+        </AnimatedTouchableOpacity>
     );
 }
 
@@ -145,8 +179,7 @@ export function OauthButton({ title, onPress, loading, image, style, textStyle }
             loading={loading}
             style={style}
             textStyle={textStyle}
-            icon={image && <Image source={image} style={{ width: 22, height: 22, marginRight: 12 }} resizeMode="contain" />}
+            icon={image && <Image source={image} style={{ width: 22, height: 22 }} resizeMode="contain" />}
         />
     );
 }
-

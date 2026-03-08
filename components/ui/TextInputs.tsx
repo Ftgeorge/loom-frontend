@@ -20,56 +20,60 @@ interface AppTextInputProps extends TextInputProps {
     containerStyle?: ViewStyle;
 }
 
-export function AppTextInput({ 
-    label, 
-    error, 
-    leftIcon, 
-    rightIcon, 
-    style, 
-    containerStyle, 
-    onFocus, 
-    onBlur, 
-    ...props 
+export function AppTextInput({
+    label,
+    error,
+    leftIcon,
+    rightIcon,
+    style,
+    containerStyle,
+    onFocus,
+    onBlur,
+    ...props
 }: AppTextInputProps) {
     const [focused, setFocused] = useState(false);
 
     const getBorderColor = () => {
         if (error) return Colors.error;
-        if (focused) return Colors.primary;
+        if (focused) return Colors.primary + 'CC';
         return Colors.cardBorder;
     };
 
     const getBackgroundColor = () => {
-        if (error) return Colors.error + '05';
+        if (error) return Colors.errorLight;
         if (focused) return Colors.white;
-        return Colors.surface;
+        return Colors.canvas;
     };
 
     return (
         <View style={[{ marginBottom: 20, width: '100%' }, containerStyle]}>
             {label && (
                 <Text style={[
-                    Typography.label, 
-                    { 
-                        marginBottom: 8, 
-                        color: focused ? Colors.primary : Colors.textSecondary 
+                    Typography.label,
+                    {
+                        marginBottom: 8,
+                        color: focused ? Colors.primary : Colors.muted
                     }
                 ]}>
                     {label}
                 </Text>
             )}
-            
+
             <View
                 style={{
                     flexDirection: 'row',
-                    alignItems: 'center', 
-                    justifyContent: 'center', // Added for extra alignment insurance
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     borderWidth: 1.5,
                     borderRadius: Radius.md,
-                    height: 58,           
+                    height: 58,
                     borderColor: getBorderColor(),
                     backgroundColor: getBackgroundColor(),
                     overflow: 'hidden',
+                    shadowColor: focused ? Colors.primary : 'transparent',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: focused ? 0.12 : 0,
+                    shadowRadius: 8,
                 }}
             >
                 {leftIcon && (
@@ -80,18 +84,18 @@ export function AppTextInput({
 
                 <RNTextInput
                     style={[
-                        Typography.body, 
                         {
                             flex: 1,
-                            color: Colors.text,
+                            color: Colors.ink,
+                            fontFamily: 'Inter-Regular',
+                            fontSize: 15,
                             paddingHorizontal: 16,
-                            /* FIXES FOR IOS/ANDROID CENTERING */
-                            height: Platform.OS === 'ios' ? 58 : '100%', 
-                            textAlignVertical: 'center', 
+                            height: Platform.OS === 'ios' ? 58 : '100%',
+                            textAlignVertical: 'center',
                             includeFontPadding: false,
-                            lineHeight: undefined, // CRITICAL: Removes custom font line-height drift
-                            paddingTop: 0,        // Ensures no top-heavy padding
-                            paddingBottom: 0,     // Ensures no bottom-heavy padding
+                            lineHeight: undefined,
+                            paddingTop: 0,
+                            paddingBottom: 0,
                             ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as any) : {}),
                         },
                         style
@@ -119,7 +123,7 @@ export function AppTextInput({
 
             {error && (
                 <Text style={[
-                    Typography.label, 
+                    Typography.label,
                     { color: Colors.error, marginTop: 6, fontSize: 11 }
                 ]}>
                     {error}
@@ -138,14 +142,14 @@ export function PasswordInput({ ...props }: Omit<AppTextInputProps, 'rightIcon'>
             {...props}
             secureTextEntry={!visible}
             rightIcon={
-                <TouchableOpacity 
-                    onPress={() => setVisible(!visible)} 
+                <TouchableOpacity
+                    onPress={() => setVisible(!visible)}
                     hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
                 >
-                    <Ionicons 
-                        name={visible ? 'eye-off-outline' : 'eye-outline'} 
-                        size={22} 
-                        color={Colors.muted} 
+                    <Ionicons
+                        name={visible ? 'eye-off-outline' : 'eye-outline'}
+                        size={22}
+                        color={Colors.muted}
                     />
                 </TouchableOpacity>
             }
@@ -159,22 +163,22 @@ export function PhoneInput(props: Omit<AppTextInputProps, 'leftIcon'>) {
             {...props}
             keyboardType="phone-pad"
             leftIcon={
-                <View style={{ 
-                    flexDirection: 'row', 
-                    alignItems: 'center', 
-                    paddingLeft: 16 
+                <View style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    paddingLeft: 16
                 }}>
                     <Text style={[
-                        Typography.body, 
+                        Typography.body,
                         { color: Colors.textSecondary, fontWeight: '600', lineHeight: undefined }
                     ]}>
                         +234
                     </Text>
-                    <View style={{ 
-                        width: 1, 
-                        height: 24, 
-                        backgroundColor: Colors.cardBorder, 
-                        marginLeft: 12 
+                    <View style={{
+                        width: 1,
+                        height: 24,
+                        backgroundColor: Colors.cardBorder,
+                        marginLeft: 12
                     }} />
                 </View>
             }

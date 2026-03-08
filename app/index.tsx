@@ -127,7 +127,7 @@ export default function SplashScreen() {
         <Animated.View style={[styles.taglineBox, taglineStyle]}>
           <View style={styles.labelLine} />
           <Text style={styles.tagline}>
-            PROFESSIONAL SERVICES. SIMPLIFIED.
+            SERVICES. SIMPLIFIED.
           </Text>
           <View style={styles.labelLine} />
         </Animated.View>
@@ -135,7 +135,7 @@ export default function SplashScreen() {
 
       <Animated.View style={[styles.footer, indicatorStyle]}>
         <ActivityIndicator color={Colors.white} size="small" style={{ marginBottom: 20 }} />
-        <Text style={styles.version}>PREPARING YOUR EXPERIENCE...</Text>
+        <Text style={styles.version}>LOADING...</Text>
       </Animated.View>
     </View>
   );
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   letter: {
-    fontFamily: "MontserratAlternates-Bold",
+    fontFamily: "PlusJakartaSans-ExtraBold",
     fontSize: 84,
     color: Colors.white,
     letterSpacing: -6,
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   tagline: {
     fontSize: 9,
     color: Colors.accent,
-    fontFamily: "MontserratAlternates-Bold",
+    fontFamily: "PlusJakartaSans-Bold",
     letterSpacing: 3,
     textTransform: 'uppercase',
   },
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Colors.primary,
     fontSize: 12,
-    fontFamily: "MontserratAlternates-Bold",
+    fontFamily: "PlusJakartaSans-Bold",
     letterSpacing: 1,
   },
   btnIcon: {
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     fontSize: 8,
     color: 'rgba(255,255,255,0.3)',
-    fontFamily: "MontserratAlternates-Medium",
+    fontFamily: "Inter-Medium",
     letterSpacing: 2,
   }
 });

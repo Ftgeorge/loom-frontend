@@ -12,7 +12,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
-const SORT_OPTIONS = ['Best Match', 'Top Rated', 'Lowest Price'];
+const SORT_OPTIONS = ['Best for you', 'Best ratings', 'Lowest cost'];
 
 export default function MatchedArtisansScreen() {
     const router = useRouter();
@@ -52,18 +52,18 @@ export default function MatchedArtisansScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <AppHeader title="Top Matches" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="Results" showBack onBack={() => router.back()} showNotification={false} />
 
             <FlatList
                 data={sorted}
                 ListHeaderComponent={
                     <View>
                         <View style={{ padding: 24, paddingBottom: 0 }}>
-                            <Text style={Typography.h2}>Artisans for You</Text>
+                            <Text style={Typography.h2}>Ready to help</Text>
                             <Text style={[Typography.bodySmall, { color: Colors.textSecondary, marginTop: 4 }]}>
                                 {loading
-                                    ? 'Finding the best pros...'
-                                    : `${artisans.length} pros available right now.`}
+                                    ? 'Searching...'
+                                    : `${artisans.length} pros ready now.`}
                             </Text>
                         </View>
                         <FlatList

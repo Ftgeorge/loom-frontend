@@ -62,7 +62,7 @@ export function OTPInput({ length = 6, onComplete, error }: OTPInputProps) {
                                     backgroundColor: isFocused ? Colors.white : Colors.surface,
                                     borderColor: hasError ? Colors.error : (isFocused ? Colors.primary : Colors.cardBorder),
                                     fontSize: 24,
-                                    fontFamily: 'MontserratAlternates-Bold',
+                                    fontFamily: 'PlusJakartaSans-Bold',
                                     color: Colors.text,
                                     textAlign: 'center',
                                     ...Shadows.sm

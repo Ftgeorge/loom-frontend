@@ -3,13 +3,16 @@
 @tailwind utilities;
 
 @layer utilities {
-    .text-montserrat {
-        font-family: 'MontserratAlternates';
+    .text-inter {
+        font-family: 'Inter-Regular';
+    }
+    .text-jakarta {
+        font-family: 'PlusJakartaSans-Regular';
     }
 }
 
 /* Base text styling to attach the default font to RN Text components */
 Text,
 TextInput {
-    font-family: 'MontserratAlternates';
+    font-family: 'Inter-Regular';
 }

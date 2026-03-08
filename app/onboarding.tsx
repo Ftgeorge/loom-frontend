@@ -25,21 +25,21 @@ const pages = [
         titleKey: 'onboard1Title' as const,
         descKey: 'onboard1Desc' as const,
         accent: Colors.primary,
-        mission: 'FIND PROS'
+        mission: 'DISCOVER'
     },
     {
         icon: 'terminal-outline' as const,
         titleKey: 'onboard2Title' as const,
         descKey: 'onboard2Desc' as const,
         accent: Colors.accent,
-        mission: 'CONNECT'
+        mission: 'MATCH'
     },
     {
         icon: 'shield-checkmark-outline' as const,
         titleKey: 'onboard3Title' as const,
         descKey: 'onboard3Desc' as const,
         accent: Colors.success,
-        mission: 'TRUSTED'
+        mission: 'TRUST'
     },
 ];
 
@@ -76,7 +76,7 @@ export default function OnboardingScreen() {
             <LoomThread variant="minimal" opacity={0.2} animated />
 
             <View style={{ position: 'absolute', top: 64, width: '100%', paddingHorizontal: 32, zIndex: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={[Typography.label, { color: Colors.primary, fontSize: 8 }]}>HOW IT WORKS</Text>
+                <Text style={[Typography.label, { color: Colors.primary, fontSize: 8 }]}>STEP {currentPage + 1}</Text>
                 <TouchableOpacity onPress={handleSkip} style={{ backgroundColor: Colors.gray100, paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.xs }}>
                     <Text style={[Typography.label, { color: Colors.muted, fontSize: 8 }]}>SKIP</Text>
                 </TouchableOpacity>
@@ -157,7 +157,7 @@ export default function OnboardingScreen() {
                 </View>
 
                 <PrimaryButton
-                    title={currentPage === pages.length - 1 ? "GET STARTED" : "NEXT"}
+                    title={currentPage === pages.length - 1 ? "Get Started" : "Next"}
                     onPress={handleNext}
                     style={{ height: 64, borderRadius: Radius.md }}
                     variant={currentPage === pages.length - 1 ? 'accent' : 'primary'}
