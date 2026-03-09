@@ -36,7 +36,7 @@ export function CategoryPill({ cat, onPress }: CategoryPillProps) {
             <TouchableOpacity
                 style={{
                     height: 140,
-                    borderRadius: Radius.lg,
+                    borderRadius: Radius.sm,
                     overflow: 'hidden',
                     ...Shadows.md,
                 }}
@@ -65,7 +65,7 @@ export function CategoryPill({ cat, onPress }: CategoryPillProps) {
                         left: 10,
                         width: 32,
                         height: 32,
-                        borderRadius: 10,
+                        borderRadius: 5,
                         backgroundColor: 'rgba(255,255,255,0.18)',
                         borderWidth: 1,
                         borderColor: 'rgba(255,255,255,0.3)',

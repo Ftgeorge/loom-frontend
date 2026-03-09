@@ -161,7 +161,7 @@ export function AppHeader({
                             backgroundColor: Colors.surface
                         }}>
                             <View>
-                                <Text style={[Typography.label, { fontSize: 10, color: Colors.violet, marginBottom: 4 }]}>Your City</Text>
+                                <Text style={[Typography.label, { fontSize: 10, color: Colors.primary, marginBottom: 4 }]}>Your City</Text>
                                 <Text style={[Typography.h3, { fontSize: 20 }]}>Where are you?</Text>
                             </View>
                             <TouchableOpacity onPress={() => setShowPicker(false)} style={{ padding: 8 }}>

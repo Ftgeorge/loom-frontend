@@ -1,4 +1,4 @@
-import { Colors, Radius } from '@/theme';
+import { Colors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -34,12 +34,12 @@ export function SectionHeader({ overline, title, action, onAction }: SectionHead
                 <TouchableOpacity
                     onPress={onAction}
                     style={{
-                        backgroundColor: Colors.canvas,
-                        paddingHorizontal: 12,
+                        // backgroundColor: Colors.canvas,
+                        // paddingHorizontal: 12,
                         paddingVertical: 6,
-                        borderRadius: Radius.full,
-                        borderWidth: 1,
-                        borderColor: Colors.cardBorder,
+                        // borderRadius: Radius.full,
+                        // borderWidth: 1,
+                        // borderColor: Colors.cardBorder,
                         flexDirection: 'row',
                         alignItems: 'center',
                         gap: 4,

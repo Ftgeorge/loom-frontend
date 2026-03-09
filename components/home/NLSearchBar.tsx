@@ -21,9 +21,9 @@ export function NLSearchBar({ onPress }: NLSearchBarProps) {
             <TouchableOpacity
                 style={{
                     backgroundColor: Colors.surface,
-                    borderRadius: Radius.xl,
-                    paddingHorizontal: 20,
-                    paddingVertical: 18,
+                    borderRadius: Radius.sm,
+                    paddingHorizontal: 10,
+                    paddingVertical: 10,
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: 14,
@@ -37,21 +37,21 @@ export function NLSearchBar({ onPress }: NLSearchBarProps) {
                 activeOpacity={1}
             >
                 <View style={{
-                    width: 36, height: 36, borderRadius: 12,
-                    backgroundColor: Colors.primaryLight,
+                    // width: 40, height: 40, borderRadius: 6,
+                    // backgroundColor: Colors.primaryLight,
                     alignItems: 'center', justifyContent: 'center',
                 }}>
-                    <Ionicons name="search" size={18} color={Colors.primary} />
+                    <Ionicons name="search" size={26} color={Colors.muted} />
                 </View>
                 <Text style={[Typography.body, { flex: 1, fontSize: 15, color: Colors.muted }]}>
                     Describe what you need help with...
                 </Text>
                 <View style={{
                     backgroundColor: Colors.primary,
-                    width: 32, height: 32, borderRadius: 10,
+                    width: 42, height: 42, borderRadius: 10,
                     alignItems: 'center', justifyContent: 'center',
                 }}>
-                    <Ionicons name="arrow-forward" size={16} color={Colors.white} />
+                    <Ionicons name="arrow-forward" size={20} color={Colors.white} />
                 </View>
             </TouchableOpacity>
         </Animated.View>

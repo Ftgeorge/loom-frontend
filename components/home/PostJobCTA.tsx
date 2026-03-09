@@ -20,12 +20,12 @@ export function PostJobCTA({ onPress }: PostJobCTAProps) {
         <Animated.View style={[animatedStyle, { marginBottom: 40 }]}>
             <TouchableOpacity
                 style={{
-                    borderRadius: Radius.xl,
+                    borderRadius: Radius.sm,
                     borderWidth: 1.5,
-                    borderColor: Colors.violet + '40',
+                    borderColor: Colors.primary + '40',
                     borderStyle: 'dashed',
                     padding: 24,
-                    backgroundColor: Colors.violetLight,
+                    backgroundColor: Colors.primaryLight,
                     flexDirection: 'row',
                     alignItems: 'center',
                     gap: 16,
@@ -37,7 +37,7 @@ export function PostJobCTA({ onPress }: PostJobCTAProps) {
             >
                 <View style={{
                     width: 52, height: 52, borderRadius: 16,
-                    backgroundColor: Colors.violet,
+                    backgroundColor: Colors.primary,
                     alignItems: 'center', justifyContent: 'center',
                     ...Shadows.violet,
                 }}>
@@ -46,7 +46,7 @@ export function PostJobCTA({ onPress }: PostJobCTAProps) {
                 <View style={{ flex: 1 }}>
                     <Text style={{
                         fontSize: 10, fontFamily: 'PlusJakartaSans-Bold',
-                        color: Colors.violet, letterSpacing: 0.5,
+                        color: Colors.primary, letterSpacing: 0.5,
                         marginBottom: 4, textTransform: 'uppercase',
                     }}>
                         Post a Job
@@ -58,7 +58,7 @@ export function PostJobCTA({ onPress }: PostJobCTAProps) {
                         Post a request and let Loom find the right professional
                     </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={Colors.violet} />
+                <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
             </TouchableOpacity>
         </Animated.View>
     );

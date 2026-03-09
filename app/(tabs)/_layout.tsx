@@ -1,6 +1,6 @@
 import { t } from '@/i18n';
 import { useAppStore } from '@/store';
-import { Colors, Shadows } from '@/theme';
+import { Colors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-around',
         overflow: 'hidden',
-        borderWidth: 1,
+        borderWidth: 2,
         borderColor: 'rgba(0,0,0,0.06)',
         // Shadow
         shadowColor: '#000',
@@ -266,6 +266,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.12,
         shadowRadius: 24,
         elevation: 12,
+        backgroundColor: 'white'
     },
     androidBg: {
         backgroundColor: '#FFFFFF',

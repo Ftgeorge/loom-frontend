@@ -77,7 +77,7 @@ export default function ClientHomeScreen() {
             >
                 {/* ─── Greeting ──────────────────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(80).springify()} style={{ marginBottom: 32 }}>
-                    <Text style={[Typography.label, { color: Colors.violet, marginBottom: 6 }]}>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 6 }]}>
                         WELCOME BACK
                     </Text>
                     <Text style={[Typography.display, { fontSize: 34, letterSpacing: -0.8 }]}>
@@ -97,8 +97,13 @@ export default function ClientHomeScreen() {
                 )}
 
                 {/* ─── Natural Language Search ───────────────────────────────── */}
-                <Animated.View entering={FadeInDown.delay(160).springify()}>
+                {/* <Animated.View entering={FadeInDown.delay(160).springify()}>
                     <NLSearchBar onPress={() => router.push({ pathname: '/search', params: { category: 'all' } })} />
+                </Animated.View> */}
+
+                 {/* ─── Post a Job CTA ────────────────────────────────────────── */}
+                <Animated.View entering={FadeInDown.delay(380).springify()}>
+                    <PostJobCTA onPress={() => router.push('/post-job')} />
                 </Animated.View>
 
                 {/* ─── Categories ────────────────────────────────────────────── */}
@@ -125,8 +130,9 @@ export default function ClientHomeScreen() {
                     </ScrollView>
                 </Animated.View>
 
+
                 {/* ─── Top Professionals ─────────────────────────────────────── */}
-                <Animated.View entering={FadeInDown.delay(300).springify()} style={{ marginBottom: 48 }}>
+                {/* <Animated.View entering={FadeInDown.delay(300).springify()} style={{ marginBottom: 48 }}>
                     <SectionHeader
                         overline="Top professionals"
                         title="Highest Rated Near You"
@@ -158,32 +164,31 @@ export default function ClientHomeScreen() {
                             )}
                         />
                     )}
-                </Animated.View>
-
-                {/* ─── Post a Job CTA ────────────────────────────────────────── */}
-                <Animated.View entering={FadeInDown.delay(380).springify()}>
-                    <PostJobCTA onPress={() => router.push('/post-job')} />
-                </Animated.View>
+                </Animated.View> */}
 
                 {/* ─── Nearby Professionals ──────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(440).springify()}>
-                    <SectionHeader overline="Nearby" title="Available Professionals" />
-                    {loading ? (
-                        <SkeletonList count={3} />
-                    ) : (
-                        <View style={{ gap: 12 }}>
-                            {artisans.slice(0, 5).map((art, index) => (
-                                <Animated.View key={art.id} entering={FadeInDown.delay(480 + index * 80).springify()}>
-                                    <ArtisanCard
-                                        artisan={art}
-                                        horizontal
-                                        onPress={() => router.push({ pathname: '/artisan-profile', params: { id: art.id } })}
-                                    />
-                                </Animated.View>
-                            ))}
-                        </View>
-                    )}
-                </Animated.View>
+    <SectionHeader overline="Nearby" title="Available Professionals" />
+    {loading ? (
+        <SkeletonList count={4} />
+    ) : (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+    {artisans.slice(0, 4).map((art, index) => (
+        <Animated.View
+            key={art.id}
+            entering={FadeInDown.delay(480 + index * 80).springify()}
+            style={{ width: '48%' }} // 👈 wrapper controls the width
+        >
+            <ArtisanCard
+                artisan={art}
+                grid // 👈 new prop, card fills 100% of wrapper
+                onPress={() => router.push({ pathname: '/artisan-profile', params: { id: art.id } })}
+            />
+        </Animated.View>
+        ))}
+        </View>
+        )}
+</Animated.View>
             </ScrollView>
         </View>
     );
