@@ -3,8 +3,7 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { RequestCard } from '@/components/ui/RequestCard';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
-import { EmptyState, ErrorState } from '@/components/ui/StateComponents';
-import { t } from '@/i18n';
+import { ErrorState } from '@/components/ui/StateComponents';
 import { jobApi } from '@/services/api';
 import { mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
@@ -14,7 +13,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
-const SEGMENTS = ['ACTIVE', 'ARCHIVED', 'VOIDED'];
+const SEGMENTS = ['ACTIVE', 'COMPLETED', 'CANCELLED'];
 
 export default function RequestsScreen() {
     const router = useRouter();
@@ -56,12 +55,12 @@ export default function RequestsScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.2} animated />
-            <AppHeader title="Mission Console" onNotification={() => router.push('/notifications')} />
+            <AppHeader title="My Bookings" onNotification={() => router.push('/notifications')} />
 
             <View style={{ paddingHorizontal: 24, paddingVertical: 20 }}>
                 <View style={{ marginBottom: 16 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>SIGNAL REGISTRY</Text>
-                    <Text style={[Typography.h3, { fontSize: 20 }]}>Project Ledger</Text>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>ALL REQUESTS</Text>
+                    <Text style={[Typography.h3, { fontSize: 20 }]}>Booking History</Text>
                 </View>
                 <SegmentedControl
                     segments={SEGMENTS}
@@ -86,12 +85,12 @@ export default function RequestsScreen() {
                         borderWidth: 1.5
                     }}>
                         <Text style={[Typography.h3, { textAlign: 'center', color: Colors.primary }]}>
-                            {segIdx === 0 ? 'GRID SILENT' : segIdx === 1 ? 'NO ARCHIVED DATA' : 'VOID REGISTRY EMPTY'}
+                            {segIdx === 0 ? 'NO ACTIVE REQUESTS' : segIdx === 1 ? 'NO COMPLETED REQUESTS' : 'NO CANCELLED REQUESTS'}
                         </Text>
                         <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted, marginTop: 12, lineHeight: 20 }]}>
                             {segIdx === 0
-                                ? 'No active mission protocols currently broadcasting in this sector.'
-                                : 'No historical data found in this log selection.'}
+                                ? "You don't have any active service requests right now."
+                                : "Your past requests will appear here once you have them."}
                         </Text>
                     </View>
                 </View>

@@ -22,7 +22,7 @@ export function SegmentedControl({ segments, selected, onSelect }: SegmentedCont
                         accessibilityRole="tab"
                         accessibilityState={{ selected: isActive }}
                     >
-                        <Text className={`text-sm ${isActive ? 'text-white font-semibold' : 'font-medium text-muted'}`}>
+                        <Text className={`text-sm ${isActive ? 'text-primary font-semibold' : 'font-medium text-muted'}`}>
                             {seg}
                         </Text>
                     </TouchableOpacity>

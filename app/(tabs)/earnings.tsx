@@ -35,7 +35,7 @@ export default function EarningsScreen() {
                     amount: Math.random() * 50000, // Mock data for velocity visualization
                 })),
                 transactions: [
-                    { id: '1', description: 'Mission #142 Payment', amount: 12500, type: 'credit', date: new Date().toISOString(), status: 'completed' },
+                    { id: '1', description: 'Job #142 Payment', amount: 12500, type: 'credit', date: new Date().toISOString(), status: 'completed' },
                     { id: '2', description: 'Withdrawal to Kuda Bank', amount: 45000, type: 'debit', date: new Date().toISOString(), status: 'completed' },
                 ],
             });

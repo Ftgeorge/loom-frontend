@@ -131,7 +131,7 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          <Text style={[Typography.label, { color: Colors.primary, marginTop: 24, fontSize: 10, letterSpacing: 2 }]}>ME</Text>
+          <Text style={[Typography.label, { color: Colors.primary, marginTop: 24, fontSize: 10, letterSpacing: 2 }]}>PROFILE</Text>
           <Text style={[Typography.h1, { marginTop: 8, fontSize: 32 }]}>
             {user?.name?.toUpperCase()}
           </Text>
@@ -148,7 +148,7 @@ export default function ProfileScreen() {
               <Text style={[Typography.label, { color: Colors.primary, fontSize: 9 }]}>{isArtisan ? "PROFESSIONAL" : "CLIENT"}</Text>
             </View>
             <Text style={[Typography.bodySmall, { color: Colors.muted, fontWeight: '600' }]}>
-              {user?.location?.city?.toUpperCase() || "LOST"}
+              {user?.location?.city?.toUpperCase() || "LOCATION NOT SET"}
             </Text>
           </View>
         </Animated.View>

@@ -55,7 +55,7 @@ export default function NotificationsScreen() {
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.3} animated />
             <AppHeader
-                title="Log Ledger"
+                title="Notifications"
                 showBack
                 onBack={() => router.back()}
                 showNotification={false}
@@ -82,8 +82,8 @@ export default function NotificationsScreen() {
             ) : notifications.length === 0 ? (
                 <EmptyState
                     icon="notifications-off-outline"
-                    title="Ledger Empty"
-                    message="Deployment is silent. All signals are currently cleared."
+                    title="No Notifications"
+                    message="You're all caught up! We'll let you know when something new arrives."
                 />
             ) : (
                 <FlatList

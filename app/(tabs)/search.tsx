@@ -1,8 +1,9 @@
 import { ArtisanCard } from '@/components/ui/ArtisanCard';
 import { Chip } from '@/components/ui/CardChipBadge';
+import LayoutSwitch from '@/components/ui/LayoutSwitch';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
-import { EmptyState, ErrorState } from '@/components/ui/StateComponents';
+import { ErrorState } from '@/components/ui/StateComponents';
 import { AppTextInput } from '@/components/ui/TextInputs';
 import { artisanApi } from '@/services/api';
 import { mapArtisan } from '@/services/mappers';
@@ -25,7 +26,7 @@ const ScanningBar = () => {
             -1,
             false
         );
-    }, []);
+    }, [progress]);
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [{ translateY: interpolate(progress.value, [0, 1], [0, 600]) }],
@@ -67,15 +68,18 @@ export default function SearchScreen() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+    const [viewLayout, setViewLayout] = useState<'grid' | 'list'>('grid');
 
-    const search = useCallback(async (cat: string | null, q: string) => {
+    const search = useCallback(async (catId: string | null, q: string) => {
         try {
             setLoading(true);
             setError(false);
 
             let results: Artisan[] = [];
-            if (cat) {
-                const res = await artisanApi.search({ skill: cat, limit: 30 });
+            if (catId) {
+                const category = CATEGORIES.find(c => c.id === catId);
+                const skillName = category ? category.label : catId;
+                const res = await artisanApi.search({ skill: skillName, limit: 30 });
                 results = (res.results as any[]).map(mapArtisan);
             } else {
                 const res = await artisanApi.list({ limit: 30 });
@@ -112,7 +116,7 @@ export default function SearchScreen() {
             <LoomThread variant="minimal" opacity={0.2} animated />
             {loading && <ScanningBar />}
 
-            <View style={{ paddingHorizontal: 24, paddingTop: 40, paddingBottom: 16 }}>
+            <View style={{ paddingHorizontal: 24, paddingTop: 40 }}>
                 <Animated.View entering={FadeInDown.springify()}>
                     <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>FIND A PRO</Text>
                     <Text style={[Typography.h1, { fontSize: 36, marginBottom: 8 }]}>Explore Services</Text>
@@ -126,20 +130,24 @@ export default function SearchScreen() {
                     value={query}
                     onChangeText={setQuery}
                     containerStyle={{
-                        height: 64,
-                        borderRadius: Radius.md,
+                        borderRadius: Radius.sm,
                         backgroundColor: Colors.white,
-                        borderWidth: 1.5,
-                        borderColor: Colors.cardBorder,
                         ...Shadows.md
                     }}
-                    leftIcon={<Ionicons name="search" size={24} color={Colors.primary} />}
+                    leftIcon={
+                        <View style={{ paddingLeft: 20 }}>
+                            <Ionicons name="search" size={22} color={Colors.muted} />
+                        </View>
+                    }
                 />
             </View>
 
             <FlatList
+                key={viewLayout}
                 data={artisans}
                 keyExtractor={(item) => item.id}
+                numColumns={viewLayout === 'grid' ? 2 : 1}
+                columnWrapperStyle={viewLayout === 'grid' ? { gap: 12, marginBottom: 16 } : undefined}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 150, paddingHorizontal: 24 }}
                 initialNumToRender={10}
@@ -167,6 +175,8 @@ export default function SearchScreen() {
                                 />
                             )}
                         />
+
+                        {/* <LayoutSwitch/> */}
 
                         {loading ? (
                             <View style={{ marginTop: 24 }}>
@@ -200,28 +210,37 @@ export default function SearchScreen() {
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                                     <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.accent }} />
                                     <Text style={[Typography.label, { fontSize: 10, color: Colors.primary, letterSpacing: 1, fontWeight: '700' }]}>
-                                        FOUND {artisans.length} VERIFIED PROS
+                                        FOUND {artisans.length} PROFESSIONALS
                                     </Text>
                                 </View>
-                                <View style={{ padding: 6, backgroundColor: Colors.surface, borderRadius: 4 }}>
-                                    <Ionicons name="filter" size={14} color={Colors.primary} />
-                                </View>
+                                <LayoutSwitch
+                                    viewLayout={viewLayout}
+                                    setViewLayout={setViewLayout}
+                                />
                             </View>
                         )}
                     </View>
                 }
                 renderItem={({ item, index }) =>
                     loading || error || artisans.length === 0 ? null : (
-                        <Animated.View entering={FadeInDown.delay(100 + index * 50).springify()} style={{ marginBottom: 16 }}>
+                        <Animated.View
+                            entering={FadeInDown.delay(100 + index * 50).springify()}
+                            style={{
+                                marginBottom: 16,
+                                flex: viewLayout === 'grid' ? 0.5 : 1,
+                                paddingHorizontal: viewLayout === 'grid' ? 0 : 0 // handled by columnWrapperStyle or paddingHorizontal above
+                            }}
+                        >
                             <ArtisanCard
                                 artisan={item}
+                                grid={viewLayout === 'grid'}
+                                list={viewLayout === 'list'}
                                 onPress={() =>
                                     router.push({
                                         pathname: '/artisan-profile',
                                         params: { id: item.id },
                                     })
                                 }
-                                horizontal
                             />
                         </Animated.View>
                     )

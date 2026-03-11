@@ -92,7 +92,7 @@ export function Chip({ label, selected, onPress, color, icon, small, containerSt
                     backgroundColor: selected
                         ? (violet ? Colors.violet : activeColor)
                         : (violet && selected ? Colors.violetLight : Colors.surface),
-                    borderRadius: Radius.full,
+                    borderRadius: Radius.xs,
                     paddingHorizontal: small ? 10 : 16,
                     paddingVertical: small ? 6 : 10,
                     borderWidth: 1,

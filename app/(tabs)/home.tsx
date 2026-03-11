@@ -1,31 +1,30 @@
 import { mapArtisan } from '@/services/mappers';
 import { AppHeader } from '@/components/AppHeader';
 import { ArtisanCard } from '@/components/ui/ArtisanCard';
-import { SkeletonHorizontalList, SkeletonList } from '@/components/ui/SkeletonLoader';
-import { ErrorState } from '@/components/ui/StateComponents';
+import { SkeletonList } from '@/components/ui/SkeletonLoader';
+import { Ionicons } from '@expo/vector-icons';
 import { ActiveJobBanner } from '@/components/home/ActiveJobBanner';
 import { CategoryPill } from '@/components/home/CategoryPill';
-import { NLSearchBar } from '@/components/home/NLSearchBar';
 import { PostJobCTA } from '@/components/home/PostJobCTA';
 import { SectionHeader } from '@/components/home/SectionHeader';
 import { artisanApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Typography } from '@/theme';
+import { Colors, Shadows, Typography } from '@/theme';
 import type { Artisan } from '@/types';
 import { CATEGORIES } from '@/types';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-    FlatList,
     RefreshControl,
     ScrollView,
     Text,
+    TouchableOpacity,
     View,
 } from 'react-native';
 import Animated, {
     FadeInDown,
-    FadeInRight,
 } from 'react-native-reanimated';
+import LayoutSwitch from '@/components/ui/LayoutSwitch';
 
 export default function ClientHomeScreen() {
     const router = useRouter();
@@ -34,6 +33,7 @@ export default function ClientHomeScreen() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+    const [viewLayout, setViewLayout] = useState<'grid' | 'list'>('grid');
 
     const load = useCallback(async () => {
         try {
@@ -50,14 +50,6 @@ export default function ClientHomeScreen() {
 
     useEffect(() => { load(); }, [load]);
     const onRefresh = () => { setRefreshing(true); load(); };
-
-    const topRated = React.useMemo(() =>
-        artisans
-            .filter(a => a.availability === 'online')
-            .sort((a, b) => b.rating - a.rating)
-            .slice(0, 8),
-        [artisans]
-    );
 
     const activeJobs = React.useMemo(() =>
         jobs.filter(j => ['matched', 'scheduled', 'in_progress'].includes(j.status)).slice(0, 1),
@@ -101,7 +93,7 @@ export default function ClientHomeScreen() {
                     <NLSearchBar onPress={() => router.push({ pathname: '/search', params: { category: 'all' } })} />
                 </Animated.View> */}
 
-                 {/* ─── Post a Job CTA ────────────────────────────────────────── */}
+                {/* ─── Post a Job CTA ────────────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(380).springify()}>
                     <PostJobCTA onPress={() => router.push('/post-job')} />
                 </Animated.View>
@@ -168,27 +160,44 @@ export default function ClientHomeScreen() {
 
                 {/* ─── Nearby Professionals ──────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(440).springify()}>
-    <SectionHeader overline="Nearby" title="Available Professionals" />
-    {loading ? (
-        <SkeletonList count={4} />
-    ) : (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-    {artisans.slice(0, 4).map((art, index) => (
-        <Animated.View
-            key={art.id}
-            entering={FadeInDown.delay(480 + index * 80).springify()}
-            style={{ width: '48%' }} // 👈 wrapper controls the width
-        >
-            <ArtisanCard
-                artisan={art}
-                grid // 👈 new prop, card fills 100% of wrapper
-                onPress={() => router.push({ pathname: '/artisan-profile', params: { id: art.id } })}
-            />
-        </Animated.View>
-        ))}
-        </View>
-        )}
-</Animated.View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                        <View>
+                            <Text style={{ fontSize: 10, fontFamily: 'Inter-SemiBold', color: Colors.muted, letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 4 }}>
+                                NEARBY
+                            </Text>
+                            <Text style={{ fontSize: 20, fontFamily: 'PlusJakartaSans-Bold', color: Colors.ink }}>
+                                Available Professionals
+                            </Text>
+                        </View>
+
+                        {/* Layout Switch */}
+                        <LayoutSwitch
+                        viewLayout={viewLayout}
+                        setViewLayout={setViewLayout}
+                        />
+                    </View>
+
+                    {loading ? (
+                        <SkeletonList count={4} />
+                    ) : (
+                        <View style={viewLayout === 'grid' ? { flexDirection: 'row', flexWrap: 'wrap', gap: 12 } : { gap: 16 }}>
+                            {artisans.slice(0, 10).map((art, index) => (
+                                <Animated.View
+                                    key={art.id}
+                                    entering={FadeInDown.delay(480 + index * 80).springify()}
+                                    style={viewLayout === 'grid' ? { width: '48.2%' } : { width: '100%' }}
+                                >
+                                    <ArtisanCard
+                                        artisan={art}
+                                        grid={viewLayout === 'grid'}
+                                        list={viewLayout === 'list'}
+                                        onPress={() => router.push({ pathname: '/artisan-profile', params: { id: art.id } })}
+                                    />
+                                </Animated.View>
+                            ))}
+                        </View>
+                    )}
+                </Animated.View>
             </ScrollView>
         </View>
     );
