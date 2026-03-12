@@ -1,11 +1,15 @@
-import { AppHeader } from '@/components/AppHeader';
+import { SubAppHeader } from '@/components/AppSubHeader';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { LoomThread } from '@/components/ui/LoomThread';
+import { artisanApi, jobApi } from '@/services/api';
+import { mapArtisan } from '@/services/mappers';
+import { useAppStore } from '@/store';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
+import type { Artisan } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const TIME_SLOTS = [
@@ -33,36 +37,67 @@ const DAYS = (() => {
 export default function BookingScreen() {
     const router = useRouter();
     const { artisanId } = useLocalSearchParams<{ artisanId: string }>();
+    const { user } = useAppStore();
+    const [artisan, setArtisan] = useState<Artisan | null>(null);
     const [selectedDate, setSelectedDate] = useState(DAYS[0].date);
     const [selectedTime, setSelectedTime] = useState('');
     const [notes, setNotes] = useState('');
     const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        if (artisanId) {
+            artisanApi.getById(artisanId).then(res => {
+                setArtisan(mapArtisan(res));
+            }).catch(console.error);
+        }
+    }, [artisanId]);
+
     const handleConfirm = async () => {
+        if (!artisan) return;
         setLoading(true);
-        // Simulate mission initialization
-        await new Promise((r) => setTimeout(r, 1200));
-        setLoading(false);
-        router.push('/(tabs)/requests');
+        try {
+            // 1. Create Job Request
+            const jobRes = await jobApi.create({
+                description: notes || `Service booking with ${artisan.name}`,
+                skill: artisan.skills[0] || 'general',
+                budget: 0,
+                urgency: 'today',
+                location: `${user?.location?.area}, ${user?.location?.city}`
+            });
+
+            // 2. Assign to this specific artisan
+            await jobApi.assign(jobRes.id, artisan.id);
+
+            router.push('/(tabs)/requests');
+        } catch (err: any) {
+            console.error("[Booking] Error:", err);
+            const msg = err.details 
+                ? `${err.message}: ${JSON.stringify(err.details)}` 
+                : err.message || "Unable to complete booking.";
+            Alert.alert("Booking Failed", msg);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.3} animated />
-            <AppHeader title="Book Service" showBack onBack={() => router.back()} showNotification={false} />
+            <SubAppHeader
+                label="BOOKING"
+                title="Select Slot"
+                description="Choose a date and time that works best for your service."
+                showBack
+                onBack={() => router.back()}
+                onNotification={() => {}}
+            />
 
             <ScrollView
                 contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
                 showsVerticalScrollIndicator={false}
             >
                 {/* Protocol Header */}
-                <Animated.View entering={FadeInDown.springify()} style={{ marginBottom: 40 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>AVAILABILITY</Text>
-                    <Text style={[Typography.h1, { fontSize: 32 }]}>Select Day</Text>
-                    <Text style={[Typography.body, { color: Colors.muted, marginTop: 12, lineHeight: 22 }]}>
-                        Choose a date and time that works best for your service.
-                    </Text>
-                </Animated.View>
+                {/* Content Removed (Now in Header) */}
 
                 {/* Date Selection */}
                 <Animated.View entering={FadeInDown.delay(100).springify()}>
@@ -123,6 +158,7 @@ export default function BookingScreen() {
                         <Ionicons name="time-outline" size={14} color={Colors.primary} />
                         <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>SELECT TIME</Text>
                     </View>
+                    {/* Profile Header Removed (Now in Header) */}
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
                         {TIME_SLOTS.map((t) => (
                             <TouchableOpacity

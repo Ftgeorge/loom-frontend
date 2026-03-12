@@ -1,4 +1,4 @@
-import { AppHeader } from '@/components/AppHeader';
+import { SubAppHeader } from '@/components/AppSubHeader';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { Card } from '@/components/ui/CardChipBadge';
 import { LoomThread } from '@/components/ui/LoomThread';
@@ -10,11 +10,13 @@ import { useAppStore } from '@/store';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { formatDate, formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp, StretchInY } from 'react-native-reanimated';
 
 export default function EarningsScreen() {
+    const router = useRouter();
     const { language, setEarnings, earnings } = useAppStore();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -23,23 +25,32 @@ export default function EarningsScreen() {
         try {
             setError(false);
             const data = await artisanApi.meEarnings();
-            const totalEarned = Number(data.total_earned);
-            const pendingPayout = Number(data.pending_payout);
+            const totalEarned = Number(data.total_earned || 0);
+            const pendingPayout = Number(data.pending_payout || 0);
+            
+            // Map transactions from backend TransactionRow to frontend Transaction
+            const txs = (data.transactions || []).map((t: any) => ({
+                id: t.id,
+                description: t.description,
+                amount: Number(t.amount),
+                date: t.created_at,
+                type: t.type,
+                status: t.status
+            }));
+
             setEarnings({
                 totalEarnings: totalEarned,
-                thisWeek: 0,
-                thisMonth: 0,
+                thisWeek: totalEarned, // For now, use total as we don't have weekly split yet
+                thisMonth: totalEarned,
                 pendingPayments: pendingPayout,
                 weeklyData: ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((day) => ({
                     day,
-                    amount: Math.random() * 50000, // Mock data for velocity visualization
+                    amount: 0, // Should be calculated if we add temporal queries
                 })),
-                transactions: [
-                    { id: '1', description: 'Job #142 Payment', amount: 12500, type: 'credit', date: new Date().toISOString(), status: 'completed' },
-                    { id: '2', description: 'Withdrawal to Kuda Bank', amount: 45000, type: 'debit', date: new Date().toISOString(), status: 'completed' },
-                ],
+                transactions: txs,
             });
-        } catch {
+        } catch (err) {
+            console.error("Earnings load error:", err);
             setError(true);
         } finally {
             setLoading(false);
@@ -48,26 +59,31 @@ export default function EarningsScreen() {
 
     useEffect(() => { load(); }, [load]);
 
+    const maxBar = React.useMemo(() => earnings ? Math.max(...earnings.weeklyData.map((d) => d.amount), 1) : 1, [earnings]);
+
     if (loading) return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <AppHeader title="Earnings" showNotification={false} />
+            <SubAppHeader label="FINANCIALS" title="Earnings" description="Loading your financial data..." onNotification={() => router.push('/notifications')} />
             <View style={{ padding: 24 }}><SkeletonList count={4} /></View>
         </View>
     );
 
     if (error || !earnings) return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <AppHeader title="Earnings" showNotification={false} />
+            <SubAppHeader label="FINANCIALS" title="Earnings" description="Something went wrong." onNotification={() => router.push('/notifications')} />
             <ErrorState onRetry={load} />
         </View>
     );
 
-    const maxBar = React.useMemo(() => earnings ? Math.max(...earnings.weeklyData.map((d) => d.amount), 1) : 1, [earnings]);
-
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.2} animated />
-            <AppHeader title="Earnings" showNotification={false} />
+            <SubAppHeader
+                label="FINANCIALS"
+                title="My Earnings"
+                description="Track your revenue and manage your payouts."
+                onNotification={() => router.push('/notifications')}
+            />
 
             <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
                 {/* Yield Hub */}

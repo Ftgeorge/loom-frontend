@@ -5,7 +5,7 @@ import { Colors, Radius, Shadows, Typography } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { ImageBackground, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
 export default function RoleSelectionScreen() {
@@ -19,12 +19,14 @@ export default function RoleSelectionScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <LoomThread variant="minimal" animated scale={1.2} opacity={0.3} />
+      <View style={StyleSheet.absoluteFill}>
+        <LoomThread variant="dense" animated scale={1.5} opacity={0.5} />
+      </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 32, justifyContent: 'center' }}>
         <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 48 }}>
           <Text style={[Typography.label, { color: Colors.primary, marginBottom: 12 }]}>LOOM</Text>
-          <Text style={[Typography.h1, { fontSize: 32, lineHeight: 38 }]}>
+          <Text style={[Typography.h1, { fontSize: 36, lineHeight: 38 }]}>
             How can we{"\n"}help you?
           </Text>
         </Animated.View>
@@ -67,7 +69,7 @@ export default function RoleSelectionScreen() {
                 </View>
 
                 <View>
-                  <Text style={[Typography.label, { color: Colors.accent, fontSize: 10, marginBottom: 4 }]}>CLIENT</Text>
+                  <Text style={[Typography.label, { color: Colors.gray300, fontSize: 10, marginBottom: 4 }]}>CLIENT</Text>
                   <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>
                     {t("iNeedArtisan", language)}
                   </Text>
@@ -117,7 +119,7 @@ export default function RoleSelectionScreen() {
                 </View>
 
                 <View>
-                  <Text style={[Typography.label, { color: 'rgba(255,255,255,0.8)', fontSize: 10, marginBottom: 4 }]}>PROFESSIONAL</Text>
+                  <Text style={[Typography.label, { color: 'rgba(255,255,255,0.8)', fontSize: 10, marginBottom: 4 }]}>ARTISAN</Text>
                   <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>
                     {t("iAmArtisan", language)}
                   </Text>

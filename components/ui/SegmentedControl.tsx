@@ -9,7 +9,7 @@ interface SegmentedControlProps {
 
 export function SegmentedControl({ segments, selected, onSelect }: SegmentedControlProps) {
     return (
-        <View className="flex-row bg-surface rounded-xl p-1">
+        <View className="flex-row bg-surface rounded-md p-1">
             {segments.map((seg, i) => {
                 const isActive = i === selected;
                 return (

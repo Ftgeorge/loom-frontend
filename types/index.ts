@@ -1,6 +1,6 @@
 // ─── Core Enums ─────────────────────────────────────────
 export type UserRole = 'client' | 'artisan';
-export type Language = 'en' | 'pidgin' | 'yoruba';
+export type Language = 'en' | 'pidgin' | 'yoruba' | 'hausa' | 'igbo';
 
 export type JobStatus =
     | 'draft'
@@ -63,11 +63,23 @@ export interface User {
     languagePref: Language;
     avatar?: string;
     location?: Location;
+    interests?: CategoryId[];
     rating?: number;
     createdAt: string;
 }
 
 // ─── Artisan ────────────────────────────────────────────
+export interface ArtisanPortfolioItem {
+    id: string;
+    imageUrl: string;
+    title: string;
+    description: string;
+    createdAt: string;
+    rating?: number;
+    comment?: string;
+    customerName?: string;
+}
+
 export interface ArtisanReview {
     id: string;
     clientName: string;
@@ -79,6 +91,7 @@ export interface ArtisanReview {
 
 export interface Artisan {
     id: string;
+    userId: string;
     name: string;
     phone: string;
     email?: string;
@@ -89,7 +102,8 @@ export interface Artisan {
     verified: boolean;
     distance: number; // km
     availability: 'online' | 'offline' | 'busy';
-    priceRange: { min: number; max: number };
+    baseFee: number;
+    pricePerHour?: number;
     bio: string;
     location: Location;
     serviceAreas: string[];
@@ -98,6 +112,7 @@ export interface Artisan {
     matchScore?: number;
     completedJobs: number;
     joinedDate: string;
+    portfolio: ArtisanPortfolioItem[];
 }
 
 // ─── Job Request ────────────────────────────────────────
@@ -119,6 +134,8 @@ export interface JobRequest {
     scheduledDate?: string;
     scheduledTime?: string;
     completedAt?: string;
+    ratingId?: string;
+    ratingValue?: number;
 }
 
 // ─── Messages ───────────────────────────────────────────

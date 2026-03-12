@@ -3,6 +3,7 @@ import { PrimaryButton } from "@/components/ui/Buttons";
 import { LoomThread } from "@/components/ui/LoomThread";
 import { AppTextInput, PasswordInput } from "@/components/ui/TextInputs";
 import { authApi } from "@/services/api";
+import { mapUser } from "@/services/mappers";
 import { useAppStore } from "@/store";
 import { Colors, Radius, Shadows, Typography } from "@/theme";
 import { SignInSchema, mapZodErrors } from "@/utils/helpers";
@@ -41,18 +42,15 @@ export default function SignInScreen() {
         password: form.password,
       });
 
+      const mappedUser = mapUser(res.user);
       signIn(
-        (res.user.role as any) ?? "client",
-        {
-          id: res.user.id,
-          email: res.user.email,
-          name: res.user.name ?? form.phone,
-        },
+        mappedUser.role as any,
+        mappedUser,
         res.token
       );
 
       router.replace(
-        res.user.role === "artisan" ? "/(tabs)/dashboard" : "/(tabs)/home"
+        mappedUser.role === "artisan" ? "/(tabs)/dashboard" : "/(tabs)/home"
       );
     } catch (err: any) {
       Alert.alert("Authentication Failed", err.message ?? "Credentials could not be verified.");
@@ -108,7 +106,7 @@ export default function SignInScreen() {
             onPress={() => router.push("/(auth)/forgot-password")}
           >
             <Text style={[Typography.label, { color: Colors.primary, fontSize: 10, textTransform: 'none' }]}>
-              Forgot password? <Text style={{ fontWeight: '800' }}>Reset it</Text>
+              Forgot password?
             </Text>
           </TouchableOpacity>
 
@@ -116,7 +114,7 @@ export default function SignInScreen() {
             title="Sign In"
             onPress={handleSignIn}
             loading={loading}
-            style={{ marginTop: 32, height: 60, borderRadius: Radius.md }}
+            style={{ marginTop: 32, height: 60, borderRadius: Radius.sm }}
           />
         </Animated.View>
 
@@ -135,7 +133,7 @@ export default function SignInScreen() {
             <Text style={[Typography.label, { color: Colors.muted, fontSize: 10, textTransform: 'none' }]}>
               Don't have an account?{" "}
               <Text
-                onPress={() => router.push("/(auth)/sign-up")}
+                onPress={() => router.push("/role-selection")}
                 style={{ color: Colors.primary, fontWeight: "800" }}
               >
                 Create Account

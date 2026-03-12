@@ -1,4 +1,4 @@
-import { AppHeader } from "@/components/AppHeader";
+import { SubAppHeader } from "@/components/AppSubHeader";
 import { Avatar } from "@/components/ui/AvatarRating";
 import { Card } from "@/components/ui/CardChipBadge";
 import { LoomThread } from "@/components/ui/LoomThread";
@@ -42,167 +42,310 @@ export default function ProfileScreen() {
     ]);
   };
 
-  const menuItems = [
-    ...(isArtisan
-      ? [
-        {
-          icon: "eye-outline",
-          label: "View My Profile",
-          onPress: () => artisanId && router.push({ pathname: '/artisan-profile', params: { id: artisanId } }),
-        },
-        { icon: "star-outline", label: "My Reviews", onPress: () => { } },
-        {
-          icon: "shield-checkmark-outline",
-          label: "Verification",
-          onPress: () => { },
-        },
-        {
-          icon: "construct-outline",
-          label: "My Skills",
-          onPress: () => router.push("/artisan-onboarding"),
-        },
-      ]
-      : [
-        {
-          icon: "bookmark-outline",
-          label: `Saved Professionals (${savedArtisans.length})`,
-          onPress: () => { },
-        },
-        { icon: "card-outline", label: "Payment History", onPress: () => { } },
-      ]),
+  interface MenuItem {
+    icon: string;
+    label: string;
+    onPress: () => void;
+    danger?: boolean;
+  }
+
+  interface MenuSection {
+    title: string;
+    items: MenuItem[];
+  }
+
+  const menuSections: MenuSection[] = [
     {
-      icon: "settings-outline",
-      label: "Settings",
-      onPress: () => router.push("/settings"),
+      title: "ACTIVITY",
+      items: isArtisan
+        ? [
+          {
+            icon: "person-outline",
+            label: "View Public Profile",
+            onPress: () => artisanId && router.push({ pathname: '/artisan-profile', params: { id: artisanId } }),
+          },
+          { icon: "star-outline", label: "My Reviews", onPress: () => { } },
+          {
+            icon: "shield-checkmark-outline",
+            label: "Verification Status",
+            onPress: () => router.push("/verification"),
+          },
+          {
+            icon: "construct-outline",
+            label: "Manage Skills",
+            onPress: () => router.push("/artisan-onboarding"),
+          },
+        ]
+        : [
+          {
+            icon: "bookmark-outline",
+            label: `Saved Professionals (${savedArtisans.length})`,
+            onPress: () => { },
+          },
+          { icon: "receipt-outline", label: "Payment History", onPress: () => { } },
+          {
+            icon: "hammer-outline",
+            label: "Switch to Artisan Account",
+            onPress: () => {
+              Alert.alert(
+                "Become a Professional",
+                "Do you want to start offering your services on Loom?",
+                [
+                  { text: "Later", style: "cancel" },
+                  {
+                    text: "Let's Go",
+                    onPress: () => {
+                      import('@/store').then(({ useAppStore }) => {
+                        useAppStore.getState().switchRole('artisan');
+                        router.push('/artisan-onboarding');
+                      });
+                    }
+                  }
+                ]
+              );
+            },
+          },
+        ],
     },
     {
-      icon: "language-outline",
-      label: `Language: ${languageNames[language]}`,
-      onPress: () => router.push("/settings"),
+      title: "PREFERENCES",
+      items: [
+        {
+          icon: "settings-outline",
+          label: "General Settings",
+          onPress: () => router.push("/settings"),
+        },
+        {
+          icon: "language-outline",
+          label: `Language: ${languageNames[language]}`,
+          onPress: () => router.push("/settings"),
+        },
+      ],
     },
     {
-      icon: "help-circle-outline",
-      label: "Help & Support",
-      onPress: () => router.push("/help"),
+      title: "SUPPORT",
+      items: [
+        {
+          icon: "help-circle-outline",
+          label: "Help & Support Center",
+          onPress: () => router.push("/help"),
+        },
+      ],
     },
     {
-      icon: "log-out-outline",
-      label: "Sign Out",
-      onPress: handleLogout,
-      danger: true,
+      title: "ACCOUNT",
+      items: [
+        {
+          icon: "log-out-outline",
+          label: "Sign Out",
+          onPress: handleLogout,
+          danger: true,
+        },
+      ],
     },
   ];
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <LoomThread variant="minimal" opacity={0.2} animated />
-      <AppHeader title="Profile" showNotification={false} />
+      <SubAppHeader
+        label="IDENTITY"
+        title="My Profile"
+        description="Manage your personal information and preferences."
+        onNotification={() => router.push('/notifications')}
+      />
 
       <ScrollView
         contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Command Center */}
-        <Animated.View entering={FadeInDown.springify()} style={{ alignItems: "center", paddingVertical: 50 }}>
-          <View style={{ position: 'relative' }}>
+        <Animated.View entering={FadeInDown.springify()} style={{ alignItems: "center", paddingVertical: 40 }}>
+          {/* ─── Premium Avatar Complex ────────────────────────────────────────── */}
+          <View style={{ marginBottom: 24 }}>
             <View style={{
-              padding: 4,
-              borderRadius: 60,
-              borderWidth: 2,
-              borderColor: Colors.primary,
-              borderStyle: 'dashed'
+              padding: 12,
+              borderRadius: 80,
+              backgroundColor: Colors.white,
+              borderWidth: 1,
+              borderColor: Colors.cardBorder,
+              ...Shadows.md
             }}>
-              <Avatar name={user?.name || "U"} size={100} />
+              <View style={{
+                padding: 6,
+                borderRadius: 70,
+                borderWidth: 2,
+                borderColor: Colors.primary + '10',
+                borderStyle: 'dashed'
+              }}>
+                <View style={{
+                  borderRadius: 60,
+                  overflow: 'hidden',
+                  ...Shadows.sm
+                }}>
+                  <Avatar name={user?.name || "U"} size={110} />
+                </View>
+              </View>
+
+              {/* Floating Camera Action */}
+              <TouchableOpacity
+                activeOpacity={0.9}
+                style={{
+                  position: 'absolute',
+                  bottom: 12,
+                  right: 12,
+                  backgroundColor: Colors.ink,
+                  width: 38,
+                  height: 38,
+                  borderRadius: 19,
+                  borderWidth: 4,
+                  borderColor: Colors.white,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  ...Shadows.md
+                }}
+              >
+                <Ionicons name="camera" size={16} color={Colors.white} />
+              </TouchableOpacity>
             </View>
+
+            {/* Identity Halo (Subtle Glow) */}
             <View style={{
               position: 'absolute',
-              bottom: 4,
-              right: 4,
-              backgroundColor: Colors.accent,
-              width: 32,
-              height: 32,
-              borderRadius: 16,
-              borderWidth: 4,
-              borderColor: Colors.background,
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <Ionicons name="camera" size={14} color={Colors.white} />
-            </View>
+              top: -20,
+              left: -20,
+              right: -20,
+              bottom: -20,
+              borderRadius: 100,
+              backgroundColor: Colors.primary,
+              opacity: 0.03,
+              zIndex: -1
+            }} />
           </View>
 
-          <Text style={[Typography.label, { color: Colors.primary, marginTop: 24, fontSize: 10, letterSpacing: 2 }]}>PROFILE</Text>
-          <Text style={[Typography.h1, { marginTop: 8, fontSize: 32 }]}>
+          {/* ─── Profile Details ──────────────────────────────────────────────── */}
+          <Text style={[Typography.label, {
+            color: Colors.primary,
+            fontSize: 10,
+            letterSpacing: 3,
+            fontWeight: '800',
+            opacity: 0.6
+          }]}>
+            IDENTITY KEY
+          </Text>
+
+          <Text style={[Typography.h1, {
+            marginTop: 8,
+            fontSize: 32,
+            color: Colors.ink,
+            fontFamily: 'PlusJakartaSans-ExtraBold'
+          }]}>
             {user?.name?.toUpperCase()}
           </Text>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 12 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16 }}>
             <View style={{
-              backgroundColor: Colors.white,
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-              borderRadius: Radius.xs,
+              backgroundColor: Colors.primary,
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: Radius.full,
               borderWidth: 1,
-              borderColor: Colors.cardBorder
+              borderColor: Colors.primary
             }}>
-              <Text style={[Typography.label, { color: Colors.primary, fontSize: 9 }]}>{isArtisan ? "PROFESSIONAL" : "CLIENT"}</Text>
+              <Text style={[Typography.label, {
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: '700',
+                letterSpacing: 0.5
+              }]}>
+                {isArtisan ? "VERIFIED PRO" : "CLIENT"}
+              </Text>
             </View>
-            <Text style={[Typography.bodySmall, { color: Colors.muted, fontWeight: '600' }]}>
-              {user?.location?.city?.toUpperCase() || "LOCATION NOT SET"}
-            </Text>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Ionicons name="location" size={14} color={Colors.muted} />
+              <Text style={[Typography.bodySmall, { color: Colors.muted, fontWeight: '600' }]}>
+                {user?.location?.city?.toUpperCase() || "LOCATION NOT SET"}
+              </Text>
+            </View>
           </View>
         </Animated.View>
 
-        {/* Action Grille */}
-        <View style={{ gap: 12 }}>
-          {menuItems.map((item, i) => (
-            <Animated.View key={item.label} entering={FadeInDown.delay(200 + i * 50).springify()}>
-              <TouchableOpacity
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  padding: 20,
-                  backgroundColor: Colors.white,
-                  borderRadius: Radius.md,
-                  gap: 16,
-                  borderWidth: 1.5,
-                  borderColor: Colors.cardBorder,
-                  ...Shadows.sm
-                }}
-                onPress={item.onPress}
-                activeOpacity={0.8}
-              >
-                <View style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: Radius.xs,
-                  backgroundColor: item.danger ? Colors.error + '08' : Colors.surface,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: item.danger ? Colors.error + '20' : Colors.cardBorder
-                }}>
-                  <Ionicons
-                    name={item.icon as any}
-                    size={18}
-                    color={item.danger ? Colors.error : Colors.primary}
-                  />
-                </View>
-                <Text
-                  style={[
-                    Typography.body,
-                    { flex: 1, fontWeight: '700', color: item.danger ? Colors.error : Colors.primary, fontSize: 14 }
-                  ]}
-                >
-                  {item.label}
-                </Text>
-                <Ionicons
-                  name="arrow-forward"
-                  size={14}
-                  color={Colors.gray400}
-                />
-              </TouchableOpacity>
-            </Animated.View>
+        <View style={{ gap: 32 }}>
+          {menuSections.map((section, sectionIdx) => (
+            <View key={section.title}>
+              <Text style={[Typography.label, {
+                color: Colors.muted,
+                fontSize: 10,
+                letterSpacing: 1.5,
+                marginBottom: 16,
+                paddingHorizontal: 4
+              }]}>
+                {section.title}
+              </Text>
+
+              <View style={{ gap: 10 }}>
+                {section.items.map((item, i) => (
+                  <Animated.View
+                    key={item.label}
+                    entering={FadeInDown.delay(200 + (sectionIdx * 100) + (i * 50)).springify()}
+                  >
+                    <TouchableOpacity
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        padding: 16,
+                        backgroundColor: Colors.white,
+                        borderRadius: Radius.lg,
+                        gap: 16,
+                        borderWidth: 1,
+                        borderColor: Colors.cardBorder,
+                        ...Shadows.sm
+                      }}
+                      onPress={item.onPress}
+                      activeOpacity={0.7}
+                    >
+                      <View style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: Radius.sm,
+                        backgroundColor: item.danger ? Colors.error + '10' : Colors.surface,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderWidth: 1,
+                        borderColor: item.danger ? Colors.error + '25' : Colors.cardBorder
+                      }}>
+                        <Ionicons
+                          name={item.icon as any}
+                          size={20}
+                          color={item.danger ? Colors.error : Colors.primary}
+                        />
+                      </View>
+
+                      <Text
+                        style={[
+                          Typography.body,
+                          {
+                            flex: 1,
+                            fontWeight: '600',
+                            color: item.danger ? Colors.error : Colors.ink,
+                            fontSize: 15
+                          }
+                        ]}
+                      >
+                        {item.label}
+                      </Text>
+
+                      <Ionicons
+                        name="chevron-forward"
+                        size={16}
+                        color={Colors.gray400}
+                      />
+                    </TouchableOpacity>
+                  </Animated.View>
+                ))}
+              </View>
+            </View>
           ))}
         </View>
 

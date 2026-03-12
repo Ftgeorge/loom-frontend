@@ -2,35 +2,39 @@ import { useAppStore } from '@/store';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { Alert, FlatList, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, Modal, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
 import { NIGERIAN_STATES } from '@/utils/locations';
 
-interface AppHeaderProps {
+interface SubAppHeaderProps {
     title?: string;
+    description?: string;
+    label?: string;
+    onNotification?: () => void;
     showLocation?: boolean;
-    showNotification?: boolean;
     showBack?: boolean;
     onBack?: () => void;
-    onNotification?: () => void;
-    rightAction?: React.ReactNode;
+    showNotification?: boolean;
+    notifPlacement?: 'top' | 'content';
 }
 
-export function AppHeader({
+export function SubAppHeader({
     title,
+    description,
+    label,
+    onNotification,
     showLocation,
-    showNotification = true,
     showBack,
     onBack,
-    onNotification,
-    rightAction,
-}: AppHeaderProps) {
+    showNotification = true,
+    notifPlacement = 'content'
+}: SubAppHeaderProps) {
     const insets = useSafeAreaInsets();
-    const router = useRouter();
-    const { selectedState, setSelectedState, notifications } = useAppStore();
+    const { selectedState, setSelectedState, notifications, user } = useAppStore();
     const [showPicker, setShowPicker] = useState(false);
+    const router = useRouter();
 
     const unread = (notifications || []).filter((n) => !n.read).length;
 
@@ -41,7 +45,7 @@ export function AppHeader({
             
             Alert.alert(
                 'Update Location',
-                `You've switched to ${state}. Please update your city and area to see the best professionals matching your new location.`,
+                `You've switched to ${state}. To see relevant professionals, please update your city and area in your profile.`,
                 [
                     { text: 'Later', style: 'cancel' },
                     { 
@@ -59,61 +63,52 @@ export function AppHeader({
         <>
             <View
                 style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 24,
-                    paddingBottom: 16,
-                    backgroundColor: Colors.canvas,
                     paddingTop: insets.top + 12,
-                    borderBottomWidth: 1,
-                    borderBottomColor: Colors.divider,
+                    paddingHorizontal: 24,
+                    paddingBottom: 24,
                 }}
             >
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
-                    {showBack && (
-                        <TouchableOpacity
-                            onPress={onBack}
-                            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                            style={{ padding: 4 }}
-                        >
-                            <Ionicons name="arrow-back" size={24} color={Colors.primary} />
-                        </TouchableOpacity>
-                    )}
-                    {showLocation && (
-                        <TouchableOpacity
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                backgroundColor: Colors.surface,
-                                paddingHorizontal: 12,
-                                paddingVertical: 8,
-                                borderRadius: Radius.full,
-                                gap: 6,
-                                borderWidth: 1,
-                                borderColor: Colors.cardBorder,
-                                ...Shadows.xs
-                            }}
-                            activeOpacity={0.8}
-                            onPress={() => setShowPicker(true)}
-                        >
-                            <Ionicons name="location" size={12} color={Colors.primary} />
-                            <Text style={{ fontSize: 12, fontFamily: 'Inter-SemiBold', color: Colors.ink }}>
-                                {selectedState}
-                            </Text>
-                            <Ionicons name="chevron-down" size={12} color={Colors.muted} />
-                        </TouchableOpacity>
-                    )}
-                    {title && !showLocation && (
-                        <Text style={{ fontSize: 16, fontFamily: 'PlusJakartaSans-SemiBold', color: Colors.ink, flex: 1 }} numberOfLines={1}>
-                            {title}
-                        </Text>
-                    )}
-                </View>
+                {/* Top Action Row */}
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                        {showBack && (
+                            <TouchableOpacity
+                                onPress={onBack}
+                                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                                style={{ padding: 4 }}
+                            >
+                                <Ionicons name="arrow-back" size={24} color={Colors.primary} />
+                            </TouchableOpacity>
+                        )}
+                        {showLocation ? (
+                            <TouchableOpacity
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    backgroundColor: Colors.surface,
+                                    paddingHorizontal: 12,
+                                    paddingVertical: 8,
+                                    borderRadius: Radius.full,
+                                    gap: 6,
+                                    borderWidth: 1,
+                                    borderColor: Colors.cardBorder,
+                                    ...Shadows.xs
+                                }}
+                                activeOpacity={0.8}
+                                onPress={() => setShowPicker(true)}
+                            >
+                                <Ionicons name="location" size={12} color={Colors.primary} />
+                                <Text style={{ fontSize: 12, fontFamily: 'Inter-SemiBold', color: Colors.ink }}>
+                                    {selectedState}
+                                </Text>
+                                <Ionicons name="chevron-down" size={12} color={Colors.muted} />
+                            </TouchableOpacity>
+                        ) : (
+                            <View style={{ width: 1, height: 1 }} />
+                        )}
+                    </View>
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                    {rightAction}
-                    {showNotification && (
+                    {showNotification && notifPlacement === 'top' && (
                         <TouchableOpacity
                             onPress={onNotification}
                             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -147,6 +142,50 @@ export function AppHeader({
                         </TouchableOpacity>
                     )}
                 </View>
+
+                {/* Content Row */}
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <View style={{ flex: 1, marginRight: notifPlacement === 'content' ? 20 : 0 }}>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>{label}</Text>
+                        <Text style={[Typography.h1, { fontSize: 36, marginBottom: 8, lineHeight: 42 }]}>{title}</Text>
+                        <Text style={[Typography.body, { color: Colors.muted }]}>{description}</Text>
+                    </View>
+
+                    {showNotification && notifPlacement === 'content' && (
+                        <TouchableOpacity
+                            onPress={onNotification}
+                            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                            style={{
+                                width: 48,
+                                height: 48,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: Radius.md,
+                                backgroundColor: Colors.surface,
+                                borderWidth: 1,
+                                borderColor: Colors.cardBorder,
+                                position: 'relative',
+                                marginTop: 18,
+                                ...Shadows.xs,
+                            }}
+                        >
+                            <Ionicons name="notifications" size={20} color={Colors.ink} />
+                            {unread > 0 && (
+                                <View style={{
+                                    position: 'absolute',
+                                    top: 8,
+                                    right: 8,
+                                    backgroundColor: Colors.violet,
+                                    width: 10,
+                                    height: 10,
+                                    borderRadius: 5,
+                                    borderWidth: 2,
+                                    borderColor: Colors.surface,
+                                }} />
+                            )}
+                        </TouchableOpacity>
+                    )}
+                </View>
             </View>
 
             <Modal
@@ -155,8 +194,9 @@ export function AppHeader({
                 animationType="fade"
                 onRequestClose={() => setShowPicker(false)}
             >
-                <Pressable
+                <TouchableOpacity
                     style={{ flex: 1, backgroundColor: 'rgba(0,18,12,0.8)', justifyContent: 'center', padding: 32 }}
+                    activeOpacity={1}
                     onPress={() => setShowPicker(false)}
                 >
                     <View style={{
@@ -178,8 +218,8 @@ export function AppHeader({
                             backgroundColor: Colors.surface
                         }}>
                             <View>
-                                <Text style={[Typography.label, { fontSize: 10, color: Colors.primary, marginBottom: 4 }]}>Your City</Text>
-                                <Text style={[Typography.h3, { fontSize: 20 }]}>Where are you?</Text>
+                                <Text style={[Typography.label, { fontSize: 10, color: Colors.primary, marginBottom: 4 }]}>Your Location</Text>
+                                <Text style={[Typography.h3, { fontSize: 20 }]}>Switch State</Text>
                             </View>
                             <TouchableOpacity onPress={() => setShowPicker(false)} style={{ padding: 8 }}>
                                 <Ionicons name="close" size={24} color={Colors.primary} />
@@ -216,7 +256,7 @@ export function AppHeader({
                             )}
                         />
                     </View>
-                </Pressable>
+                </TouchableOpacity>
             </Modal>
         </>
     );

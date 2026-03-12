@@ -41,8 +41,9 @@ export default function SignUpScreen() {
                 password: form.password,
             });
 
+            const role = loginRes.user.role === 'customer' ? 'client' : loginRes.user.role;
             signIn(
-                (loginRes.user.role as any) ?? 'client',
+                role as any,
                 {
                     id: loginRes.user.id,
                     email: loginRes.user.email,
@@ -75,12 +76,33 @@ export default function SignUpScreen() {
                 <BackButton onPress={() => router.back()} />
 
                 <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 40, marginTop: 32 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>JOIN US</Text>
-                    <Text style={[Typography.h1, { fontSize: 32 }]}>Hop in</Text>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <View>
+                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>JOIN US</Text>
+                            <Text style={[Typography.h1, { fontSize: 32 }]}>Log in</Text>
+                        </View>
+                        <TouchableOpacity
+                            onPress={() => router.push('/role-selection')}
+                            style={{
+                                backgroundColor: user?.role === 'artisan' ? '#7C472720' : Colors.primaryLight,
+                                paddingHorizontal: 12,
+                                paddingVertical: 8,
+                                borderRadius: Radius.xs,
+                                borderWidth: 1,
+                                borderColor: user?.role === 'artisan' ? '#7C4727' : Colors.primary,
+                                alignItems: 'center'
+                            }}
+                        >
+                            <Text style={[Typography.label, { color: user?.role === 'artisan' ? '#7C4727' : Colors.primary, fontSize: 8 }]}>
+                                {user?.role === 'artisan' ? 'AS ARTISAN' : 'AS CLIENT'}
+                            </Text>
+                            <Text style={{ fontSize: 8, color: Colors.muted, marginTop: 2, fontWeight: '700' }}>CHANGE</Text>
+                        </TouchableOpacity>
+                    </View>
                     <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 12, lineHeight: 22 }]}>
                         {user?.role === 'artisan'
-                            ? 'Join the crew and start earning.'
-                            : 'Get your profile set to find pros.'}
+                            ? 'Join the artisans and start earning.'
+                            : 'Get your profile set to find artisan.'}
                     </Text>
                 </Animated.View>
 
@@ -113,8 +135,8 @@ export default function SignUpScreen() {
                         containerStyle={{ borderRadius: Radius.xs }}
                     />
                     <PasswordInput
-                        label="SECRET"
-                        placeholder="Keep it secret"
+                        label="Password"
+                        placeholder="Enter your password"
                         value={form.password}
                         onChangeText={(password) => setForm({ ...form, password })}
                         error={errors.password}
@@ -125,7 +147,7 @@ export default function SignUpScreen() {
                         title="GO"
                         onPress={handleSignUp}
                         loading={loading}
-                        style={{ marginTop: 32, height: 60, borderRadius: Radius.md }}
+                        style={{ marginTop: 32, height: 60 }}
                     />
                 </Animated.View>
 

@@ -1,4 +1,4 @@
-import { AppHeader } from '@/components/AppHeader';
+import { SubAppHeader } from '@/components/AppSubHeader';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { EmptyState } from '@/components/ui/StateComponents';
@@ -54,28 +54,33 @@ export default function NotificationsScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.3} animated />
-            <AppHeader
+            <SubAppHeader
+                label="ALERTS"
                 title="Notifications"
+                description="Stay updated with your latest activities."
                 showBack
                 onBack={() => router.back()}
                 showNotification={false}
-                rightAction={
-                    <TouchableOpacity
-                        onPress={handleMarkAllRead}
-                        style={{
-                            paddingHorizontal: 12,
-                            paddingVertical: 6,
-                            backgroundColor: Colors.white,
-                            borderRadius: Radius.xs,
-                            borderWidth: 1,
-                            borderColor: Colors.cardBorder,
-                            ...Shadows.sm
-                        }}
-                    >
-                        <Text style={[Typography.label, { color: Colors.primary, fontSize: 8 }]}>CLEAR ALL</Text>
-                    </TouchableOpacity>
-                }
             />
+
+            {!loading && notifications.length > 0 && (
+                <TouchableOpacity 
+                    onPress={handleMarkAllRead}
+                    style={{ 
+                        alignSelf: 'flex-end', 
+                        marginHorizontal: 24, 
+                        marginBottom: 16,
+                        paddingVertical: 8,
+                        paddingHorizontal: 12,
+                        borderRadius: Radius.full,
+                        backgroundColor: Colors.surface,
+                        borderWidth: 1,
+                        borderColor: Colors.cardBorder
+                    }}
+                >
+                    <Text style={[Typography.label, { fontSize: 10, color: Colors.primary }]}>MARK ALL READ</Text>
+                </TouchableOpacity>
+            )}
 
             {loading ? (
                 <View style={{ padding: 24 }}><SkeletonList count={5} type="notification" /></View>
@@ -89,7 +94,8 @@ export default function NotificationsScreen() {
                 <FlatList
                     data={notifications}
                     keyExtractor={(item) => item.id}
-                    contentContainerStyle={{ paddingBottom: 100 }}
+                    contentContainerStyle={{ paddingBottom: 120, paddingHorizontal: 24 }}
+                    showsVerticalScrollIndicator={false}
                     initialNumToRender={15}
                     maxToRenderPerBatch={15}
                     windowSize={5}
@@ -101,56 +107,68 @@ export default function NotificationsScreen() {
                                 <TouchableOpacity
                                     style={{
                                         flexDirection: 'row',
-                                        paddingHorizontal: 24,
-                                        paddingVertical: 24,
-                                        gap: 20,
-                                        backgroundColor: item.read ? 'transparent' : Colors.white,
-                                        borderBottomWidth: 1,
-                                        borderBottomColor: Colors.gray100
+                                        padding: 20,
+                                        gap: 16,
+                                        backgroundColor: item.read ? Colors.canvas : Colors.white,
+                                        borderRadius: Radius.lg,
+                                        marginBottom: 12,
+                                        borderWidth: 1,
+                                        borderColor: item.read ? Colors.divider : Colors.cardBorder,
+                                        ...(!item.read ? Shadows.md : {})
                                     }}
                                     onPress={() => markNotificationRead(item.id)}
-                                    activeOpacity={0.7}
+                                    activeOpacity={0.8}
                                 >
                                     <View style={{
-                                        width: 52,
-                                        height: 52,
-                                        borderRadius: Radius.xs,
+                                        width: 48,
+                                        height: 48,
+                                        borderRadius: Radius.md,
                                         backgroundColor: typeInfo.bg || Colors.primaryLight,
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        borderWidth: 1,
-                                        borderColor: item.read ? 'transparent' : typeInfo.color + '20'
                                     }}>
                                         <Ionicons
                                             name={typeInfo.icon as any}
-                                            size={24}
+                                            size={22}
                                             color={typeInfo.color || Colors.primary}
                                         />
                                     </View>
 
                                     <View style={{ flex: 1 }}>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                                            <Text style={[Typography.h3, { fontSize: 16, flex: 1, color: Colors.text }]} numberOfLines={1}>{item.title}</Text>
-                                            <Text style={[Typography.label, { fontSize: 9, color: Colors.muted, letterSpacing: 0 }]}>{timeAgo(item.createdAt).toUpperCase()}</Text>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                                            <Text 
+                                                style={[Typography.h3, { 
+                                                    fontSize: 15, 
+                                                    flex: 1, 
+                                                    color: Colors.ink,
+                                                    fontFamily: item.read ? 'PlusJakartaSans-SemiBold' : 'PlusJakartaSans-Bold'
+                                                }]} 
+                                                numberOfLines={1}
+                                            >
+                                                {item.title}
+                                            </Text>
+                                            {!item.read && (
+                                                <View style={{
+                                                    width: 8,
+                                                    height: 8,
+                                                    borderRadius: 4,
+                                                    backgroundColor: Colors.accent,
+                                                }} />
+                                            )}
                                         </View>
                                         <Text
-                                            style={[Typography.bodySmall, { color: item.read ? Colors.muted : Colors.textSecondary, lineHeight: 22 }]}
+                                            style={[Typography.bodySmall, { 
+                                                color: item.read ? Colors.muted : Colors.text, 
+                                                lineHeight: 20,
+                                                fontSize: 13
+                                            }]}
                                             numberOfLines={2}
                                         >
                                             {item.body}
                                         </Text>
-                                        {!item.read && (
-                                            <View style={{
-                                                position: 'absolute',
-                                                top: 6,
-                                                left: -12,
-                                                width: 6,
-                                                height: 6,
-                                                borderRadius: 3,
-                                                backgroundColor: Colors.accent,
-                                                ...Shadows.sm
-                                            }} />
-                                        )}
+                                        <Text style={[Typography.label, { fontSize: 9, color: Colors.muted, letterSpacing: 0, marginTop: 8 }]}>
+                                            {timeAgo(item.createdAt).toUpperCase()}
+                                        </Text>
                                     </View>
                                 </TouchableOpacity>
                             </Animated.View>

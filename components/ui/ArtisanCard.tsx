@@ -1,493 +1,261 @@
+import { Avatar, RatingStars } from '@/components/ui/AvatarRating';
+import { Badge, Chip } from '@/components/ui/CardChipBadge';
+import { LoomThread } from '@/components/ui/LoomThread';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { Artisan } from '@/types';
 import { formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { ImageBackground, Text, TouchableOpacity, View } from 'react-native';
-import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
-} from 'react-native-reanimated';
-import { Avatar } from './AvatarRating';
-
-const AnimatedTouchableOpacity = Animated.createAnimatedComponent(TouchableOpacity);
-
-// Maps an artisan's primary skill to our local craft photo
-const SKILL_IMAGES: Record<string, any> = {
-    plumber: require('../../assets/images/cat_plumber.png'),
-    electrician: require('../../assets/images/cat_electrician.png'),
-    carpenter: require('../../assets/images/cat_carpenter.png'),
-    tailor: require('../../assets/images/cat_tailor.png'),
-    mechanic: require('../../assets/images/cat_mechanic.png'),
-    cleaning: require('../../assets/images/cat_cleaning.png'),
-    hair_beauty: require('../../assets/images/cat_hair_beauty.png'),
-    ac_repair: require('../../assets/images/cat_ac_repair.png'),
-};
-
-function getSkillImage(skills: string[]) {
-    for (const s of skills) {
-        if (SKILL_IMAGES[s]) return SKILL_IMAGES[s];
-    }
-    return require('../../assets/images/artisan.jpg'); // fallback
-}
+import React, { useCallback } from 'react';
+import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 interface ArtisanCardProps {
     artisan: Artisan;
-    onPress: () => void;
-    horizontal?: boolean;
-    featured?: boolean;
+    onPress?: () => void;
     grid?: boolean;
     list?: boolean;
+    featured?: boolean;
 }
 
-// ─── Verified Badge ────────────────────────────────────────────────────────────
-function LoomVerifiedBadge() {
-    return (
-        <View style={{
-            flexDirection: 'row', alignItems: 'center', gap: 4,
-            backgroundColor: Colors.violetLight,
-            borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3,
-            borderWidth: 1, borderColor: Colors.violet + '30',
-        }}>
-            <Ionicons name="shield-checkmark" size={10} color={Colors.violet} />
-            <Text style={{
-                fontSize: 8, fontFamily: 'PlusJakartaSans-Bold',
-                color: Colors.violet, letterSpacing: 0.6, textTransform: 'uppercase',
-            }}>Verified</Text>
-        </View>
-    );
-}
-
-// ─── Online Status Dot ─────────────────────────────────────────────────────────
-function OnlineDot({ online }: { online: boolean }) {
-    return (
-        <View style={{
-            width: 10, height: 10, borderRadius: 5,
-            backgroundColor: online ? Colors.success : Colors.muted,
-            borderWidth: 2, borderColor: 'white',
-        }} />
-    );
-}
-
-// ─── Rating row ────────────────────────────────────────────────────────────────
-function RatingRow({ rating, distance, verified }: { rating: number; distance: number; verified: boolean }) {
-    return (
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
-                <Ionicons name="star" size={11} color="#F59E0B" />
-                <Text style={{ fontSize: 12, fontFamily: 'Inter-SemiBold', color: Colors.ink }}>
-                    {rating.toFixed(1)}
-                </Text>
-            </View>
-            <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: Colors.gray300 }} />
-            <Text style={{ fontSize: 12, fontFamily: 'Inter-Regular', color: Colors.muted }}>
-                {distance}km away
-            </Text>
-            {verified && <LoomVerifiedBadge />}
-        </View>
-    );
-}
-
-export const ArtisanCard = React.memo(({ artisan, onPress, grid, list, featured }: ArtisanCardProps) => {
+const ArtisanCardComponent: React.FC<ArtisanCardProps> = ({
+    artisan,
+    onPress,
+    grid = false,
+    list = false,
+    featured = false,
+}) => {
     const scale = useSharedValue(1);
-    const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-    const handlePressIn = () => { scale.value = withSpring(0.97, { damping: 15 }); };
-    const handlePressOut = () => { scale.value = withSpring(1, { damping: 15 }); };
 
-    const craftImage = getSkillImage(artisan.skills);
-    const primarySkill = artisan.skills[0]?.replace(/_/g, ' ') ?? 'Artisan';
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+    }));
 
-    if (list) {
-        return (
-            <AnimatedTouchableOpacity
-                style={[{
-                    borderRadius: Radius.md,
-                    backgroundColor: Colors.surface,
-                    borderWidth: 1,
-                    borderColor: Colors.cardBorder,
-                    flexDirection: 'row',
-                    padding: 12,
-                    gap: 16,
-                    ...Shadows.sm,
-                }, animatedStyle]}
+    const onPressIn = useCallback(() => {
+        scale.value = withSpring(0.96, { damping: 15, stiffness: 300 });
+    }, []);
+
+    const onPressOut = useCallback(() => {
+        scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+    }, []);
+
+    // Selection of craft image based on skills
+    const getCraftImage = (skills: string[]) => {
+        const skill = skills[0]?.toLowerCase() || 'general';
+        if (skill.includes('plumb')) return { uri: 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=400' };
+        if (skill.includes('elect')) return { uri: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400' };
+        if (skill.includes('carp')) return { uri: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=400' };
+        if (skill.includes('tailor')) return { uri: 'https://images.unsplash.com/photo-1590736704728-f4730bb30770?w=400' };
+        if (skill.includes('mech')) return { uri: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400' };
+        if (skill.includes('clean')) return { uri: 'https://images.unsplash.com/photo-1581578769538-da81ad722e4a?w=400' };
+        if (skill.includes('hair') || skill.includes('beau')) return { uri: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400' };
+        if (skill.includes('ac') || skill.includes('repair')) return { uri: 'https://images.unsplash.com/photo-1558223108-630d94ec171c?w=400' };
+        return { uri: 'https://images.unsplash.com/photo-1541963463532-d68292c34b19?w=400' };
+    };
+
+    const craftImage = getCraftImage(artisan.skills);
+
+    const renderList = () => (
+        <Animated.View style={[styles.card, styles.listCard, animatedStyle]}>
+            <TouchableOpacity
                 onPress={onPress}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
+                onPressIn={onPressIn}
+                onPressOut={onPressOut}
                 activeOpacity={1}
+                style={[styles.touchable, { flexDirection: 'row' }]}
             >
-                {/* Image Section */}
-                <View style={{ width: 100, height: 100, borderRadius: Radius.sm, overflow: 'hidden' }}>
-                    <ImageBackground source={craftImage} style={{ width: '100%', height: '100%' }}>
-                        <View style={{ ...StyleSheet_absoluteFill, backgroundColor: 'rgba(0,0,0,0.2)' }} />
-                        <View style={{ position: 'absolute', top: 6, right: 6 }}>
-                            <OnlineDot online={artisan.availability === 'online'} />
-                        </View>
+                <View style={styles.imageContainer}>
+                    <ImageBackground source={craftImage} style={styles.fullImage}>
+                        <View style={styles.overlay} />
                     </ImageBackground>
                 </View>
 
-                {/* Info Section */}
-                <View style={{ flex: 1, justifyContent: 'space-between', paddingVertical: 2 }}>
-                    <View>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                            <Text style={[Typography.h3, { fontSize: 16 }]} numberOfLines={1}>
-                                {artisan.name}
-                            </Text>
-                            {artisan.verified && (
-                                <Ionicons name="shield-checkmark" size={14} color={Colors.violet} />
-                            )}
-                        </View>
-
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 8 }}>
-                            <Ionicons name="star" size={12} color="#F59E0B" />
-                            <Text style={{ fontSize: 13, fontFamily: 'Inter-SemiBold', color: Colors.ink }}>
-                                {artisan.rating.toFixed(1)}
-                            </Text>
-                            <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: Colors.gray300 }} />
-                            <Text style={{ fontSize: 13, fontFamily: 'Inter-Regular', color: Colors.muted }}>
-                                {primarySkill}
-                            </Text>
-                        </View>
-
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                            <Ionicons name="location-outline" size={12} color={Colors.muted} />
-                            <Text style={{ fontSize: 12, fontFamily: 'Inter-Regular', color: Colors.muted }}>
-                                {artisan.distance}km away
-                            </Text>
-                        </View>
+                <View style={styles.content}>
+                    <View style={styles.headerRow}>
+                        <Text style={styles.name} numberOfLines={1}>{artisan.name}</Text>
+                        {artisan.verified && <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />}
                     </View>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 4 }}>
-                            <Text style={{ fontSize: 14, fontFamily: 'Inter-Bold', color: Colors.ink }}>
-                                {formatNaira(artisan.priceRange.min).split('.')[0]}
-                            </Text>
-                            <Text style={{ fontSize: 10, fontFamily: 'Inter-Regular', color: Colors.muted }}>
-                                /hr
-                            </Text>
-                        </View>
-                        <View style={{
-                            backgroundColor: Colors.primaryLight,
-                            paddingHorizontal: 8,
-                            paddingVertical: 4,
-                            borderRadius: Radius.xs
-                        }}>
-                            <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', color: Colors.primary }}>
-                                VIEW
-                            </Text>
-                        </View>
+                    <Text style={styles.skills} numberOfLines={1}>{artisan.skills.join(' • ')}</Text>
+                    
+                    <View style={styles.footerRow}>
+                        <RatingStars rating={artisan.rating} size={10} showValue={false} />
+                        <Text style={styles.price}>From {formatNaira(artisan.baseFee)}</Text>
                     </View>
                 </View>
-            </AnimatedTouchableOpacity>
-        );
-    }
-    if (grid) {
-        return (
-            <AnimatedTouchableOpacity
-                style={[{
-                    borderRadius: Radius.sm,
-                    overflow: 'visible',
-                    width: '100%',
-                    backgroundColor: Colors.surface,
-                    borderWidth: 1,
-                    borderColor: Colors.cardBorder,
-                    ...Shadows.sm,
-                }, animatedStyle]}
-                onPress={onPress}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
-                activeOpacity={1}
-                accessibilityLabel={`View ${artisan.name}'s profile`}
-            >
-                {/* ── Photo Hero — clipped independently ── */}
-                <ImageBackground
-                    source={craftImage}
-                    style={{
-                        width: '100%',
-                        height: 105,
-                        borderTopLeftRadius: Radius.sm,
-                        borderTopRightRadius: Radius.sm,
-                        overflow: 'hidden',
-                    }}
-                    resizeMode="cover"
-                >
-                    {/* Scrim */}
-                    <View style={{ ...StyleSheet_absoluteFill, backgroundColor: 'rgba(0,0,0,0.30)' }} />
 
-                    {/* Skill chip — top left */}
-                    <View style={{
-                        position: 'absolute', top: 10, left: 10,
-                        backgroundColor: 'rgba(0,0,0,0.50)',
-                        borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3,
-                        borderWidth: 1, borderColor: 'rgba(255,255,255,0.18)',
-                    }}>
-                        <Text style={{
-                            fontSize: 9, fontFamily: 'PlusJakartaSans-Bold',
-                            color: 'white', textTransform: 'capitalize', letterSpacing: 0.5,
-                        }}>
-                            {primarySkill}
-                        </Text>
-                    </View>
-
-                    {/* Availability pill — top right */}
-                    <View style={{
-                        position: 'absolute', top: 10, right: 10,
-                        flexDirection: 'row', alignItems: 'center', gap: 4,
-                        backgroundColor: artisan.availability === 'online'
-                            ? 'rgba(16,185,129,0.88)' : 'rgba(80,80,80,0.75)',
-                        borderRadius: 20, paddingHorizontal: 7, paddingVertical: 3,
-                    }}>
-                        <View style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: 'white' }} />
-                        <Text style={{ fontSize: 8, fontFamily: 'Inter-SemiBold', color: 'white' }}>
-                            {artisan.availability === 'online' ? 'Online' : 'Busy'}
-                        </Text>
-                    </View>
-                </ImageBackground>
-
-                {/* ── Avatar — outside the clipped ImageBackground ── */}
-                <View style={{
-                    position: 'absolute',
-                    top: 105 - 20, // photo height minus half avatar height
-                    left: 12,
-                    width: 40, height: 40, borderRadius: 20,
-                    borderWidth: 2.5, borderColor: Colors.surface,
-                    overflow: 'hidden',
-                    zIndex: 10,
-                    ...Shadows.sm,
-                }}>
-                    <Avatar name={artisan.name} size={40} />
+                <View style={styles.viewBadge}>
+                    <Text style={styles.viewText}>VIEW</Text>
                 </View>
-
-                {/* ── Info Panel ── */}
-                <View style={{ paddingHorizontal: 12, paddingTop: 26, paddingBottom: 12, gap: 5 }}>
-
-                    {/* Name row */}
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Text style={[Typography.h3, { fontSize: 13, flex: 1 }]} numberOfLines={1}>
-                            {artisan.name}
-                        </Text>
-                        {artisan.verified && (
-                            <Ionicons name="shield-checkmark" size={13} color={Colors.violet} />
-                        )}
-                    </View>
-
-                    {/* Rating + distance */}
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                        <Ionicons name="star" size={10} color="#F59E0B" />
-                        <Text style={{ fontSize: 11, fontFamily: 'Inter-SemiBold', color: Colors.ink }}>
-                            {artisan.rating.toFixed(1)}
-                        </Text>
-                        <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: Colors.gray300 }} />
-                        <Text style={{ fontSize: 11, fontFamily: 'Inter-Regular', color: Colors.muted }}>
-                            {artisan.distance}km away
-                        </Text>
-                    </View>
-
-                    {/* Price + CTA */}
-                    <View style={{
-                        borderTopWidth: 1, borderTopColor: Colors.divider,
-                        paddingTop: 8, marginTop: 2,
-                        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-                    }}>
-                        <View>
-                            <Text style={{ fontSize: 9, fontFamily: 'Inter-Regular', color: Colors.muted, marginBottom: 1 }}>
-                                from
-                            </Text>
-                            <Text style={{ fontFamily: 'Inter-Bold', fontSize: 14, color: Colors.ink }}>
-                                {formatNaira(artisan.priceRange.min).split('.')[0]}
-                            </Text>
-                        </View>
-
-                        <View style={{
-                            width: 30, height: 30, borderRadius: 15,
-                            backgroundColor: Colors.primary,
-                            alignItems: 'center', justifyContent: 'center',
-                            ...Shadows.sm,
-                        }}>
-                            <Ionicons name="arrow-forward" size={14} color="white" />
-                        </View>
-                    </View>
-                </View>
-            </AnimatedTouchableOpacity>
-        );
-    }
-
-    // ─── Featured Card — hero photo header (like the category pills) ─────────────
-    if (featured) {
-        return (
-            <AnimatedTouchableOpacity
-                style={[{
-                    borderRadius: Radius.xl,
-                    overflow: 'hidden',
-                    width: 200,
-                    ...Shadows.violet,
-                    borderWidth: 1.5,
-                    borderColor: Colors.violet + '30',
-                }, animatedStyle]}
-                onPress={onPress}
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
-                activeOpacity={1}
-            >
-                {/* Photo hero — top 110px */}
-                <ImageBackground
-                    source={craftImage}
-                    style={{ width: '100%', height: 110 }}
-                    resizeMode="cover"
-                >
-                    <View style={{ ...StyleSheet_absoluteFill, backgroundColor: 'rgba(0,0,0,0.35)' }} />
-
-                    {/* BEST MATCH chip */}
-                    <View style={{
-                        position: 'absolute', top: 10, left: 10,
-                        flexDirection: 'row', alignItems: 'center', gap: 4,
-                        backgroundColor: Colors.violet,
-                        paddingHorizontal: 8, paddingVertical: 4,
-                        borderRadius: 20,
-                    }}>
-                        <Ionicons name="sparkles" size={9} color="white" />
-                        <Text style={{ fontSize: 9, fontFamily: 'PlusJakartaSans-Bold', color: 'white', letterSpacing: 0.4 }}>
-                            BEST MATCH
-                        </Text>
-                    </View>
-
-                    {/* Avatar pinned bottom-left, half-over the fold */}
-                    <View style={{
-                        position: 'absolute', bottom: -22, left: 14,
-                        borderRadius: 22, borderWidth: 3, borderColor: Colors.surface,
-                        width: 44, height: 44, overflow: 'hidden',
-                    }}>
-                        <Avatar name={artisan.name} size={44} />
-                    </View>
-
-                    {/* Online dot */}
-                    <View style={{ position: 'absolute', bottom: -16, left: 44 }}>
-                        <OnlineDot online={artisan.availability === 'online'} />
-                    </View>
-                </ImageBackground>
-
-                {/* Info panel */}
-                <View style={{ backgroundColor: Colors.surface, paddingHorizontal: 14, paddingTop: 28, paddingBottom: 16 }}>
-                    <Text style={[Typography.h3, { fontSize: 15, marginBottom: 2 }]} numberOfLines={1}>
-                        {artisan.name}
-                    </Text>
-                    <Text style={[Typography.bodySmall, { fontSize: 11, marginBottom: 10 }]} numberOfLines={1}>
-                        {primarySkill}
-                    </Text>
-
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 12 }}>
-                        <Ionicons name="star" size={11} color="#F59E0B" />
-                        <Text style={{ fontSize: 12, fontFamily: 'Inter-SemiBold', color: Colors.ink }}>
-                            {artisan.rating.toFixed(1)}
-                        </Text>
-                        {artisan.verified && <LoomVerifiedBadge />}
-                    </View>
-
-                    <View style={{
-                        borderTopWidth: 1, borderTopColor: Colors.divider,
-                        paddingTop: 10,
-                        flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-                    }}>
-                        <View>
-                            <Text style={{ fontSize: 9, fontFamily: 'Inter-Regular', color: Colors.muted, marginBottom: 2 }}>
-                                from
-                            </Text>
-                            <Text style={{ fontFamily: 'Inter-Bold', fontSize: 14, color: Colors.ink }}>
-                                {formatNaira(artisan.priceRange.min).split('.')[0]}
-                            </Text>
-                        </View>
-                        {artisan.matchScore !== undefined && (
-                            <View style={{
-                                backgroundColor: Colors.violet,
-                                paddingHorizontal: 10, paddingVertical: 5,
-                                borderRadius: 20,
-                            }}>
-                                <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', color: Colors.white }}>
-                                    {artisan.matchScore}%
-                                </Text>
-                            </View>
-                        )}
-                    </View>
-                </View>
-            </AnimatedTouchableOpacity>
-        );
-    }
-
-    // ─── Standard Vertical Card (horizontal scroll list) ──────────────────────
-    return (
-        <AnimatedTouchableOpacity
-            style={[{
-                borderRadius: Radius.lg,
-                overflow: 'hidden',
-                width: 170,
-                backgroundColor: Colors.surface,
-                borderWidth: 1,
-                borderColor: Colors.cardBorder,
-                ...Shadows.sm,
-            }, animatedStyle]}
-            onPress={onPress}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
-            activeOpacity={1}
-            accessibilityLabel={`View ${artisan.name}'s profile`}
-        >
-            {/* Photo strip */}
-            <ImageBackground
-                source={craftImage}
-                style={{ width: '100%', height: 88 }}
-                resizeMode="cover"
-            >
-                <View style={{ ...StyleSheet_absoluteFill, backgroundColor: 'rgba(0,0,0,0.32)' }} />
-                {/* Skill label bottom-left */}
-                <View style={{ position: 'absolute', bottom: 8, left: 10 }}>
-                    <Text style={{ fontSize: 9, fontFamily: 'PlusJakartaSans-Bold', color: 'white', textTransform: 'capitalize' }}>
-                        {primarySkill}
-                    </Text>
-                </View>
-                {/* Online dot */}
-                <View style={{ position: 'absolute', top: 8, right: 8 }}>
-                    <OnlineDot online={artisan.availability === 'online'} />
-                </View>
-            </ImageBackground>
-
-            {/* Info */}
-            <View style={{ padding: 12, gap: 6 }}>
-                <Text style={[Typography.h3, { fontSize: 14 }]} numberOfLines={1}>
-                    {artisan.name}
-                </Text>
-
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
-                    <Ionicons name="star" size={10} color="#F59E0B" />
-                    <Text style={{ fontSize: 11, fontFamily: 'Inter-SemiBold', color: Colors.ink }}>
-                        {artisan.rating.toFixed(1)}
-                    </Text>
-                    <Text style={{ fontSize: 11, fontFamily: 'Inter-Regular', color: Colors.muted }}>
-                        · {artisan.distance}km
-                    </Text>
-                </View>
-
-                {artisan.verified && <LoomVerifiedBadge />}
-
-                <View style={{
-                    borderTopWidth: 1, borderTopColor: Colors.divider,
-                    paddingTop: 8, marginTop: 2,
-                }}>
-                    <Text style={{ fontSize: 9, fontFamily: 'Inter-Regular', color: Colors.muted, marginBottom: 2 }}>
-                        starting at
-                    </Text>
-                    <Text style={{ fontFamily: 'Inter-Bold', fontSize: 13, color: Colors.ink }}>
-                        {formatNaira(artisan.priceRange.min).split('.')[0]}
-                    </Text>
-                </View>
-            </View>
-        </AnimatedTouchableOpacity>
+            </TouchableOpacity>
+        </Animated.View>
     );
+
+    const renderGrid = () => (
+        <Animated.View style={[styles.card, styles.gridCard, animatedStyle]}>
+            <TouchableOpacity
+                onPress={onPress}
+                onPressIn={onPressIn}
+                onPressOut={onPressOut}
+                activeOpacity={1}
+                style={[styles.touchable, { flexDirection: 'column' }]}
+            >
+                <View style={styles.gridImageContainer}>
+                    <ImageBackground source={craftImage} style={styles.fullImage}>
+                        <View style={styles.overlay} />
+                    </ImageBackground>
+                    <View style={styles.gridAvatar}>
+                        <Avatar name={artisan.name} size={40} />
+                    </View>
+                </View>
+
+                <View style={styles.gridContent}>
+                    <Text style={styles.gridName} numberOfLines={1}>{artisan.name}</Text>
+                    <Text style={styles.gridSkills} numberOfLines={1}>{artisan.skills[0] || 'Artisan'}</Text>
+                    
+                    <View style={styles.gridFooter}>
+                        <View style={styles.gridStats}>
+                            <Ionicons name="star" size={10} color={Colors.warning} />
+                            <Text style={styles.gridRating}>{artisan.rating}</Text>
+                        </View>
+                        <View style={styles.gridAction}>
+                            <Ionicons name="arrow-forward" size={12} color="white" />
+                        </View>
+                    </View>
+                </View>
+            </TouchableOpacity>
+        </Animated.View>
+    );
+
+    if (grid) return renderGrid();
+    return renderList();
+};
+
+const styles = StyleSheet.create({
+    card: {
+        backgroundColor: Colors.white,
+        borderRadius: Radius.lg,
+        ...Shadows.sm,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: Colors.cardBorder,
+    },
+    listCard: {
+        flexDirection: 'row',
+        marginBottom: 12,
+    },
+    gridCard: {
+        flex: 1,
+        margin: 6,
+    },
+    touchable: {
+        flex: 1,
+    },
+    imageContainer: {
+        width: 100,
+        height: 100,
+    },
+    fullImage: {
+        width: '100%',
+        height: '100%',
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.1)',
+    },
+    content: {
+        flex: 1,
+        padding: 16,
+        justifyContent: 'center',
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    name: {
+        ...Typography.h3,
+        fontSize: 16,
+    },
+    skills: {
+        ...Typography.bodySmall,
+        color: Colors.muted,
+        marginTop: 4,
+    },
+    footerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 12,
+    },
+    price: {
+        ...Typography.label,
+        color: Colors.primary,
+        fontSize: 10,
+    },
+    viewBadge: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        backgroundColor: Colors.primaryLight,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: Radius.xs,
+    },
+    viewText: {
+        ...Typography.label,
+        fontSize: 8,
+        color: Colors.primary,
+    },
+    // Grid styles
+    gridImageContainer: {
+        height: 110,
+        width: '100%',
+    },
+    gridAvatar: {
+        position: 'absolute',
+        bottom: -20,
+        left: 12,
+        zIndex: 10,
+        borderWidth: 3,
+        borderColor: Colors.white,
+        borderRadius: 25,
+    },
+    gridContent: {
+        padding: 12,
+        paddingTop: 24,
+    },
+    gridName: {
+        ...Typography.h3,
+        fontSize: 14,
+    },
+    gridSkills: {
+        ...Typography.bodySmall,
+        color: Colors.muted,
+        fontSize: 11,
+    },
+    gridFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    gridStats: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+    },
+    gridRating: {
+        ...Typography.label,
+        fontSize: 10,
+    },
+    gridAction: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: Colors.primary,
+        alignItems: 'center',
+        justifyContent: 'center',
+    }
 });
 
+export const ArtisanCard = React.memo(ArtisanCardComponent);
 ArtisanCard.displayName = 'ArtisanCard';
-
-// Inline absoluteFill helper (avoids importing StyleSheet just for this)
-const StyleSheet_absoluteFill = {
-    position: 'absolute' as const,
-    top: 0, left: 0, right: 0, bottom: 0,
-};

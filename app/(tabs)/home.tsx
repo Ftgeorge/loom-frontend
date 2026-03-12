@@ -1,5 +1,5 @@
 import { mapArtisan } from '@/services/mappers';
-import { AppHeader } from '@/components/AppHeader';
+import { SubAppHeader } from '@/components/AppSubHeader';
 import { ArtisanCard } from '@/components/ui/ArtisanCard';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { Ionicons } from '@expo/vector-icons';
@@ -25,10 +25,12 @@ import Animated, {
     FadeInDown,
 } from 'react-native-reanimated';
 import LayoutSwitch from '@/components/ui/LayoutSwitch';
+import { LoomThread } from '@/components/ui/LoomThread';
+import { EmptyState } from '@/components/ui/StateComponents';
 
 export default function ClientHomeScreen() {
     const router = useRouter();
-    const { user, jobs } = useAppStore();
+    const { user, jobs, selectedState, selectedCity } = useAppStore();
     const [artisans, setArtisans] = useState<Artisan[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -38,7 +40,13 @@ export default function ClientHomeScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            const res = await artisanApi.list({ limit: 30 });
+            const res = await artisanApi.list({ 
+                limit: 30,
+                city: selectedCity,
+                state: selectedState,
+                area: user?.location?.area,
+                interests: user?.interests
+            });
             setArtisans((res.results as any[]).map(mapArtisan));
         } catch {
             setError(true);
@@ -46,7 +54,7 @@ export default function ClientHomeScreen() {
             setLoading(false);
             setRefreshing(false);
         }
-    }, []);
+    }, [selectedState, selectedCity, user?.interests, user?.location?.area]);
 
     useEffect(() => { load(); }, [load]);
     const onRefresh = () => { setRefreshing(true); load(); };
@@ -60,25 +68,22 @@ export default function ClientHomeScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.canvas }}>
-            <AppHeader showLocation showNotification onNotification={() => router.push('/notifications')} />
+            <LoomThread variant="minimal" opacity={0.3} animated />
+            <SubAppHeader
+                showLocation
+                label="WELCOME BACK"
+                title={`Hello, ${firstName}`}
+                description="What can we help you with today?"
+                onNotification={() => router.push('/notifications')}
+                notifPlacement="top"
+            />
 
             <ScrollView
                 contentContainerStyle={{ padding: 24, paddingBottom: 130 }}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
                 showsVerticalScrollIndicator={false}
             >
-                {/* ─── Greeting ──────────────────────────────────────────────── */}
-                <Animated.View entering={FadeInDown.delay(80).springify()} style={{ marginBottom: 32 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 6 }]}>
-                        WELCOME BACK
-                    </Text>
-                    <Text style={[Typography.display, { fontSize: 34, letterSpacing: -0.8 }]}>
-                        Hello, {firstName}
-                    </Text>
-                    <Text style={[Typography.body, { marginTop: 6 }]}>
-                        What can we help you with today?
-                    </Text>
-                </Animated.View>
+                {/* ─── Greeting Removed (Now in Header) ───────────────────────── */}
 
                 {/* ─── Active Job Banner ─────────────────────────────────────── */}
                 {activeJobs.length > 0 && (
@@ -179,6 +184,14 @@ export default function ClientHomeScreen() {
 
                     {loading ? (
                         <SkeletonList count={4} />
+                    ) : artisans.length === 0 ? (
+                        <EmptyState 
+                            icon="location-outline"
+                            title="No professionals nearby"
+                            message={`We couldn't find any artisans in ${selectedCity}, ${selectedState}. Try switching your location to see more results.`}
+                            actionLabel="Update Location"
+                            onAction={() => router.push('/profile-completion')}
+                        />
                     ) : (
                         <View style={viewLayout === 'grid' ? { flexDirection: 'row', flexWrap: 'wrap', gap: 12 } : { gap: 16 }}>
                             {artisans.slice(0, 10).map((art, index) => (

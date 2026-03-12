@@ -55,7 +55,7 @@ export function OTPInput({ length = 6, onComplete, error }: OTPInputProps) {
                             ref={(r) => { refs.current[i] = r; }}
                             style={[
                                 {
-                                    width: 48,
+                                    width: 53,
                                     height: 60,
                                     borderRadius: Radius.md,
                                     borderWidth: 1.5,

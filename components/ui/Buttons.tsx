@@ -84,7 +84,7 @@ export function PrimaryButton({
             style={[
                 {
                     backgroundColor: bg,
-                    borderRadius: Radius.md,
+                    borderRadius: Radius.sm,
                     height: 56,
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -144,7 +144,7 @@ export function OutlinedButton({ title, onPress, loading, disabled, style, textS
             style={[
                 {
                     height: 56,
-                    borderRadius: Radius.md,
+                    borderRadius: Radius.sm,
                     borderWidth: 1.5,
                     borderColor: Colors.cardBorder,
                     flexDirection: 'row',

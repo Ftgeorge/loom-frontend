@@ -47,7 +47,7 @@ export default function MatchedArtisansScreen() {
     const sorted = [...artisans].sort((a, b) => {
         if (sortIdx === 0) return (b.matchScore || 0) - (a.matchScore || 0);
         if (sortIdx === 1) return b.rating - a.rating;
-        return a.priceRange.min - b.priceRange.min;
+        return a.baseFee - b.baseFee;
     });
 
     return (
@@ -95,7 +95,7 @@ export default function MatchedArtisansScreen() {
                     >
                         <ArtisanCard
                             artisan={item}
-                            horizontal
+                            list
                             onPress={() =>
                                 router.push({ pathname: '/artisan-profile', params: { id: item.id } })
                             }

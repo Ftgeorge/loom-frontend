@@ -44,10 +44,10 @@ export default function RequestDetailsScreen() {
     useEffect(() => { load(); }, [load]);
 
     const handleCancel = () => {
-        Alert.alert('TERMINATE PROTOCOL', 'Are you sure you want to terminate this active mission protocol?', [
-            { text: 'ABORT TERMINATION', style: 'cancel' },
+        Alert.alert('CANCEL REQUEST', 'Are you sure you want to cancel this request?', [
+            { text: 'NO, GO BACK', style: 'cancel' },
             {
-                text: 'CONFIRM TERMINATION',
+                text: 'YES, CANCEL',
                 style: 'destructive',
                 onPress: async () => {
                     if (id) {
@@ -56,7 +56,7 @@ export default function RequestDetailsScreen() {
                             updateStoreJob(id, 'cancelled');
                             setJob((j) => j ? { ...j, status: 'cancelled' } : null);
                         } catch (err: any) {
-                            Alert.alert('System Error', err.message || 'Failed to terminate protocol');
+                            Alert.alert('System Error', err.message || 'Failed to cancel request');
                         }
                     }
                 },
@@ -67,14 +67,14 @@ export default function RequestDetailsScreen() {
     if (loading) return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.4} />
-            <AppHeader title="Mission Log" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
             <View style={{ padding: 24 }}><SkeletonList count={3} /></View>
         </View>
     );
 
     if (error || !job) return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <AppHeader title="Mission Log" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
@@ -90,9 +90,9 @@ export default function RequestDetailsScreen() {
                 contentContainerStyle={{ padding: 24, paddingBottom: 120 }}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Protocol Identity */}
+                {/* Service Identity */}
                 <Animated.View entering={FadeInDown.springify()} style={{ marginBottom: 40 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>PROTOCOL IDENTITY</Text>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>SERVICE TYPE</Text>
                     <Text style={[Typography.h1, { fontSize: 32 }]}>{job.category.toUpperCase().replace('_', ' / ')}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16 }}>
                         <View style={{
@@ -104,10 +104,10 @@ export default function RequestDetailsScreen() {
                             borderColor: isTerminated ? Colors.error : Colors.success
                         }}>
                             <Text style={[Typography.label, { color: isTerminated ? Colors.error : Colors.success, fontSize: 10, fontWeight: '900' }]}>
-                                {isTerminated ? 'TERMINATED' : 'OPERATIONAL'}
+                                {isTerminated ? 'CANCELLED' : 'ACTIVE'}
                             </Text>
                         </View>
-                        <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>ID: {job.id.substring(0, 8).toUpperCase()}</Text>
+                        <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>REF: {job.id.substring(0, 8).toUpperCase()}</Text>
                     </View>
                 </Animated.View>
 
@@ -115,30 +115,30 @@ export default function RequestDetailsScreen() {
                 {!isTerminated && (
                     <Animated.View entering={FadeInDown.delay(100).springify()}>
                         <Card style={{ marginBottom: 24, padding: 24, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.cardBorder, ...Shadows.sm }}>
-                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 20 }]}>MISSION TRACKER</Text>
+                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 20 }]}>PROGRESS TRACKER</Text>
                             <StatusTimeline steps={getJobStatusSteps(job.status)} />
                         </Card>
                     </Animated.View>
                 )}
 
-                {/* Operational Logs */}
+                {/* Operational Details */}
                 <Animated.View entering={FadeInDown.delay(200).springify()}>
                     <Card style={{ padding: 24, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.cardBorder, ...Shadows.sm }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 24 }]}>OPERATIONAL LOGS</Text>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 24 }]}>DETAILS</Text>
 
-                        <DetailItem label="SECTOR" value={job.location.area.toUpperCase()} />
-                        <DetailItem label="MISSION DESCRIPTION" value={job.description} />
-                        <DetailItem label="ESTIMATED YIELD" value={formatNaira(job.budget)} />
-                        <DetailItem label="PRIORITY PROTOCOL" value={job.urgency.toUpperCase().replace('_', ' ')} />
-                        <DetailItem label="INITIALIZED" value={formatDate(job.createdAt).toUpperCase()} />
+                        <DetailItem label="AREA" value={job.location.area.toUpperCase()} />
+                        <DetailItem label="DESCRIPTION" value={job.description} />
+                        <DetailItem label="BUDGET" value={formatNaira(job.budget)} />
+                        <DetailItem label="URGENCY" value={job.urgency.toUpperCase().replace('_', ' ')} />
+                        <DetailItem label="POSTED ON" value={formatDate(job.createdAt).toUpperCase()} />
                     </Card>
                 </Animated.View>
 
-                {/* Operative assigned info */}
+                {/* Artisan assigned info */}
                 {job.artisanName && (
                     <Animated.View entering={FadeInDown.delay(300).springify()}>
                         <Card style={{ marginTop: 24, padding: 24, backgroundColor: Colors.primary, ...Shadows.md }}>
-                            <Text style={[Typography.label, { color: Colors.white, marginBottom: 20, opacity: 0.6 }]}>OPERATIVE ASSIGNED</Text>
+                            <Text style={[Typography.label, { color: Colors.white, marginBottom: 20, opacity: 0.6 }]}>ARTISAN ASSIGNED</Text>
                             <TouchableOpacity
                                 activeOpacity={0.8}
                                 style={{
@@ -165,7 +165,7 @@ export default function RequestDetailsScreen() {
                                 </View>
                                 <View style={{ flex: 1 }}>
                                     <Text style={[Typography.h3, { color: Colors.white }]}>{job.artisanName.toUpperCase()}</Text>
-                                    <Text style={[Typography.label, { color: Colors.accent, fontSize: 8, marginTop: 4 }]}>VIEW PROFILE signal</Text>
+                                    <Text style={[Typography.label, { color: Colors.accent, fontSize: 8, marginTop: 4 }]}>VIEW PROFILE</Text>
                                 </View>
                                 <Ionicons name="chevron-forward" size={20} color={Colors.white} />
                             </TouchableOpacity>
@@ -173,18 +173,18 @@ export default function RequestDetailsScreen() {
                     </Animated.View>
                 )}
 
-                {/* Tactical Actions */}
+                {/* Actions */}
                 <Animated.View entering={FadeInDown.delay(400).springify()} style={{ marginTop: 48, gap: 16 }}>
                     {job.artisanName && (
                         <View style={{ flexDirection: 'row', gap: 12 }}>
                             <SecondaryButton
-                                title="SEND SIGNAL"
+                                title="MESSAGE"
                                 onPress={() => router.push({ pathname: '/chat', params: { threadId: 't1' } })}
                                 style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
                                 textStyle={[Typography.label, { color: Colors.primary }]}
                             />
                             <SecondaryButton
-                                title="VOICE COMM"
+                                title="CALL"
                                 onPress={() => { }}
                                 style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
                                 textStyle={[Typography.label, { color: Colors.primary }]}
@@ -195,7 +195,7 @@ export default function RequestDetailsScreen() {
 
                     {job.status === 'completed' && (
                         <PrimaryButton
-                            title="CALIBRATE PERFORMANCE RATING"
+                            title="RATE & REVIEW"
                             onPress={() => router.push({ pathname: '/rate-review', params: { jobId: job.id } })}
                             variant="accent"
                             style={{ height: 64, borderRadius: Radius.md }}
@@ -215,7 +215,7 @@ export default function RequestDetailsScreen() {
                             }}
                             onPress={handleCancel}
                         >
-                            <Text style={[Typography.label, { color: Colors.error, fontWeight: '900', letterSpacing: 1 }]}>TERMINATE MISSION PROTOCOL</Text>
+                            <Text style={[Typography.label, { color: Colors.error, fontWeight: '900', letterSpacing: 1 }]}>CANCEL REQUEST</Text>
                         </TouchableOpacity>
                     )}
                 </Animated.View>

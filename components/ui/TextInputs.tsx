@@ -65,7 +65,7 @@ export function AppTextInput({
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderWidth: 1.5,
-                    borderRadius: Radius.md,
+                    borderRadius: Radius.sm,
                     height: 58,
                     borderColor: getBorderColor(),
                     backgroundColor: getBackgroundColor(),

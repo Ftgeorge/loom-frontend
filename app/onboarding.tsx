@@ -11,6 +11,7 @@ import {
     FlatList,
     NativeScrollEvent,
     NativeSyntheticEvent,
+    StyleSheet,
     Text,
     TouchableOpacity,
     View,
@@ -73,7 +74,9 @@ export default function OnboardingScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <LoomThread variant="minimal" opacity={0.2} animated />
+            <View style={StyleSheet.absoluteFill}>
+                <LoomThread variant="dense" scale={1.5} opacity={0.4} animated />
+            </View>
 
             <View style={{ position: 'absolute', top: 64, width: '100%', paddingHorizontal: 32, zIndex: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Text style={[Typography.label, { color: Colors.primary, fontSize: 8 }]}>STEP {currentPage + 1}</Text>

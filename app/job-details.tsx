@@ -83,14 +83,14 @@ export default function JobDetailsScreen() {
     if (loading) return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.4} />
-            <AppHeader title="The Gig" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
             <View style={{ padding: 24 }}><SkeletonList count={3} type="request" /></View>
         </View>
     );
 
     if (error || !job) return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <AppHeader title="The Gig" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
@@ -98,15 +98,15 @@ export default function JobDetailsScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.2} animated />
-            <AppHeader title="The Gig" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView
                 contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Mission Summary */}
+                {/* Job Summary */}
                 <Animated.View entering={FadeInDown.springify()} style={{ marginBottom: 40 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>THE GIG</Text>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>JOB TYPE</Text>
                     <Text style={[Typography.h1, { fontSize: 32 }]}>{job.category.toUpperCase().replace('_', ' / ')}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16 }}>
                         <View style={{
@@ -119,7 +119,7 @@ export default function JobDetailsScreen() {
                         }}>
                             <Text style={[Typography.label, { color: Colors.accent, fontSize: 10, fontWeight: '900' }]}>{job.status.toUpperCase()}</Text>
                         </View>
-                        <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>ID: {job.id.substring(0, 8).toUpperCase()}</Text>
+                        <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>REF: {job.id.substring(0, 8).toUpperCase()}</Text>
                     </View>
                 </Animated.View>
 
@@ -136,18 +136,18 @@ export default function JobDetailsScreen() {
                 {/* Client Identity */}
                 <Animated.View entering={FadeInDown.delay(200).springify()}>
                     <Card style={{ padding: 24, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.cardBorder, ...Shadows.sm }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 24 }]}>THE INFO</Text>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 24 }]}>DETAILS</Text>
 
-                        <DetailItem label="WHO?" value={job.clientName.toUpperCase()} />
-                        <DetailItem label="KIND" value={job.category.toUpperCase()} />
-                        <DetailItem label="GIST" value={job.description} />
-                        <DetailItem label="WHERE" value={`${job.location.area.toUpperCase()}, ${job.location.city.toUpperCase() || 'ABUJA'}`} />
-                        <DetailItem label="CASH" value={formatNaira(job.budget)} />
-                        <DetailItem label="WHEN" value={job.urgency.toUpperCase().replace('_', ' ')} />
+                        <DetailItem label="CLIENT" value={job.clientName.toUpperCase()} />
+                        <DetailItem label="SERVICE" value={job.category.toUpperCase()} />
+                        <DetailItem label="DESCRIPTION" value={job.description} />
+                        <DetailItem label="LOCATION" value={`${job.location.area.toUpperCase()}, ${job.location.city.toUpperCase() || 'ABUJA'}`} />
+                        <DetailItem label="BUDGET" value={formatNaira(job.budget)} />
+                        <DetailItem label="URGENCY" value={job.urgency.toUpperCase().replace('_', ' ')} />
                     </Card>
                 </Animated.View>
 
-                {/* Geospatial Beacon */}
+                {/* Map Action */}
                 <Animated.View entering={FadeInDown.delay(300).springify()}>
                     <TouchableOpacity
                         activeOpacity={0.9}
@@ -173,19 +173,19 @@ export default function JobDetailsScreen() {
                         }}>
                             <Ionicons name="location" size={24} color={Colors.white} />
                         </View>
-                        <Text style={[Typography.h3, { color: Colors.white }]}>MAP IT</Text>
+                        <Text style={[Typography.h3, { color: Colors.white }]}>OPEN MAP</Text>
                         <Text style={[Typography.label, { color: Colors.accent, marginTop: 8, fontSize: 8 }]}>
-                            GO TO: {job.location.area.toUpperCase()}
+                            AREA: {job.location.area.toUpperCase()}
                         </Text>
                     </TouchableOpacity>
                 </Animated.View>
 
-                {/* Tactical Actions */}
+                {/* Actions */}
                 <Animated.View entering={FadeInDown.delay(400).springify()} style={{ marginTop: 48, gap: 16 }}>
                     {artisanStatus === 'new' && (
                         <View style={{ gap: 16 }}>
                             <PrimaryButton
-                                title="I'M IN"
+                                title="ACCEPT JOB"
                                 onPress={handleAccept}
                                 variant="accent"
                                 style={{ height: 64, borderRadius: Radius.md }}
@@ -201,7 +201,7 @@ export default function JobDetailsScreen() {
                                 }}
                                 onPress={handleDecline}
                             >
-                                <Text style={[Typography.label, { color: Colors.error, fontWeight: '900' }]}>PASS</Text>
+                                <Text style={[Typography.label, { color: Colors.error, fontWeight: '900' }]}>DECLINE</Text>
                             </TouchableOpacity>
                         </View>
                     )}
@@ -217,13 +217,13 @@ export default function JobDetailsScreen() {
 
                     <View style={{ flexDirection: 'row', gap: 12 }}>
                         <SecondaryButton
-                            title="HIT UP"
+                            title="MESSAGE"
                             onPress={() => router.push({ pathname: '/chat', params: { threadId: 't1' } })}
                             style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
                             textStyle={[Typography.label, { color: Colors.primary }]}
                         />
                         <SecondaryButton
-                            title="RING"
+                            title="CALL"
                             onPress={() => { }}
                             style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
                             textStyle={[Typography.label, { color: Colors.primary }]}

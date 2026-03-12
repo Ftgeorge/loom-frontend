@@ -1,4 +1,5 @@
 import { ArtisanCard } from '@/components/ui/ArtisanCard';
+import { SubAppHeader } from '@/components/AppSubHeader';
 import { Chip } from '@/components/ui/CardChipBadge';
 import LayoutSwitch from '@/components/ui/LayoutSwitch';
 import { LoomThread } from '@/components/ui/LoomThread';
@@ -11,6 +12,7 @@ import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { Artisan } from '@/types';
 import { CATEGORIES } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
+import { useAppStore } from '@/store';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
@@ -61,28 +63,41 @@ export default function SearchScreen() {
     const insets = useSafeAreaInsets();
     const params = useLocalSearchParams<{ category?: string }>();
     const [query, setQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(
-        params.category && params.category !== 'all' ? params.category : null
-    );
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [artisans, setArtisans] = useState<Artisan[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isSearching, setIsSearching] = useState(false);
     const [error, setError] = useState(false);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     const [viewLayout, setViewLayout] = useState<'grid' | 'list'>('grid');
+    const { user } = useAppStore();
+    // Sync with params
+    useEffect(() => {
+        if (params.category) {
+            setSelectedCategory(params.category === 'all' ? null : params.category);
+        }
+    }, [params.category]);
 
-    const search = useCallback(async (catId: string | null, q: string) => {
+    const search = useCallback(async (catId: string | null, q: string, isInitial: boolean = false) => {
         try {
-            setLoading(true);
+            if (isInitial) setLoading(true);
+            setIsSearching(true);
             setError(false);
 
             let results: Artisan[] = [];
+            const locationParams = {
+                city: user?.location?.city,
+                state: user?.location?.state,
+                area: user?.location?.area
+            };
+
             if (catId) {
                 const category = CATEGORIES.find(c => c.id === catId);
                 const skillName = category ? category.label : catId;
-                const res = await artisanApi.search({ skill: skillName, limit: 30 });
+                const res = await artisanApi.search({ skill: skillName, limit: 30, ...locationParams });
                 results = (res.results as any[]).map(mapArtisan);
             } else {
-                const res = await artisanApi.list({ limit: 30 });
+                const res = await artisanApi.list({ limit: 30, ...locationParams });
                 results = (res.results as any[]).map(mapArtisan);
             }
 
@@ -94,45 +109,48 @@ export default function SearchScreen() {
                         a.skills.some((s) => s.toLowerCase().includes(q.toLowerCase()))
                 )
                 : results;
+            
             setArtisans(filtered);
         } catch (err) {
             console.error('[Search] Error fetching artisans:', err);
             setError(true);
         } finally {
             setLoading(false);
+            setIsSearching(false);
         }
-    }, []);
+    }, [user?.location]);
 
     useEffect(() => {
         clearTimeout(debounceRef.current);
         debounceRef.current = setTimeout(() => {
-            search(selectedCategory, query);
-        }, 400);
+            search(selectedCategory, query, artisans.length === 0);
+        }, query ? 400 : 0);
         return () => clearTimeout(debounceRef.current);
     }, [query, selectedCategory, search]);
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background, paddingTop: insets.top }}>
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.2} animated />
-            {loading && <ScanningBar />}
+            {(loading || isSearching) && <ScanningBar />}
+            
+            <SubAppHeader
+                label="EXPLORE"
+                title="Find a Pro"
+                description="Discover skilled artisans in your area."
+                onNotification={() => router.push('/notifications')}
+            />
 
-            <View style={{ paddingHorizontal: 24, paddingTop: 40 }}>
-                <Animated.View entering={FadeInDown.springify()}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>FIND A PRO</Text>
-                    <Text style={[Typography.h1, { fontSize: 36, marginBottom: 8 }]}>Explore Services</Text>
-                    <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>
-                        Find the best professional for your needs in your area.
-                    </Text>
-                </Animated.View>
-
+            <View style={{ paddingHorizontal: 24, paddingBottom: 16 }}>
                 <AppTextInput
                     placeholder="Search by name, skill, or location..."
                     value={query}
                     onChangeText={setQuery}
                     containerStyle={{
-                        borderRadius: Radius.sm,
+                        borderRadius: Radius.lg,
                         backgroundColor: Colors.white,
-                        ...Shadows.md
+                        borderWidth: 1.5,
+                        borderColor: isSearching ? Colors.primary : Colors.cardBorder,
+                        ...Shadows.sm
                     }}
                     leftIcon={
                         <View style={{ paddingLeft: 20 }}>
@@ -221,8 +239,7 @@ export default function SearchScreen() {
                         )}
                     </View>
                 }
-                renderItem={({ item, index }) =>
-                    loading || error || artisans.length === 0 ? null : (
+                renderItem={({ item, index }) => (
                         <Animated.View
                             entering={FadeInDown.delay(100 + index * 50).springify()}
                             style={{

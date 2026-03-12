@@ -9,7 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 // Maps each category id to its local image asset
-const CATEGORY_IMAGES: Record<string, any> = {
+export const CATEGORY_IMAGES: Record<string, any> = {
     plumber: require('../../assets/images/cat_plumber.png'),
     electrician: require('../../assets/images/cat_electrician.png'),
     carpenter: require('../../assets/images/cat_carpenter.png'),

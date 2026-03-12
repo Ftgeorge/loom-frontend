@@ -1,4 +1,4 @@
-import { AppHeader } from "@/components/AppHeader";
+import { SubAppHeader } from "@/components/AppSubHeader";
 import { Card } from "@/components/ui/CardChipBadge";
 import { languageNames } from "@/i18n";
 import { useAppStore } from "@/store";
@@ -83,11 +83,13 @@ export default function SettingsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
-      <AppHeader
+      <SubAppHeader
+        label="PREFERENCES"
         title="Settings"
+        description="Customize your experience and manage account security."
         showBack
         onBack={() => router.back()}
-        showNotification={false}
+        onNotification={() => {}}
       />
 
       <ScrollView
@@ -104,7 +106,10 @@ export default function SettingsScreen() {
               <Text style={Typography.h3}>{user?.name}</Text>
               <Text style={[Typography.bodySmall, { color: Colors.muted }]}>{user?.role === 'artisan' ? 'Professional' : 'Client'}</Text>
             </View>
-            <TouchableOpacity style={{ padding: 8 }}>
+            <TouchableOpacity 
+              style={{ padding: 8 }}
+              onPress={() => router.push('/profile-completion')}
+            >
               <Ionicons name="pencil-outline" size={20} color={Colors.primary} />
             </TouchableOpacity>
           </Card>

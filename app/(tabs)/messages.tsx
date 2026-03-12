@@ -1,4 +1,5 @@
 import { AppHeader } from '@/components/AppHeader';
+import { SubAppHeader } from '@/components/AppSubHeader';
 import { Avatar } from '@/components/ui/AvatarRating';
 import { Badge } from '@/components/ui/CardChipBadge';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
@@ -29,7 +30,7 @@ export default function MessagesScreen() {
                     row.other_user_first_name,
                     row.other_user_last_name,
                 ].filter(Boolean).join(' ') || row.other_user_email || 'Unknown',
-                lastMessage: row.last_message ?? '',
+                lastMessage: row.last_message ?? 'Check in with them',
                 lastMessageTime: row.last_message_at ?? row.created_at,
                 unreadCount: Number(row.unread_count ?? 0),
                 participantRole: 'artisan' as const,
@@ -47,7 +48,12 @@ export default function MessagesScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <AppHeader title={t('messages', language)} onNotification={() => router.push('/notifications')} />
+            <SubAppHeader
+                label="CONVERSATIONS"
+                title={t('messages', language)}
+                description="Continue your conversations with your service providers."
+                onNotification={() => router.push('/notifications')}
+            />
 
             {loading ? (
                 <View><SkeletonList count={5} type="message" /></View>

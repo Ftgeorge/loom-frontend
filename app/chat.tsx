@@ -20,11 +20,11 @@ import Animated, { FadeIn, FadeInLeft, FadeInRight } from 'react-native-reanimat
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const QUICK_REPLIES = [
-    'I dey come',
-    'How much e go cost?',
-    'Okay, thank you!',
-    'When you go fit come?',
-    'Send me your location',
+    "I'm on my way",
+    "How much will it cost?",
+    "Okay, thank you!",
+    "When can you come?",
+    "Send me your location",
 ];
 
 export default function ChatScreen() {
@@ -47,7 +47,7 @@ export default function ChatScreen() {
                 id: row.id,
                 threadId: row.thread_id,
                 senderId: row.sender_id,
-                text: row.content,
+                text: row.text, // Corrected from row.content
                 timestamp: row.sent_at,
                 read: Boolean(row.read_at),
             }));
@@ -103,7 +103,7 @@ export default function ChatScreen() {
         >
             <LoomThread variant="minimal" opacity={0.3} animated />
             <AppHeader
-                title={thread?.participantName || 'Signal'}
+                title={thread?.participantName || 'Chat'}
                 showBack
                 onBack={() => router.back()}
                 showNotification={false}
@@ -158,7 +158,7 @@ export default function ChatScreen() {
                 onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
             />
 
-            {/* Tactical Replies */}
+            {/* Quick Replies */}
             <View style={{ backgroundColor: 'transparent' }}>
                 <FlatList
                     data={QUICK_REPLIES}
@@ -216,7 +216,7 @@ export default function ChatScreen() {
                 }}>
                     <TextInput
                         style={[Typography.body, { color: Colors.text, fontSize: 15 }]}
-                        placeholder="Encrypted signal..."
+                        placeholder="Type a message..."
                         placeholderTextColor={Colors.muted}
                         value={text}
                         onChangeText={setText}

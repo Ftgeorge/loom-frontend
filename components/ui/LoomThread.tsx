@@ -199,7 +199,7 @@ export const LoomThread = React.memo(({
                 StyleSheet.absoluteFillObject,
                 {
                     opacity,
-                    zIndex: -10,
+                    zIndex: -1,
                     transform: [{ scale }]
                 }
             ]}

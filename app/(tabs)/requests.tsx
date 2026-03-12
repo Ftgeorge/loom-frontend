@@ -1,4 +1,5 @@
 import { AppHeader } from '@/components/AppHeader';
+import { SubAppHeader } from '@/components/AppSubHeader';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { RequestCard } from '@/components/ui/RequestCard';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
@@ -29,7 +30,7 @@ export default function RequestsScreen() {
             if (!refreshing) setLoading(true);
 
             const statusMap: Record<number, string | undefined> = {
-                0: 'assigned', // Active/Assigned
+                0: 'assigned,open', // Active/Assigned or Open
                 1: 'completed', // Completed
                 2: 'cancelled'  // Cancelled
             };
@@ -55,13 +56,13 @@ export default function RequestsScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.2} animated />
-            <AppHeader title="My Bookings" onNotification={() => router.push('/notifications')} />
-
-            <View style={{ paddingHorizontal: 24, paddingVertical: 20 }}>
-                <View style={{ marginBottom: 16 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>ALL REQUESTS</Text>
-                    <Text style={[Typography.h3, { fontSize: 20 }]}>Booking History</Text>
-                </View>
+            <SubAppHeader
+                title="My Bookings"
+                label="ACTIVITY"
+                description="Keep track of your service requests and appointments."
+                onNotification={() => router.push('/notifications')}
+            />
+            <View style={{ paddingHorizontal: 24 }}>
                 <SegmentedControl
                     segments={SEGMENTS}
                     selected={segIdx}

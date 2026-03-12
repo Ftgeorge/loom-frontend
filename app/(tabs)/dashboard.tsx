@@ -1,4 +1,4 @@
-import { AppHeader } from '@/components/AppHeader';
+import { SubAppHeader } from '@/components/AppSubHeader';
 import { RequestCard } from '@/components/ui/RequestCard';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
@@ -164,21 +164,21 @@ export default function ArtisanDashboard() {
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.canvas }}>
-            <AppHeader showLocation onNotification={() => router.push('/notifications')} />
+            <SubAppHeader
+                showLocation
+                label="DASHBOARD"
+                title={firstName}
+                description="Manage your business and track incoming job requests."
+                onNotification={() => router.push('/notifications')}
+            />
 
             <ScrollView
                 contentContainerStyle={{ padding: 24, paddingBottom: 130 }}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
                 showsVerticalScrollIndicator={false}
             >
-                {/* ─── Header ──────────────────────────────────────────────── */}
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 40 }}>
-                    <Animated.View entering={FadeInDown.delay(80).springify()}>
-                        <Text style={[Typography.label, { color: Colors.violet, marginBottom: 4 }]}>DASHBOARD</Text>
-                        <Text style={[Typography.h1, { fontSize: 28 }]}>
-                            {firstName}
-                        </Text>
-                    </Animated.View>
+                {/* ─── Status Toggle ────────────────────────────────────────── */}
+                <View style={{ marginBottom: 40, flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <Animated.View entering={FadeInRight.delay(160).springify()}>
                         <OnlineToggle online={artisanOnline} onToggle={() => setArtisanOnline(!artisanOnline)} />
                     </Animated.View>

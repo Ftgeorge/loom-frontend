@@ -3,23 +3,23 @@ import { useAppStore } from "@/store";
 import { Colors, Radius, Shadows, Typography } from "@/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Dimensions, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   interpolate,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
+  withSpring,
   withTiming
 } from "react-native-reanimated";
 
 const { width } = Dimensions.get('window');
 
 const LETTERS = ["L", "o", "o", "m"];
-const LETTER_DELAY = 100;
-const LETTER_DURATION = 1200;
-const TAGLINE_DELAY = 1000;
-const INDICATOR_DELAY = 1500;
+const LETTER_DELAY = 80;
+const TAGLINE_DELAY = 800;
+const INDICATOR_DELAY = 1200;
 
 function AnimatedLetter({
   letter,
@@ -33,18 +33,19 @@ function AnimatedLetter({
   useEffect(() => {
     progress.value = withDelay(
       index * LETTER_DELAY,
-      withTiming(1, {
-        duration: LETTER_DURATION,
-        easing: Easing.bezier(0.16, 1, 0.3, 1),
-      }),
+      withSpring(1, {
+        damping: 15,
+        stiffness: 100,
+        mass: 1,
+      })
     );
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
+    opacity: interpolate(progress.value, [0, 0.5, 1], [0, 0.7, 1]),
     transform: [
-      { translateY: interpolate(progress.value, [0, 1], [40, 0]) },
-      { scale: interpolate(progress.value, [0, 1], [0.5, 1]) },
+      { translateY: interpolate(progress.value, [0, 1], [30, 0]) },
+      { scale: interpolate(progress.value, [0, 1], [0.85, 1]) },
     ],
   }));
 
@@ -67,12 +68,12 @@ export default function SplashScreen() {
   useEffect(() => {
     taglineOpacity.value = withDelay(
       TAGLINE_DELAY,
-      withTiming(1, { duration: 1200, easing: Easing.out(Easing.exp) }),
+      withTiming(1, { duration: 1000, easing: Easing.out(Easing.quad) }),
     );
 
     indicatorOpacity.value = withDelay(
       INDICATOR_DELAY,
-      withTiming(1, { duration: 1000, easing: Easing.out(Easing.exp) }),
+      withTiming(1, { duration: 800, easing: Easing.out(Easing.quad) }),
     );
 
     // Auto-navigation timer (3.5 seconds)
@@ -171,12 +172,12 @@ const styles = StyleSheet.create({
   labelLine: {
     height: 1,
     width: 20,
-    backgroundColor: Colors.accent,
+    backgroundColor: Colors.gray300,
     opacity: 0.5,
   },
   tagline: {
     fontSize: 9,
-    color: Colors.accent,
+    color: Colors.gray300,
     fontFamily: "PlusJakartaSans-Bold",
     letterSpacing: 3,
     textTransform: 'uppercase',

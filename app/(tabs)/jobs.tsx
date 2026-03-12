@@ -1,4 +1,4 @@
-import { AppHeader } from '@/components/AppHeader';
+import { SubAppHeader } from '@/components/AppSubHeader';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { RequestCard } from '@/components/ui/RequestCard';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
@@ -51,13 +51,14 @@ export default function JobsScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.2} animated />
-            <AppHeader title="My Jobs" onNotification={() => router.push('/notifications')} />
+            <SubAppHeader
+                label="JOB LIST"
+                title="Service Jobs"
+                description="Manage your incoming, active and past completed jobs."
+                onNotification={() => router.push('/notifications')}
+            />
 
             <View style={{ paddingHorizontal: 24, paddingVertical: 20 }}>
-                <View style={{ marginBottom: 16 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>JOB LIST</Text>
-                    <Text style={[Typography.h3, { fontSize: 20 }]}>Service Requests</Text>
-                </View>
                 <SegmentedControl
                     segments={SEGMENTS}
                     selected={segIdx}

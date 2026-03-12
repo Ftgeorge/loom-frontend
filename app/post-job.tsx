@@ -1,4 +1,4 @@
-import { AppHeader } from '@/components/AppHeader';
+import { SubAppHeader } from '@/components/AppSubHeader';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { Badge, Card, Chip } from '@/components/ui/CardChipBadge';
 import { LoomThread } from '@/components/ui/LoomThread';
@@ -7,6 +7,7 @@ import { useAppStore } from '@/store';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { CategoryId, Urgency } from '@/types';
 import { CATEGORIES } from '@/types';
+import { CATEGORY_IMAGES } from '@/components/home/CategoryPill';
 import { JobRequestSchema, mapZodErrors, formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -14,13 +15,14 @@ import React, { useState } from 'react';
 import {
     Alert,
     Dimensions,
+    ImageBackground,
     ScrollView,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from 'react-native';
-import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, useAnimatedStyle, withSpring, useSharedValue, interpolateColor } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -131,8 +133,10 @@ export default function PostJobScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.3} animated />
-            <AppHeader
+            <SubAppHeader
+                label="POST A JOB"
                 title="Need a hand?"
+                description="Pick a service and tell us what you need done."
                 showBack
                 onBack={() => (step > 0 ? setStep(step - 1) : router.back())}
                 showNotification={false}
@@ -169,55 +173,92 @@ export default function PostJobScreen() {
                 {/* Step 1: Category */}
                 {step === 0 && (
                     <Animated.View entering={FadeInDown.springify()} style={{ paddingHorizontal: 24, paddingTop: 16 }}>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>What should we do?</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 40 }]}>Pick what you want.</Text>
 
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-                            {[...CATEGORIES, { id: 'not_sure', label: 'Other Support', icon: 'help-circle' }].map((cat) => (
-                                <TouchableOpacity
-                                    key={cat.id}
-                                    activeOpacity={0.8}
-                                    onPress={() => {
-                                        setCategory(cat.id);
-                                        setErrors(prev => ({ ...prev, category: '' }));
-                                    }}
-                                    style={{
-                                        width: (width - 48 - 12) / 2,
-                                        backgroundColor: category === cat.id ? Colors.primary : Colors.white,
-                                        borderWidth: 1.5,
-                                        borderColor: category === cat.id ? Colors.primary : (errors.category ? Colors.error : Colors.cardBorder),
-                                        borderRadius: Radius.md,
-                                        padding: 24,
-                                        alignItems: 'center',
-                                        gap: 12,
-                                        ...Shadows.sm
-                                    }}
-                                >
-                                    <View style={{
-                                        width: 56,
-                                        height: 56,
-                                        borderRadius: Radius.xs,
-                                        backgroundColor: category === cat.id ? 'rgba(255,255,255,0.1)' : Colors.primaryLight,
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}>
-                                        <Ionicons
-                                            name={(cat as any).icon || 'hammer-outline'}
-                                            size={28}
-                                            color={category === cat.id ? Colors.white : Colors.primary}
-                                        />
-                                    </View>
-                                    <Text style={[Typography.label, {
-                                        color: category === cat.id ? Colors.white : Colors.text,
-                                        textAlign: 'center',
-                                        fontSize: 10,
-                                        letterSpacing: 0,
-                                        textTransform: 'none'
-                                    }]}>
-                                        {cat.label}
-                                    </Text>
-                                </TouchableOpacity>
-                            ))}
+                            {[...CATEGORIES, { id: 'not_sure', label: 'Other Support', icon: 'help-circle' }].map((cat) => {
+                                const image = CATEGORY_IMAGES[cat.id];
+                                return (
+                                    <TouchableOpacity
+                                        key={cat.id}
+                                        activeOpacity={0.8}
+                                        onPress={() => {
+                                            setCategory(cat.id);
+                                            setErrors(prev => ({ ...prev, category: '' }));
+                                        }}
+                                        style={{
+                                            width: (width - 48 - 12) / 2,
+                                            height: 160,
+                                            borderRadius: Radius.lg,
+                                            overflow: 'hidden',
+                                            borderWidth: 2,
+                                            borderColor: category === cat.id ? Colors.primary : (errors.category ? Colors.error : 'transparent'),
+                                            ...Shadows.sm
+                                        }}
+                                    >
+                                        <ImageBackground
+                                            source={image || { uri: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=800&auto=format&fit=crop' }}
+                                            style={{ width: '100%', height: '100%' }}
+                                        >
+                                            <View style={{
+                                                position: 'absolute',
+                                                top: 0, left: 0, right: 0, bottom: 0,
+                                                backgroundColor: category === cat.id ? 'rgba(7, 131, 101, 0.7)' : 'rgba(0,0,0,0.45)',
+                                            }} />
+                                            
+                                            <View style={{
+                                                position: 'absolute',
+                                                top: 12,
+                                                left: 12,
+                                                width: 36,
+                                                height: 36,
+                                                borderRadius: 12,
+                                                backgroundColor: 'rgba(255,255,255,0.2)',
+                                                borderWidth: 1,
+                                                borderColor: 'rgba(255,255,255,0.3)',
+                                                alignItems: 'center',
+                                                justifyContent: 'center'
+                                            }}>
+                                                <Ionicons
+                                                    name={(cat as any).icon || 'hammer-outline'}
+                                                    size={20}
+                                                    color="white"
+                                                />
+                                            </View>
+
+                                            {category === cat.id && (
+                                                <View style={{
+                                                    position: 'absolute',
+                                                    top: 12,
+                                                    right: 12,
+                                                    width: 24,
+                                                    height: 24,
+                                                    borderRadius: 12,
+                                                    backgroundColor: Colors.white,
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}>
+                                                    <Ionicons name="checkmark" size={16} color={Colors.primary} />
+                                                </View>
+                                            )}
+
+                                            <View style={{
+                                                position: 'absolute',
+                                                bottom: 12,
+                                                left: 12,
+                                                right: 12
+                                            }}>
+                                                <Text style={{
+                                                    fontSize: 14,
+                                                    fontFamily: 'PlusJakartaSans-Bold',
+                                                    color: Colors.white,
+                                                }}>
+                                                    {cat.label}
+                                                </Text>
+                                            </View>
+                                        </ImageBackground>
+                                    </TouchableOpacity>
+                                );
+                            })}
                         </View>
                         {errors.category && <Text style={[Typography.label, { color: Colors.error, marginTop: 16, fontSize: 10, textTransform: 'none' }]}>{errors.category}</Text>}
 
@@ -244,7 +285,7 @@ export default function PostJobScreen() {
 
                         <View style={{
                             backgroundColor: Colors.white,
-                            borderRadius: Radius.md,
+                            borderRadius: Radius.lg,
                             borderWidth: 1.5,
                             borderColor: errors.description ? Colors.error : Colors.cardBorder,
                             padding: 20,
@@ -328,54 +369,103 @@ export default function PostJobScreen() {
                         <Text style={[Typography.label, { marginBottom: 16, marginTop: 32, color: Colors.primary }]}>CASH?</Text>
                         <View style={{
                             backgroundColor: Colors.white,
-                            borderRadius: Radius.md,
-                            padding: 32,
-                            alignItems: 'center',
+                            borderRadius: Radius.lg,
+                            padding: 20,
                             borderWidth: 1.5,
                             borderColor: Colors.cardBorder,
-                            ...Shadows.md
+                            ...Shadows.sm
                         }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 40 }}>
+                            <View style={{ 
+                                flexDirection: 'row', 
+                                alignItems: 'center', 
+                                justifyContent: 'space-between',
+                                backgroundColor: Colors.gray100,
+                                borderRadius: Radius.md,
+                                padding: 8
+                            }}>
                                 <TouchableOpacity
                                     onPress={() => setBudget(Math.max(1000, budget - 1000))}
-                                    style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center' }}
+                                    activeOpacity={0.7}
+                                    style={{ 
+                                        width: 48, 
+                                        height: 48, 
+                                        borderRadius: Radius.sm, 
+                                        backgroundColor: Colors.white, 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center',
+                                        ...Shadows.xs
+                                    }}
                                 >
-                                    <Ionicons name="remove" size={24} color={Colors.primary} />
+                                    <Ionicons name="remove" size={20} color={Colors.primary} />
                                 </TouchableOpacity>
-                                <Text style={[Typography.h1, { fontSize: 44, color: Colors.text }]}>{formatNaira(budget)}</Text>
+                                
+                                <View style={{ alignItems: 'center', flex: 1 }}>
+                                    <Text style={[Typography.h1, { fontSize: 32, color: Colors.text }]}>{formatNaira(budget)}</Text>
+                                </View>
+
                                 <TouchableOpacity
                                     onPress={() => setBudget(budget + 1000)}
-                                    style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center' }}
+                                    activeOpacity={0.7}
+                                    style={{ 
+                                        width: 48, 
+                                        height: 48, 
+                                        borderRadius: Radius.sm, 
+                                        backgroundColor: Colors.primary, 
+                                        alignItems: 'center', 
+                                        justifyContent: 'center',
+                                        ...Shadows.xs
+                                    }}
                                 >
-                                    <Ionicons name="add" size={24} color={Colors.primary} />
+                                    <Ionicons name="add" size={20} color={Colors.white} />
                                 </TouchableOpacity>
                             </View>
-                            <Text style={[Typography.label, { marginTop: 24, color: Colors.muted, textTransform: 'none', letterSpacing: 0 }]}>
-                                Usual price: ₦5k — ₦45k
-                            </Text>
+                            <View style={{ marginTop: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
+                                <Text style={[Typography.bodySmall, { color: Colors.muted, fontSize: 11 }]}>
+                                    Suggested: ₦5k — ₦45k
+                                </Text>
+                            </View>
                         </View>
 
                         <View style={{ marginTop: 40, gap: 16 }}>
                             <Text style={[Typography.label, { color: Colors.primary }]}>WHEN?</Text>
                             <View style={{ flexDirection: 'row', gap: 10 }}>
-                                {URGENCY_OPTIONS.map((opt) => (
-                                    <Chip
-                                        key={opt.value}
-                                        label={opt.label.split(' ')[1].toUpperCase()}
-                                        selected={urgency === opt.value}
-                                        onPress={() => setUrgency(opt.value)}
-                                        containerStyle={{
-                                            paddingVertical: 12,
-                                            paddingHorizontal: 16,
-                                            backgroundColor: urgency === opt.value ? (opt.value === 'now' ? Colors.error : Colors.primary) : Colors.white
-                                        }}
-                                    />
-                                ))}
+                                {URGENCY_OPTIONS.map((opt) => {
+                                    const isSelected = urgency === opt.value;
+                                    return (
+                                        <TouchableOpacity
+                                            key={opt.value}
+                                            activeOpacity={0.7}
+                                            onPress={() => setUrgency(opt.value)}
+                                            style={{
+                                                flex: 1,
+                                                paddingVertical: 18,
+                                                borderRadius: Radius.md,
+                                                backgroundColor: isSelected ? (opt.value === 'now' ? Colors.error : Colors.primary) : Colors.white,
+                                                borderWidth: 1.5,
+                                                borderColor: isSelected ? 'transparent' : Colors.cardBorder,
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                ...(isSelected ? Shadows.md : {}),
+                                                transform: [{ scale: isSelected ? 1.02 : 1 }]
+                                            }}
+                                        >
+                                            <Text style={[Typography.label, { 
+                                                color: isSelected ? Colors.white : Colors.text,
+                                                fontSize: 10,
+                                                letterSpacing: 1,
+                                                textTransform: 'uppercase',
+                                                fontWeight: isSelected ? '900' : '600'
+                                            }]}>
+                                                {opt.label.split(' ').slice(1).join(' ')}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
                             </View>
                         </View>
 
                         <PrimaryButton
-                            title="Check it"
+                            title="Check Final Info"
                             onPress={() => {
                                 if (!address || address.length < 3) {
                                     setErrors({ address: 'Please provide an address' });
@@ -383,7 +473,7 @@ export default function PostJobScreen() {
                                     setStep(3);
                                 }
                             }}
-                            style={{ marginTop: 48, height: 64, borderRadius: Radius.md }}
+                            style={{ marginTop: 48, height: 64, borderRadius: Radius.lg }}
                             variant="primary"
                         />
                     </Animated.View>
@@ -398,7 +488,7 @@ export default function PostJobScreen() {
                         <Card style={{
                             gap: 32,
                             padding: 24,
-                            borderRadius: Radius.md,
+                            borderRadius: Radius.lg,
                             backgroundColor: Colors.white,
                             borderWidth: 1.5,
                             borderColor: Colors.cardBorder,
@@ -443,7 +533,7 @@ export default function PostJobScreen() {
 
                             <View style={{
                                 backgroundColor: Colors.primary,
-                                borderRadius: Radius.xs,
+                                borderRadius: Radius.md,
                                 padding: 24,
                                 flexDirection: 'row',
                                 justifyContent: 'space-between',

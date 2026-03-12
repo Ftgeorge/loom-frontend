@@ -13,9 +13,13 @@ async function apiFetch<T>(
     options: RequestInit = {}
 ): Promise<T> {
     const authHeaders = await getAuthHeader();
+    
+    // If body is FormData, don't set Content-Type so browser sets it with boundary
+    const isFormData = options.body instanceof FormData;
+    
     const response = await fetch(`${BASE_URL}${path}`, {
         headers: {
-            "Content-Type": "application/json",
+            ...(!isFormData && { "Content-Type": "application/json" }),
             ...authHeaders,
             ...(options.headers as Record<string, string>),
         },
@@ -30,6 +34,45 @@ async function apiFetch<T>(
 
     return json as T;
 }
+
+// ─── User API ────────────────────────────────────────────
+export const userApi = {
+    /** PATCH /users/me — update basic user profile */
+    updateProfile: (data: {
+        first_name?: string;
+        last_name?: string;
+        phone?: string;
+        email?: string;
+        area?: string;
+        city?: string;
+        state?: string;
+        avatar_url?: string;
+        interests?: string[];
+    }) =>
+        apiFetch<unknown>("/users/me", {
+            method: "PATCH",
+            body: JSON.stringify(data),
+        }),
+
+    /** POST /users/me/avatar — upload profile picture */
+    uploadAvatar: (uri: string) => {
+        const formData = new FormData();
+        const filename = uri.split("/").pop() || "avatar.jpg";
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image/jpeg`;
+
+        formData.append("avatar", {
+            uri,
+            name: filename,
+            type,
+        } as any);
+
+        return apiFetch<{ avatar_url: string }>("/users/me/avatar", {
+            method: "POST",
+            body: formData,
+        });
+    },
+};
 
 // ─── Auth API ─────────────────────────────────────────────
 export interface AuthUser {
@@ -80,26 +123,58 @@ export const authApi = {
 
 /** Artisan API */
 export const artisanApi = {
-    /** GET /artisans/search?skill=plumber — category-filtered artisan search */
-    search: (params: { skill: string; limit?: number; offset?: number }) => {
-        const qs = new URLSearchParams({
-            skill: params.skill,
-            limit: String(params.limit ?? 20),
-            offset: String(params.offset ?? 0),
-        });
-        return apiFetch<{ total: number; count: number; limit: number; offset: number; results: unknown[] }>(
-            `/artisans/search?${qs}`
+    /** GET /artisans — browse all artisans (no skill filter) */
+    list: (params?: { 
+        limit?: number; 
+        offset?: number;
+        city?: string;
+        state?: string;
+        area?: string;
+        lat?: number;
+        lng?: number;
+        interests?: string[];
+    }) => {
+        const qs = new URLSearchParams();
+        if (params?.limit) qs.set("limit", String(params.limit));
+        if (params?.offset) qs.set("offset", String(params.offset));
+        if (params?.city) qs.set("city", params.city);
+        if (params?.state) qs.set("state", params.state);
+        if (params?.area) qs.set("area", params.area);
+        if (params?.lat) qs.set("lat", String(params.lat));
+        if (params?.lng) qs.set("lng", String(params.lng));
+        if (params?.interests) {
+            params.interests.forEach(i => qs.append("interests", i));
+        }
+
+        return apiFetch<{ count: number; limit: number; offset: number; results: unknown[] }>(
+            `/artisans?${qs}`
         );
     },
 
-    /** GET /artisans — browse all artisans (no skill filter) */
-    list: (params?: { limit?: number; offset?: number }) => {
+    /** GET /artisans/search?skill=plumber */
+    search: (params: { 
+        skill: string; 
+        limit?: number; 
+        offset?: number;
+        city?: string;
+        state?: string;
+        area?: string;
+        lat?: number;
+        lng?: number;
+    }) => {
         const qs = new URLSearchParams({
-            limit: String(params?.limit ?? 20),
-            offset: String(params?.offset ?? 0),
+            skill: params.skill,
         });
-        return apiFetch<{ count: number; limit: number; offset: number; results: unknown[] }>(
-            `/artisans?${qs}`
+        if (params.limit) qs.set("limit", String(params.limit));
+        if (params.offset) qs.set("offset", String(params.offset));
+        if (params.city) qs.set("city", params.city);
+        if (params.state) qs.set("state", params.state);
+        if (params.area) qs.set("area", params.area);
+        if (params.lat) qs.set("lat", String(params.lat));
+        if (params.lng) qs.set("lng", String(params.lng));
+
+        return apiFetch<{ total: number; count: number; limit: number; offset: number; results: unknown[] }>(
+            `/artisans/search?${qs}`
         );
     },
 
@@ -117,6 +192,7 @@ export const artisanApi = {
             jobs_completed: number;
             pending_payout: string;
             total_withdrawn: string;
+            transactions: any[];
         }>("/artisans/me/earnings"),
 
     /** POST /artisans/me/profile — create artisan profile for logged in user */
@@ -145,6 +221,30 @@ export const artisanApi = {
     }) =>
         apiFetch<unknown>("/artisans/me", {
             method: "PATCH",
+            body: JSON.stringify(data),
+        }),
+
+    /** POST /artisans/portfolio — add showcase item */
+    addPortfolioItem: (data: {
+        imageUrl: string;
+        title: string;
+        description?: string;
+        ratingId?: string;
+    }) =>
+        apiFetch<{ id: string }>("/artisans/portfolio", {
+            method: "POST",
+            body: JSON.stringify(data),
+        }),
+
+    /** DELETE /artisans/portfolio/:id */
+    deletePortfolioItem: (id: string) =>
+        apiFetch<void>(`/artisans/portfolio/${id}`, { method: "DELETE" }),
+
+    /** Verification */
+    getVerification: () => apiFetch<any>("/artisans/me/verification"),
+    submitVerification: (data: { documentType: string; documentNumber?: string; documentUrl: string }) =>
+        apiFetch<any>("/artisans/me/verification", {
+            method: "POST",
             body: JSON.stringify(data),
         }),
 };
@@ -262,25 +362,6 @@ export const notificationApi = {
     /** PATCH /notifications/read-all */
     markAllRead: () =>
         apiFetch<{ message: string }>("/notifications/read-all", { method: "PATCH" }),
-};
-
-// ─── User API ────────────────────────────────────────────
-export const userApi = {
-    /** PATCH /users/me — update basic user profile */
-    updateProfile: (data: {
-        first_name?: string;
-        last_name?: string;
-        phone?: string;
-        email?: string;
-        area?: string;
-        city?: string;
-        state?: string;
-        avatar_url?: string;
-    }) =>
-        apiFetch<unknown>("/users/me", {
-            method: "PATCH",
-            body: JSON.stringify(data),
-        }),
 };
 
 // ─── Skills API ───────────────────────────────────────────
