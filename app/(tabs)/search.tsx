@@ -135,7 +135,7 @@ export default function SearchScreen() {
             
             <SubAppHeader
                 label="EXPLORE"
-                title="Find a Pro"
+                title="Find an Artisan"
                 description="Discover skilled artisans in your area."
                 onNotification={() => router.push('/notifications')}
             />
@@ -220,7 +220,7 @@ export default function SearchScreen() {
                                     NO RESULTS
                                 </Text>
                                 <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted, marginTop: 12, lineHeight: 20 }]}>
-                                    We couldn't find any pros matching your current search parameters.
+                                    We couldn&apos;t find any artisans matching your current search parameters.
                                 </Text>
                             </View>
                         ) : (
@@ -228,7 +228,7 @@ export default function SearchScreen() {
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                                     <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.accent }} />
                                     <Text style={[Typography.label, { fontSize: 10, color: Colors.primary, letterSpacing: 1, fontWeight: '700' }]}>
-                                        FOUND {artisans.length} PROFESSIONALS
+                                        FOUND {artisans.length} ARTISANS
                                     </Text>
                                 </View>
                                 <LayoutSwitch

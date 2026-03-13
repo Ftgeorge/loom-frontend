@@ -26,7 +26,7 @@ export default function SettingsScreen() {
     const newRole: UserRole = user?.role === "client" ? "artisan" : "client";
     Alert.alert(
       "Switch Role",
-      `Switch to ${newRole === "client" ? "Client" : "Professional"} mode?`,
+      `Switch to ${newRole === "client" ? "Client" : "Artisan"} mode?`,
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -104,7 +104,7 @@ export default function SettingsScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <Text style={Typography.h3}>{user?.name}</Text>
-              <Text style={[Typography.bodySmall, { color: Colors.muted }]}>{user?.role === 'artisan' ? 'Professional' : 'Client'}</Text>
+              <Text style={[Typography.bodySmall, { color: Colors.muted }]}>{user?.role === 'artisan' ? 'Artisan' : 'Client'}</Text>
             </View>
             <TouchableOpacity 
               style={{ padding: 8 }}
@@ -204,7 +204,7 @@ export default function SettingsScreen() {
           <SettingItem
             icon="swap-horizontal"
             label="Switch Role"
-            value={`Currently using as ${user?.role === 'artisan' ? 'Professional' : 'Client'}`}
+            value={`Currently using as ${user?.role === 'artisan' ? 'Artisan' : 'Client'}`}
             onPress={handleRoleSwitch}
             color={Colors.warning}
           />

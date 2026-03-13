@@ -4,7 +4,6 @@ import { Card } from '@/components/ui/CardChipBadge';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
-import { t } from '@/i18n';
 import { artisanApi } from '@/services/api';
 import { useAppStore } from '@/store';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
@@ -86,35 +85,57 @@ export default function EarningsScreen() {
             />
 
             <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
-                {/* Yield Hub */}
+                {/* Balance Hub */}
                 <Animated.View entering={FadeInDown.delay(100).springify()}>
                     <Card style={{
                         backgroundColor: Colors.white,
-                        padding: 28,
-                        borderRadius: Radius.md,
-                        borderColor: Colors.cardBorder,
+                        padding: 32,
+                        borderRadius: Radius.sm,
                         borderWidth: 1.5,
+                        borderColor: Colors.cardBorder,
                         ...Shadows.md
                     }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.primary }} />
-                            <Text style={[Typography.label, { color: Colors.muted, fontSize: 9, letterSpacing: 1.5 }]}>AVAILABLE BALANCE</Text>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <View style={{ flex: 1 }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                                    <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: Colors.primary }} />
+                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 9, letterSpacing: 1.2 }]}>AVAILABLE BALANCE</Text>
+                                </View>
+                                <Text 
+                                    style={[Typography.display, { color: Colors.primary, fontSize: 36, fontWeight: '800' }]}
+                                    adjustsFontSizeToFit
+                                    numberOfLines={1}
+                                >
+                                    {formatNaira(earnings.totalEarnings)}
+                                </Text>
+                            </View>
+                            <View style={{ 
+                                width: 52, 
+                                height: 52, 
+                                borderRadius: Radius.md, 
+                                backgroundColor: Colors.surface,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderWidth: 1,
+                                borderColor: Colors.cardBorder
+                            }}>
+                                <Ionicons name="wallet" size={26} color={Colors.primary} />
+                            </View>
                         </View>
-                        <Text style={[Typography.h1, { fontSize: 40, color: Colors.primary, fontWeight: '800' }]}>{formatNaira(earnings.totalEarnings)}</Text>
 
                         <View style={{
                             flexDirection: 'row',
                             marginTop: 32,
                             paddingTop: 24,
                             borderTopWidth: 1,
-                            borderTopColor: Colors.gray100,
-                            gap: 40
+                            borderTopColor: Colors.divider,
+                            justifyContent: 'space-between'
                         }}>
                             <View>
-                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 8 }]}>WEEKLY TOTAL</Text>
+                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 8 }]}>WEEKLY REVENUE</Text>
                                 <Text style={[Typography.h3, { color: Colors.primary, marginTop: 4, fontSize: 16 }]}>{formatNaira(earnings.thisWeek)}</Text>
                             </View>
-                            <View>
+                            <View style={{ alignItems: 'flex-end' }}>
                                 <Text style={[Typography.label, { color: Colors.muted, fontSize: 8 }]}>PENDING PAYOUT</Text>
                                 <Text style={[Typography.h3, { color: Colors.accent, marginTop: 4, fontSize: 16 }]}>{formatNaira(earnings.pendingPayments)}</Text>
                             </View>
@@ -122,52 +143,55 @@ export default function EarningsScreen() {
                     </Card>
                 </Animated.View>
 
+                {/* Balance Hub Actions */}
+                <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginTop: 24 }}>
+                    <PrimaryButton
+                        title="WITHDRAW FUNDS"
+                        onPress={() => { }}
+                        variant="accent"
+                        style={{ height: 64, borderRadius: Radius.sm, ...Shadows.md }}
+                        icon={<Ionicons name="paper-plane" size={20} color={Colors.white} />}
+                    />
+                </Animated.View>
+
                 {/* Velocity Visualization */}
                 <Animated.View entering={FadeInUp.delay(300).springify()}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 40, marginBottom: 20 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 48, marginBottom: 20 }}>
                         <View>
                             <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>EARNINGS OVERVIEW</Text>
-                            <Text style={[Typography.h3, { fontSize: 20 }]}>Daily Earnings</Text>
+                            <Text style={[Typography.h3, { fontSize: 20 }]}>Performance</Text>
                         </View>
-                        <View style={{ backgroundColor: Colors.primaryLight, paddingHorizontal: 8, paddingVertical: 4, borderRadius: Radius.xs }}>
-                            <Text style={[Typography.label, { color: Colors.primary, fontSize: 9 }]}>UP THIS WEEK</Text>
+                        <View style={{ backgroundColor: Colors.primaryLight, paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.full }}>
+                            <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>THIS WEEK</Text>
                         </View>
                     </View>
 
-                    <Card style={{ paddingVertical: 28, paddingHorizontal: 20, marginBottom: 24, borderRadius: Radius.md, backgroundColor: Colors.white, borderColor: Colors.cardBorder }}>
+                    <Card style={{ paddingVertical: 28, paddingHorizontal: 20, marginBottom: 24, borderRadius: Radius.sm, backgroundColor: Colors.white, borderColor: Colors.cardBorder }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 120, alignItems: 'flex-end' }}>
                             {earnings.weeklyData.map((d, i) => (
-                                <Animated.View key={`${d.day}-${i}`} style={{ alignItems: 'center', flex: 1 }}>
+                                <View key={`${d.day}-${i}`} style={{ alignItems: 'center', flex: 1 }}>
                                     <Animated.View
                                         entering={StretchInY.delay(400 + i * 50)}
                                         style={{
                                             backgroundColor: i === 4 ? Colors.accent : Colors.primary,
-                                            borderRadius: 2,
-                                            width: 12,
+                                            borderRadius: 3,
+                                            width: 14,
                                             height: `${Math.max((d.amount / maxBar) * 100, 8)}%`,
-                                            opacity: i === 4 ? 1 : 0.15
+                                            opacity: i === 4 ? 1 : 0.12
                                         }}
                                     />
                                     <Text style={[Typography.label, { fontSize: 8, color: Colors.muted, marginTop: 12 }]}>{d.day}</Text>
-                                </Animated.View>
+                                </View>
                             ))}
                         </View>
                     </Card>
                 </Animated.View>
 
-                {/* Primary Financial Action */}
-                <PrimaryButton
-                    title="WITHDRAW MONEY"
-                    onPress={() => { }}
-                    variant="accent"
-                    style={{ marginVertical: 12, height: 64, borderRadius: Radius.md, ...Shadows.md }}
-                />
-
                 {/* Activity Ledger */}
                 <View style={{ marginTop: 40 }}>
                     <Text style={[Typography.label, { color: Colors.primary, marginBottom: 12 }]}>PAYMENT HISTORY</Text>
                     {earnings.transactions.length === 0 ? (
-                        <Card style={{ padding: 48, alignItems: 'center', backgroundColor: Colors.surface, borderStyle: 'dashed', borderColor: Colors.cardBorder, borderRadius: Radius.md }}>
+                        <Card style={{ padding: 48, alignItems: 'center', backgroundColor: Colors.surface, borderStyle: 'dashed', borderColor: Colors.cardBorder, borderRadius: Radius.sm }}>
                             <Ionicons name="receipt-outline" size={32} color={Colors.muted} />
                             <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 16 }]}>NO TRANSACTIONS YET</Text>
                         </Card>
@@ -182,7 +206,7 @@ export default function EarningsScreen() {
                                             gap: 16,
                                             padding: 20,
                                             backgroundColor: Colors.white,
-                                            borderRadius: Radius.md,
+                                            borderRadius: Radius.sm,
                                             borderWidth: 1.5,
                                             borderColor: Colors.cardBorder,
                                             ...Shadows.sm

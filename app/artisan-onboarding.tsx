@@ -2,11 +2,9 @@ import { AppHeader } from '@/components/AppHeader';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { Chip } from '@/components/ui/CardChipBadge';
-import { AppTextInput } from '@/components/ui/TextInputs';
 import { artisanApi } from '@/services/api';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { CATEGORIES } from '@/types';
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -50,7 +48,7 @@ export default function ArtisanOnboardingScreen() {
                 await artisanApi.addSkill(profileId, skillLabel);
             }
 
-            router.replace('/(tabs)/dashboard');
+            router.replace('/verification');
         } catch (err: any) {
             Alert.alert('Initialization Error', err.message || 'Failed to save operative profile');
         } finally {
@@ -220,7 +218,7 @@ export default function ArtisanOnboardingScreen() {
                                 <View style={{
                                     width: 24,
                                     height: 24,
-                                    borderRadius: Radius.xs,
+                                    borderRadius: Radius.xl,
                                     borderWidth: 2,
                                     borderColor: pricingStyle === opt.value ? Colors.primary : Colors.gray200,
                                     alignItems: 'center',
@@ -228,7 +226,7 @@ export default function ArtisanOnboardingScreen() {
                                     backgroundColor: pricingStyle === opt.value ? Colors.primaryLight : 'transparent'
                                 }}>
                                     {pricingStyle === opt.value && (
-                                        <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: Colors.primary }} />
+                                        <View style={{ width: 10, height: 10, borderRadius: 100, backgroundColor: Colors.primary }} />
                                     )}
                                 </View>
                                 <View style={{ flex: 1 }}>

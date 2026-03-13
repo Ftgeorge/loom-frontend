@@ -1,8 +1,7 @@
 import { SubAppHeader } from "@/components/AppSubHeader";
 import { Avatar } from "@/components/ui/AvatarRating";
-import { Card } from "@/components/ui/CardChipBadge";
 import { LoomThread } from "@/components/ui/LoomThread";
-import { languageNames, t } from "@/i18n";
+import { languageNames } from "@/i18n";
 import { useAppStore } from "@/store";
 import { Colors, Radius, Shadows, Typography } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
@@ -64,7 +63,6 @@ export default function ProfileScreen() {
             label: "View Public Profile",
             onPress: () => artisanId && router.push({ pathname: '/artisan-profile', params: { id: artisanId } }),
           },
-          { icon: "star-outline", label: "My Reviews", onPress: () => { } },
           {
             icon: "shield-checkmark-outline",
             label: "Verification Status",
@@ -72,8 +70,8 @@ export default function ProfileScreen() {
           },
           {
             icon: "construct-outline",
-            label: "Manage Skills",
-            onPress: () => router.push("/artisan-onboarding"),
+            label: "Professional Skills",
+            onPress: () => router.push("/manage-skills"),
           },
         ]
         : [
@@ -88,7 +86,7 @@ export default function ProfileScreen() {
             label: "Switch to Artisan Account",
             onPress: () => {
               Alert.alert(
-                "Become a Professional",
+                "Become an Artisan",
                 "Do you want to start offering your services on Loom?",
                 [
                   { text: "Later", style: "cancel" },
@@ -224,15 +222,6 @@ export default function ProfileScreen() {
           </View>
 
           {/* ─── Profile Details ──────────────────────────────────────────────── */}
-          <Text style={[Typography.label, {
-            color: Colors.primary,
-            fontSize: 10,
-            letterSpacing: 3,
-            fontWeight: '800',
-            opacity: 0.6
-          }]}>
-            IDENTITY KEY
-          </Text>
 
           <Text style={[Typography.h1, {
             marginTop: 8,
@@ -258,7 +247,7 @@ export default function ProfileScreen() {
                 fontWeight: '700',
                 letterSpacing: 0.5
               }]}>
-                {isArtisan ? "VERIFIED PRO" : "CLIENT"}
+                {isArtisan ? "VERIFIED" : "CLIENT"}
               </Text>
             </View>
 
@@ -296,7 +285,7 @@ export default function ProfileScreen() {
                         alignItems: 'center',
                         padding: 16,
                         backgroundColor: Colors.white,
-                        borderRadius: Radius.lg,
+                        borderRadius: Radius.sm,
                         gap: 16,
                         borderWidth: 1,
                         borderColor: Colors.cardBorder,
@@ -308,7 +297,7 @@ export default function ProfileScreen() {
                       <View style={{
                         width: 40,
                         height: 40,
-                        borderRadius: Radius.sm,
+                        borderRadius: Radius.xs,
                         backgroundColor: item.danger ? Colors.error + '10' : Colors.surface,
                         alignItems: 'center',
                         justifyContent: 'center',

@@ -1,7 +1,7 @@
 import { SubAppHeader } from '@/components/AppSubHeader';
-import { Avatar, RatingStars } from '@/components/ui/AvatarRating';
+import { RatingStars } from '@/components/ui/AvatarRating';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
-import { Badge, Card, Chip } from '@/components/ui/CardChipBadge';
+import { Card } from '@/components/ui/CardChipBadge';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { SkeletonProfile } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
@@ -9,13 +9,13 @@ import { artisanApi, jobApi } from '@/services/api';
 import { mapArtisan, mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
-import type { Artisan, ArtisanReview, JobRequest } from '@/types';
+import type { Artisan, JobRequest } from '@/types';
 import { formatDate, formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Image, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export default function ArtisanProfileScreen() {
     const router = useRouter();
@@ -93,7 +93,7 @@ export default function ArtisanProfileScreen() {
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.3} animated />
             <SubAppHeader
-                label="PROFESSIONAL"
+                label="ARTISAN"
                 title={artisan.name}
                 description={artisan.bio}
                 showBack
@@ -233,7 +233,7 @@ export default function ArtisanProfileScreen() {
                                                         <Text style={[Typography.label, { fontSize: 10, color: Colors.ink, fontWeight: '700' }]}>{item.customerName}</Text>
                                                     </View>
                                                     <Text style={[Typography.bodySmall, { fontSize: 12, fontStyle: 'italic', color: Colors.text, lineHeight: 18 }]} numberOfLines={2}>
-                                                        "{item.comment}"
+                                                        &quot;{item.comment}&quot;
                                                     </Text>
                                                 </View>
                                             )}
@@ -278,7 +278,7 @@ export default function ArtisanProfileScreen() {
                                     <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>{formatDate(review.createdAt).toUpperCase()}</Text>
                                 </View>
                                 <Text style={[Typography.bodySmall, { color: Colors.text, lineHeight: 20, marginBottom: 16, fontStyle: 'italic' }]}>
-                                    "{review.comment}"
+                                    &quot;{review.comment}&quot;
                                 </Text>
                                 <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
                                     {review.tags.map((tag) => (
@@ -293,40 +293,42 @@ export default function ArtisanProfileScreen() {
                 </View>
 
                 {/* Actions */}
-                <View style={{ gap: 12 }}>
-                    <PrimaryButton
-                        title="BOOK SERVICE"
-                        onPress={() => router.push({ pathname: '/booking', params: { artisanId: artisan.id } })}
-                        icon={<Ionicons name="calendar-outline" size={20} color={Colors.white} style={{ marginRight: 8 }} />}
-                        variant="accent"
-                        style={{ height: 64, borderRadius: Radius.md, ...Shadows.md }}
-                    />
-                    <View style={{ flexDirection: 'row', gap: 12 }}>
-                        <SecondaryButton
-                            title="MESSAGE"
-                            onPress={async () => {
-                                try {
-                                    const { threadApi } = await import('@/services/api');
-                                    const res = await threadApi.create({ artisanProfileId: artisan.id });
-                                    router.push({ pathname: '/chat', params: { threadId: res.id } });
-                                } catch (err) {
-                                    console.error('Failed to create thread:', err);
-                                    Alert.alert('Error', 'Unable to start a conversation at this time.');
-                                }
-                            }}
-                            style={{ flex: 1, height: 60, borderRadius: Radius.md, borderColor: Colors.primary, backgroundColor: Colors.white, borderWidth: 1.5 }}
-                            textStyle={{ color: Colors.primary, fontSize: 11, letterSpacing: 1 }}
-                            icon={<Ionicons name="chatbubbles-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />}
+                {!isOwner && (
+                    <View style={{ gap: 12 }}>
+                        <PrimaryButton
+                            title="BOOK SERVICE"
+                            onPress={() => router.push({ pathname: '/booking', params: { artisanId: artisan.id } })}
+                            icon={<Ionicons name="calendar-outline" size={20} color={Colors.white} style={{ marginRight: 8 }} />}
+                            variant="accent"
+                            style={{ height: 64, borderRadius: Radius.md, ...Shadows.md }}
                         />
-                        <SecondaryButton
-                            title="CALL"
-                            onPress={() => { }}
-                            style={{ flex: 1, height: 60, borderRadius: Radius.md, borderColor: Colors.primary, backgroundColor: Colors.white, borderWidth: 1.5 }}
-                            textStyle={{ color: Colors.primary, fontSize: 11, letterSpacing: 1 }}
-                            icon={<Ionicons name="call-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />}
-                        />
+                        <View style={{ flexDirection: 'row', gap: 12 }}>
+                            <SecondaryButton
+                                title="MESSAGE"
+                                onPress={async () => {
+                                    try {
+                                        const { threadApi } = await import('@/services/api');
+                                        const res = await threadApi.create({ artisanProfileId: artisan.id });
+                                        router.push({ pathname: '/chat', params: { threadId: res.id } });
+                                    } catch (err) {
+                                        console.error('Failed to create thread:', err);
+                                        Alert.alert('Error', 'Unable to start a conversation at this time.');
+                                    }
+                                }}
+                                style={{ flex: 1, height: 60, borderRadius: Radius.md, borderColor: Colors.primary, backgroundColor: Colors.white, borderWidth: 1.5 }}
+                                textStyle={{ color: Colors.primary, fontSize: 11, letterSpacing: 1 }}
+                                icon={<Ionicons name="chatbubbles-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />}
+                            />
+                            <SecondaryButton
+                                title="CALL"
+                                onPress={() => { }}
+                                style={{ flex: 1, height: 60, borderRadius: Radius.md, borderColor: Colors.primary, backgroundColor: Colors.white, borderWidth: 1.5 }}
+                                textStyle={{ color: Colors.primary, fontSize: 11, letterSpacing: 1 }}
+                                icon={<Ionicons name="call-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />}
+                            />
+                        </View>
                     </View>
-                </View>
+                )}
             </ScrollView>
 
             {/* Add Work Modal */}

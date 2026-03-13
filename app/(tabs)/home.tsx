@@ -1,24 +1,22 @@
-import { mapArtisan } from '@/services/mappers';
+import { artisanApi, jobApi } from '@/services/api';
+import { useAppStore } from '@/store';
+import { Colors } from '@/theme';
+import type { Artisan } from '@/types';
+import { CATEGORIES } from '@/types';
+import { useRouter, useFocusEffect } from 'expo-router';
+import { mapArtisan, mapJob } from '@/services/mappers';
 import { SubAppHeader } from '@/components/AppSubHeader';
 import { ArtisanCard } from '@/components/ui/ArtisanCard';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
-import { Ionicons } from '@expo/vector-icons';
 import { ActiveJobBanner } from '@/components/home/ActiveJobBanner';
 import { CategoryPill } from '@/components/home/CategoryPill';
 import { PostJobCTA } from '@/components/home/PostJobCTA';
 import { SectionHeader } from '@/components/home/SectionHeader';
-import { artisanApi } from '@/services/api';
-import { useAppStore } from '@/store';
-import { Colors, Shadows, Typography } from '@/theme';
-import type { Artisan } from '@/types';
-import { CATEGORIES } from '@/types';
-import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     RefreshControl,
     ScrollView,
     Text,
-    TouchableOpacity,
     View,
 } from 'react-native';
 import Animated, {
@@ -40,14 +38,19 @@ export default function ClientHomeScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            const res = await artisanApi.list({ 
-                limit: 30,
-                city: selectedCity,
-                state: selectedState,
-                area: user?.location?.area,
-                interests: user?.interests
-            });
-            setArtisans((res.results as any[]).map(mapArtisan));
+            const [artRes, jobRes] = await Promise.all([
+                artisanApi.list({ 
+                    limit: 30,
+                    city: selectedCity,
+                    state: selectedState,
+                    area: user?.location?.area,
+                    interests: user?.interests
+                }),
+                jobApi.list({ status: 'assigned,open', limit: 5 })
+            ]);
+            
+            setArtisans((artRes.results as any[]).map(mapArtisan));
+            useAppStore.getState().setJobs((jobRes.results as any[]).map(mapJob));
         } catch {
             setError(true);
         } finally {
@@ -57,6 +60,12 @@ export default function ClientHomeScreen() {
     }, [selectedState, selectedCity, user?.interests, user?.location?.area]);
 
     useEffect(() => { load(); }, [load]);
+    
+    useFocusEffect(
+        useCallback(() => {
+            load();
+        }, [load])
+    );
     const onRefresh = () => { setRefreshing(true); load(); };
 
     const activeJobs = React.useMemo(() =>
@@ -131,7 +140,7 @@ export default function ClientHomeScreen() {
                 {/* ─── Top Professionals ─────────────────────────────────────── */}
                 {/* <Animated.View entering={FadeInDown.delay(300).springify()} style={{ marginBottom: 48 }}>
                     <SectionHeader
-                        overline="Top professionals"
+                        overline="Top artisans"
                         title="Highest Rated Near You"
                         action="View all"
                         onAction={() => router.push('/search')}
@@ -163,7 +172,7 @@ export default function ClientHomeScreen() {
                     )}
                 </Animated.View> */}
 
-                {/* ─── Nearby Professionals ──────────────────────────────────── */}
+                {/* ─── Nearby Artisans ──────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(440).springify()}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                         <View>
@@ -171,7 +180,7 @@ export default function ClientHomeScreen() {
                                 NEARBY
                             </Text>
                             <Text style={{ fontSize: 20, fontFamily: 'PlusJakartaSans-Bold', color: Colors.ink }}>
-                                Available Professionals
+                                Available Artisans
                             </Text>
                         </View>
 

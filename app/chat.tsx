@@ -16,6 +16,7 @@ import {
     TextInput, TouchableOpacity,
     View,
 } from 'react-native';
+import { ErrorState } from '@/components/ui/StateComponents';
 import Animated, { FadeIn, FadeInLeft, FadeInRight } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -38,22 +39,25 @@ export default function ChatScreen() {
     const thread = threads.find((t) => t.id === threadId);
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(false);
 
     const loadMessages = useCallback(async () => {
         if (!threadId) return;
         try {
+            setLoadError(false);
             const res = await threadApi.getMessages(threadId);
             const mapped = (res.results as any[]).map((row: any): Message => ({
                 id: row.id,
                 threadId: row.thread_id,
                 senderId: row.sender_id,
-                text: row.text, // Corrected from row.content
+                text: row.text,
                 timestamp: row.sent_at,
                 read: Boolean(row.read_at),
             }));
             setMessages(mapped);
         } catch (err) {
             console.error('Failed to load messages:', err);
+            setLoadError(true);
         } finally {
             setLoading(false);
         }
@@ -109,81 +113,87 @@ export default function ChatScreen() {
                 showNotification={false}
             />
 
-            <FlatList
-                ref={listRef}
-                data={messages}
-                keyExtractor={(item) => item.id}
-                contentContainerStyle={{ padding: 24, paddingBottom: 24, flexGrow: 1, justifyContent: 'flex-end' }}
-                showsVerticalScrollIndicator={false}
-                initialNumToRender={20}
-                maxToRenderPerBatch={20}
-                windowSize={5}
-                removeClippedSubviews={Platform.OS === 'android'}
-                renderItem={({ item, index }) => {
-                    const mine = isMe(item);
-                    return (
-                        <Animated.View
-                            entering={mine ? FadeInRight.delay(50).springify() : FadeInLeft.delay(50).springify()}
-                            style={{
-                                maxWidth: '85%',
-                                paddingHorizontal: 16,
-                                paddingVertical: 12,
-                                borderRadius: Radius.md,
-                                marginBottom: 12,
-                                backgroundColor: mine ? Colors.accent : Colors.white,
-                                alignSelf: mine ? 'flex-end' : 'flex-start',
-                                borderTopRightRadius: mine ? 2 : Radius.md,
-                                borderTopLeftRadius: mine ? Radius.md : 2,
-                                borderWidth: 1,
-                                borderColor: mine ? Colors.accent : Colors.cardBorder,
-                                ...Shadows.sm
-                            }}
-                        >
-                            <Text style={[Typography.body, { color: mine ? Colors.white : Colors.text, fontSize: 15, lineHeight: 22 }]}>
-                                {item.text}
-                            </Text>
-                            <Text style={[Typography.label, {
-                                fontSize: 9,
-                                marginTop: 6,
-                                color: mine ? 'rgba(255,255,255,0.6)' : Colors.muted,
-                                alignSelf: mine ? 'flex-end' : 'flex-start',
-                                letterSpacing: 0,
-                                textTransform: 'none'
-                            }]}>
-                                {formatTime(item.timestamp)}
-                            </Text>
-                        </Animated.View>
-                    );
-                }}
-                onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
-            />
+            {loadError ? (
+                <ErrorState onRetry={loadMessages} message="Failed to load your conversation." />
+            ) : (
+                <>
+                    <FlatList
+                        ref={listRef}
+                        data={messages}
+                        keyExtractor={(item) => item.id}
+                        contentContainerStyle={{ padding: 24, paddingBottom: 24, flexGrow: 1, justifyContent: 'flex-end' }}
+                        showsVerticalScrollIndicator={false}
+                        initialNumToRender={20}
+                        maxToRenderPerBatch={20}
+                        windowSize={5}
+                        removeClippedSubviews={Platform.OS === 'android'}
+                        renderItem={({ item, index }) => {
+                            const mine = isMe(item);
+                            return (
+                                <Animated.View
+                                    entering={mine ? FadeInRight.delay(50).springify() : FadeInLeft.delay(50).springify()}
+                                    style={{
+                                        maxWidth: '85%',
+                                        paddingHorizontal: 16,
+                                        paddingVertical: 12,
+                                        borderRadius: Radius.md,
+                                        marginBottom: 12,
+                                        backgroundColor: mine ? Colors.accent : Colors.white,
+                                        alignSelf: mine ? 'flex-end' : 'flex-start',
+                                        borderTopRightRadius: mine ? 2 : Radius.md,
+                                        borderTopLeftRadius: mine ? Radius.md : 2,
+                                        borderWidth: 1,
+                                        borderColor: mine ? Colors.accent : Colors.cardBorder,
+                                        ...Shadows.sm
+                                    }}
+                                >
+                                    <Text style={[Typography.body, { color: mine ? Colors.white : Colors.text, fontSize: 15, lineHeight: 22 }]}>
+                                        {item.text}
+                                    </Text>
+                                    <Text style={[Typography.label, {
+                                        fontSize: 9,
+                                        marginTop: 6,
+                                        color: mine ? 'rgba(255,255,255,0.6)' : Colors.muted,
+                                        alignSelf: mine ? 'flex-end' : 'flex-start',
+                                        letterSpacing: 0,
+                                        textTransform: 'none'
+                                    }]}>
+                                        {formatTime(item.timestamp)}
+                                    </Text>
+                                </Animated.View>
+                            );
+                        }}
+                        onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
+                    />
 
-            {/* Quick Replies */}
-            <View style={{ backgroundColor: 'transparent' }}>
-                <FlatList
-                    data={QUICK_REPLIES}
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 16, gap: 10 }}
-                    keyExtractor={(item) => item}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            onPress={() => handleSend(item)}
-                            style={{
-                                paddingHorizontal: 16,
-                                paddingVertical: 10,
-                                borderRadius: Radius.xs,
-                                backgroundColor: 'rgba(255,255,255,0.8)',
-                                borderWidth: 1,
-                                borderColor: Colors.cardBorder,
-                                ...Shadows.sm
-                            }}
-                        >
-                            <Text style={[Typography.label, { color: Colors.primary, fontSize: 9, textTransform: 'none', letterSpacing: 0 }]}>{item}</Text>
-                        </TouchableOpacity>
-                    )}
-                />
-            </View>
+                    {/* Quick Replies */}
+                    <View style={{ backgroundColor: 'transparent' }}>
+                        <FlatList
+                            data={QUICK_REPLIES}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 16, gap: 10 }}
+                            keyExtractor={(item) => item}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    onPress={() => handleSend(item)}
+                                    style={{
+                                        paddingHorizontal: 16,
+                                        paddingVertical: 10,
+                                        borderRadius: Radius.xs,
+                                        backgroundColor: 'rgba(255,255,255,0.8)',
+                                        borderWidth: 1,
+                                        borderColor: Colors.cardBorder,
+                                        ...Shadows.sm
+                                    }}
+                                >
+                                    <Text style={[Typography.label, { color: Colors.primary, fontSize: 9, textTransform: 'none', letterSpacing: 0 }]}>{item}</Text>
+                                </TouchableOpacity>
+                            )}
+                        />
+                    </View>
+                </>
+            )}
 
             {/* Comm Input */}
             <View style={{

@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { RawArtisan, RawUser, RawJob, RawEarnings, RawReview, RawPortfolioItem } from "./mappers";
 
 const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -49,7 +50,7 @@ export const userApi = {
         avatar_url?: string;
         interests?: string[];
     }) =>
-        apiFetch<unknown>("/users/me", {
+        apiFetch<RawUser>("/users/me", {
             method: "PATCH",
             body: JSON.stringify(data),
         }),
@@ -146,7 +147,7 @@ export const artisanApi = {
             params.interests.forEach(i => qs.append("interests", i));
         }
 
-        return apiFetch<{ count: number; limit: number; offset: number; results: unknown[] }>(
+        return apiFetch<{ count: number; limit: number; offset: number; results: RawArtisan[] }>(
             `/artisans?${qs}`
         );
     },
@@ -173,31 +174,24 @@ export const artisanApi = {
         if (params.lat) qs.set("lat", String(params.lat));
         if (params.lng) qs.set("lng", String(params.lng));
 
-        return apiFetch<{ total: number; count: number; limit: number; offset: number; results: unknown[] }>(
+        return apiFetch<{ total: number; count: number; limit: number; offset: number; results: RawArtisan[] }>(
             `/artisans/search?${qs}`
         );
     },
 
     /** GET /artisans/:id — get a single artisan by profile ID */
-    getById: (id: string) => apiFetch<unknown>(`/artisans/${id}`),
+    getById: (id: string) => apiFetch<RawArtisan>(`/artisans/${id}`),
 
     /** GET /artisans/me/full — logged-in artisan's own full profile */
-    meProfile: () => apiFetch<unknown>("/artisans/me/full"),
+    meProfile: () => apiFetch<RawArtisan>("/artisans/me/full"),
 
     /** GET /artisans/me/earnings — my earnings (artisan only) */
     meEarnings: () =>
-        apiFetch<{
-            artisan_profile_id: string;
-            total_earned: string;
-            jobs_completed: number;
-            pending_payout: string;
-            total_withdrawn: string;
-            transactions: any[];
-        }>("/artisans/me/earnings"),
+        apiFetch<RawEarnings>("/artisans/me/earnings"),
 
     /** POST /artisans/me/profile — create artisan profile for logged in user */
     createProfile: (data: { bio?: string; yearsOfExperience?: number }) =>
-        apiFetch<any>(`/artisans/me/profile`, {
+        apiFetch<RawArtisan>(`/artisans/me/profile`, {
             method: "POST",
             body: JSON.stringify(data),
         }),
@@ -219,7 +213,7 @@ export const artisanApi = {
         price_min?: number;
         price_max?: number;
     }) =>
-        apiFetch<unknown>("/artisans/me", {
+        apiFetch<RawArtisan>("/artisans/me", {
             method: "PATCH",
             body: JSON.stringify(data),
         }),
@@ -241,12 +235,16 @@ export const artisanApi = {
         apiFetch<void>(`/artisans/portfolio/${id}`, { method: "DELETE" }),
 
     /** Verification */
-    getVerification: () => apiFetch<any>("/artisans/me/verification"),
+    getVerification: () => apiFetch<{ status: string }>("/artisans/me/verification"),
     submitVerification: (data: { documentType: string; documentNumber?: string; documentUrl: string }) =>
-        apiFetch<any>("/artisans/me/verification", {
+        apiFetch<{ status: string }>("/artisans/me/verification", {
             method: "POST",
             body: JSON.stringify(data),
         }),
+
+    /** Skill Management */
+    getMeSkills: () => apiFetch<{ skill_id: string; name: string }[]>("/artisans/me/skills"),
+    removeSkill: (skillId: string) => apiFetch<void>(`/artisans/me/skills/${skillId}`, { method: "DELETE" }),
 };
 
 // ─── Job API ─────────────────────────────────────────────
@@ -257,11 +255,11 @@ export const jobApi = {
         if (params?.status) qs.set("status", params.status);
         qs.set("limit", String(params?.limit ?? 20));
         qs.set("offset", String(params?.offset ?? 0));
-        return apiFetch<{ total: number; count: number; results: unknown[] }>(`/jobs?${qs}`);
+        return apiFetch<{ total: number; count: number; results: RawJob[] }>(`/jobs?${qs}`);
     },
 
     /** GET /jobs/:id — single job with full detail */
-    getById: (id: string) => apiFetch<unknown>(`/jobs/${id}`),
+    getById: (id: string) => apiFetch<RawJob>(`/jobs/${id}`),
 
     /** POST /jobs — create a new job request (customer only) */
     create: (data: {
@@ -278,28 +276,28 @@ export const jobApi = {
 
     /** GET /jobs/:jobId/matches?skill=plumber */
     getMatches: (jobId: string, skill: string) =>
-        apiFetch<{ results: unknown[] }>(
+        apiFetch<{ results: RawArtisan[] }>(
             `/jobs/${jobId}/matches?skill=${encodeURIComponent(skill)}`
         ),
 
     /** POST /jobs/:jobId/assign — assign an artisan (customer only) */
     assign: (jobId: string, artisanProfileId: string) =>
-        apiFetch<unknown>(`/jobs/${jobId}/assign`, {
+        apiFetch<RawJob>(`/jobs/${jobId}/assign`, {
             method: "POST",
             body: JSON.stringify({ artisanProfileId }),
         }),
 
     /** POST /jobs/:jobId/accept — accept job (artisan only) */
     accept: (jobId: string) =>
-        apiFetch<unknown>(`/jobs/${jobId}/accept`, { method: "POST" }),
+        apiFetch<RawJob>(`/jobs/${jobId}/accept`, { method: "POST" }),
 
     /** POST /jobs/:jobId/complete — mark job done (artisan only) */
     complete: (jobId: string) =>
-        apiFetch<unknown>(`/jobs/${jobId}/complete`, { method: "POST" }),
+        apiFetch<RawJob>(`/jobs/${jobId}/complete`, { method: "POST" }),
 
     /** POST /jobs/:jobId/cancel — cancel job (customer only) */
     cancel: (jobId: string) =>
-        apiFetch<unknown>(`/jobs/${jobId}/cancel`, { method: "POST" }),
+        apiFetch<RawJob>(`/jobs/${jobId}/cancel`, { method: "POST" }),
 
     /** POST /jobs/:jobId/rate — submit a rating (customer only) */
     rate: (jobId: string, data: { rating: number; comment?: string }) =>
@@ -312,7 +310,7 @@ export const jobApi = {
 // ─── Thread / Messaging API ───────────────────────────────
 export const threadApi = {
     /** GET /threads — list all threads for logged-in user */
-    list: () => apiFetch<{ count: number; results: unknown[] }>("/threads"),
+    list: () => apiFetch<{ count: number; results: any[] }>("/threads"),
 
     /** GET /threads/:id/messages */
     getMessages: (threadId: string, params?: { limit?: number; offset?: number }) => {
@@ -320,7 +318,7 @@ export const threadApi = {
             limit: String(params?.limit ?? 50),
             offset: String(params?.offset ?? 0),
         });
-        return apiFetch<{ count: number; results: unknown[] }>(
+        return apiFetch<{ count: number; results: any[] }>(
             `/threads/${threadId}/messages?${qs}`
         );
     },
@@ -348,7 +346,7 @@ export const notificationApi = {
             limit: String(params?.limit ?? 30),
             offset: String(params?.offset ?? 0),
         });
-        return apiFetch<{ count: number; unread: number; results: unknown[] }>(
+        return apiFetch<{ count: number; unread: number; results: any[] }>(
             `/notifications?${qs}`
         );
     },

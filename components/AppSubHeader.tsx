@@ -45,7 +45,7 @@ export function SubAppHeader({
             
             Alert.alert(
                 'Update Location',
-                `You've switched to ${state}. To see relevant professionals, please update your city and area in your profile.`,
+                `You've switched to ${state}. To see relevant artisans, please update your city and area in your profile.`,
                 [
                     { text: 'Later', style: 'cancel' },
                     { 
@@ -160,7 +160,7 @@ export function SubAppHeader({
                                 height: 48,
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                borderRadius: Radius.md,
+                                borderRadius: Radius.sm,
                                 backgroundColor: Colors.surface,
                                 borderWidth: 1,
                                 borderColor: Colors.cardBorder,

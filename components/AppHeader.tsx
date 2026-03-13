@@ -41,7 +41,7 @@ export function AppHeader({
             
             Alert.alert(
                 'Update Location',
-                `You've switched to ${state}. Please update your city and area to see the best professionals matching your new location.`,
+                `You've switched to ${state}. Please update your city and area to see the best artisans matching your new location.`,
                 [
                     { text: 'Later', style: 'cancel' },
                     { 
@@ -122,7 +122,7 @@ export function AppHeader({
                                 height: 40,
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                borderRadius: Radius.md,
+                                borderRadius: Radius.sm,
                                 backgroundColor: Colors.surface,
                                 borderWidth: 1,
                                 borderColor: Colors.cardBorder,

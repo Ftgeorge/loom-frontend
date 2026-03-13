@@ -202,7 +202,7 @@ export default function BookingScreen() {
                     }}>
                         <TextInput
                             style={[Typography.body, { color: Colors.text, textAlignVertical: 'top', fontSize: 14 }]}
-                            placeholder="Tell the pro more about what you need..."
+                            placeholder="Tell the artisan:  more about what you need..."
                             placeholderTextColor={Colors.muted}
                             multiline
                             value={notes}

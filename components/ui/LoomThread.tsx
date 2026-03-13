@@ -1,6 +1,6 @@
 import { Colors } from "@/theme";
 import React, { useEffect, useMemo } from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import { StyleSheet, View, useWindowDimensions } from "react-native";
 import Animated, {
     Easing,
     interpolate,
@@ -21,12 +21,9 @@ import Svg, {
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedG = Animated.createAnimatedComponent(G);
 
-const { width: W, height: H } = Dimensions.get("window");
-
 /* ---------- thread path generators ---------- */
 
-const threadPaths = {
-    /** Two crossing arcs – the default look */
+const getThreadPaths = (W: number, H: number) => ({
     default: [
         {
             d: `M -40,${H * 0.15} C ${W * 0.35},${H * 0.05} ${W * 0.55},${H * 0.75} ${W + 40},${H * 0.55}`,
@@ -39,8 +36,6 @@ const threadPaths = {
             dasharray: "6 10",
         },
     ],
-
-    /** Three threads for busier screens */
     dense: [
         {
             d: `M -40,${H * 0.1} C ${W * 0.5},${H * 0.0} ${W * 0.3},${H * 0.6} ${W + 40},${H * 0.45}`,
@@ -58,8 +53,6 @@ const threadPaths = {
             dasharray: "3 6",
         },
     ],
-
-    /** Single delicate arc */
     minimal: [
         {
             d: `M -40,${H * 0.3} C ${W * 0.4},${H * 0.15} ${W * 0.6},${H * 0.85} ${W + 40},${H * 0.7}`,
@@ -67,8 +60,6 @@ const threadPaths = {
             dasharray: undefined as string | undefined,
         },
     ],
-
-    /** Complex variant with more motion and threads */
     complex: [
         {
             d: `M -40,${H * 0.1} C ${W * 0.3},${H * 0.1} ${W * 0.2},0.8 ${W + 40},${H * 0.2}`,
@@ -91,7 +82,7 @@ const threadPaths = {
             dasharray: undefined as string | undefined,
         }
     ]
-};
+});
 
 /* ---------- animated single path ---------- */
 
@@ -136,7 +127,7 @@ function AnimatedThread({
         } else {
             progress.value = 1;
         }
-    }, []);
+    }, [animated, delay, index]);
 
     const PATH_LENGTH = 2000;
 
@@ -184,13 +175,15 @@ export const LoomThread = React.memo(({
     variant = "default",
     color,
     colorEnd,
-    opacity = 1,
+    opacity = 0.4, // Increased default opacity for visibility
     animated = true,
     scale = 1,
 }: LoomThreadProps) => {
+    const { width: W, height: H } = useWindowDimensions();
     const baseColor = color ?? Colors.primary;
     const endColor = colorEnd ?? Colors.accent;
-    const paths = threadPaths[variant];
+    
+    const paths = useMemo(() => getThreadPaths(W, H)[variant], [W, H, variant]);
     const gradId = `loomGrad_${variant}`;
 
     return (
@@ -199,8 +192,7 @@ export const LoomThread = React.memo(({
                 StyleSheet.absoluteFillObject,
                 {
                     opacity,
-                    zIndex: -1,
-                    transform: [{ scale }]
+                    zIndex: 99, // Render on top but non-interactive to ensure visibility
                 }
             ]}
             pointerEvents="none"
@@ -216,7 +208,7 @@ export const LoomThread = React.memo(({
 
                 {paths.map((p, i) => (
                     <AnimatedThread
-                        key={i}
+                        key={`${W}-${H}-${i}`}
                         index={i}
                         d={p.d}
                         strokeWidth={p.strokeWidth}
@@ -230,4 +222,3 @@ export const LoomThread = React.memo(({
         </View>
     );
 });
-

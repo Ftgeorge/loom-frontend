@@ -3,10 +3,10 @@ import { RequestCard } from '@/components/ui/RequestCard';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
 import { artisanApi, jobApi } from '@/services/api';
-import { mapArtisan, mapJob } from '@/services/mappers';
+import { mapArtisan, mapJob, mapEarnings } from '@/services/mappers';
 import { useAppStore } from '@/store';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
-import type { Artisan, JobRequest } from '@/types';
+import type { Artisan, JobRequest, EarningsSummary } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -17,6 +17,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+// ... existing imports
 import Animated, {
     FadeInDown,
     FadeInRight,
@@ -42,7 +43,7 @@ function StatCard({ label, value, icon, delay, accent }: {
         >
             <View style={{
                 backgroundColor: accent ? Colors.primary : Colors.surface,
-                borderRadius: Radius.lg,
+                borderRadius: Radius.sm,
                 padding: 18,
                 borderWidth: 1,
                 borderColor: accent ? 'transparent' : Colors.cardBorder,
@@ -115,7 +116,7 @@ function OnlineToggle({ online, onToggle }: { online: boolean; onToggle: () => v
                     fontFamily: 'PlusJakartaSans-Bold',
                     color: online ? Colors.success : Colors.muted,
                 }}>
-                    {online ? "I'M IN" : "I'M OUT"}
+                    {online ? "AVAILABLE" : "OFFLINE"}
                 </Text>
             </TouchableOpacity>
         </Animated.View>
@@ -127,26 +128,30 @@ export default function ArtisanDashboard() {
     const { user, artisanOnline, setArtisanOnline } = useAppStore();
     const [jobs, setJobs] = useState<JobRequest[]>([]);
     const [profile, setProfile] = useState<Artisan | null>(null);
-    const [earnings, setEarnings] = useState<any>(null);
+    const [earnings, setEarnings] = useState<EarningsSummary | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
+    const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
     const load = useCallback(async () => {
         try {
             setError(false);
             if (!refreshing) setLoading(true);
 
-            const [jobsRes, profileRes, earningsRes] = await Promise.all([
+            const [jobsRes, profileRes, earningsRes, verifyRes] = await Promise.all([
                 jobApi.list({ limit: 30 }),
                 artisanApi.meProfile(),
-                artisanApi.meEarnings()
+                artisanApi.meEarnings(),
+                artisanApi.getVerification().catch(() => null)
             ]);
 
-            setJobs((jobsRes.results as any[]).map(mapJob));
+            setJobs(((jobsRes.results || []) as any[]).map(mapJob));
             if (profileRes) setProfile(mapArtisan(profileRes));
-            setEarnings(earningsRes);
-        } catch {
+            setEarnings(mapEarnings(earningsRes));
+            setVerificationStatus(verifyRes?.status || 'unverified');
+        } catch (err) {
+            console.error('[Dashboard] Error loading data:', err);
             setError(true);
         } finally {
             setLoading(false);
@@ -165,7 +170,7 @@ export default function ArtisanDashboard() {
     return (
         <View style={{ flex: 1, backgroundColor: Colors.canvas }}>
             <SubAppHeader
-                showLocation
+                showLocation={false}
                 label="DASHBOARD"
                 title={firstName}
                 description="Manage your business and track incoming job requests."
@@ -177,8 +182,51 @@ export default function ArtisanDashboard() {
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
                 showsVerticalScrollIndicator={false}
             >
-                {/* ─── Status Toggle ────────────────────────────────────────── */}
-                <View style={{ marginBottom: 40, flexDirection: 'row', justifyContent: 'flex-end' }}>
+                {/* ─── Verification Banner ──────────────────────────────────── */}
+                {verificationStatus !== 'approved' && (
+                    <Animated.View entering={FadeInUp.springify()} style={{ marginBottom: 20 }}>
+                        <TouchableOpacity 
+                            onPress={() => router.push('/verification')}
+                            activeOpacity={0.9}
+                            style={{
+                                backgroundColor: verificationStatus === 'pending' ? Colors.warning + '10' : Colors.error + '10',
+                                borderRadius: Radius.sm,
+                                padding: 16,
+                                borderWidth: 1,
+                                borderColor: verificationStatus === 'pending' ? Colors.warning + '20' : Colors.error + '20',
+                                flexDirection: 'row',
+                                alignItems: 'center',
+                                gap: 12
+                            }}
+                        >
+                            <View style={{ 
+                                width: 36, height: 36, borderRadius: 18, 
+                                backgroundColor: verificationStatus === 'pending' ? Colors.warning : Colors.error,
+                                alignItems: 'center', justifyContent: 'center' 
+                            }}>
+                                <Ionicons 
+                                    name={verificationStatus === 'pending' ? "time-outline" : "alert-circle-outline"} 
+                                    size={20} 
+                                    color={Colors.white} 
+                                />
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <Text style={[Typography.label, { fontSize: 13, color: Colors.ink, fontFamily: 'PlusJakartaSans-Bold' }]}>
+                                    {verificationStatus === 'pending' ? "Verification in Progress" : "Complete Your Verification"}
+                                </Text>
+                                <Text style={[Typography.bodySmall, { color: Colors.muted, fontSize: 11, marginTop: 1 }]}>
+                                    {verificationStatus === 'pending' 
+                                        ? "We're reviewing your documents. Hang tight!" 
+                                        : "Verify your ID to unlock all features and start earning."}
+                                </Text>
+                            </View>
+                            <Ionicons name="chevron-forward" size={16} color={Colors.muted} />
+                        </TouchableOpacity>
+                    </Animated.View>
+                )}
+
+                {/* ─── Status Row ───────────────────────────────────────────── */}
+                <View style={{ marginBottom: 32, flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <Animated.View entering={FadeInRight.delay(160).springify()}>
                         <OnlineToggle online={artisanOnline} onToggle={() => setArtisanOnline(!artisanOnline)} />
                     </Animated.View>
@@ -188,7 +236,7 @@ export default function ArtisanDashboard() {
                 <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginBottom: 20 }}>
                     <View style={{
                         backgroundColor: Colors.primary,
-                        borderRadius: Radius.xl,
+                        borderRadius: Radius.sm,
                         padding: 24,
                         ...Shadows.brand,
                         overflow: 'hidden',
@@ -202,7 +250,7 @@ export default function ArtisanDashboard() {
                             Total Earnings
                         </Text>
                         <Text style={{ fontSize: 38, fontFamily: 'Inter-Bold', color: Colors.white, letterSpacing: -1, marginBottom: 4 }}>
-                            ₦{Number(earnings?.total_earned ?? 0).toLocaleString()}
+                            ₦{Number(earnings?.totalEarnings ?? 0).toLocaleString()}
                         </Text>
                         <Text style={{ fontSize: 12, fontFamily: 'Inter-Regular', color: 'rgba(255,255,255,0.45)', marginBottom: 24 }}>
                             All time · Updated just now
@@ -214,7 +262,7 @@ export default function ArtisanDashboard() {
                                     This week
                                 </Text>
                                 <Text style={{ fontSize: 17, fontFamily: 'Inter-Bold', color: Colors.white, marginTop: 2 }}>
-                                    ₦{Number(earnings?.this_week ?? 0).toLocaleString()}
+                                    ₦{Number(earnings?.thisWeek ?? 0).toLocaleString()}
                                 </Text>
                             </View>
                             <View style={{ width: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
@@ -223,7 +271,7 @@ export default function ArtisanDashboard() {
                                     Completed
                                 </Text>
                                 <Text style={{ fontSize: 17, fontFamily: 'Inter-Bold', color: Colors.white, marginTop: 2 }}>
-                                    {earnings?.completed_jobs ?? 0} jobs
+                                    {profile?.completedJobs ?? 0} jobs
                                 </Text>
                             </View>
                         </View>
@@ -264,11 +312,7 @@ export default function ArtisanDashboard() {
                             onPress={() => router.push('/(tabs)/jobs')}
                             style={{
                                 backgroundColor: Colors.canvas,
-                                paddingHorizontal: 12,
                                 paddingVertical: 6,
-                                borderRadius: 20,
-                                borderWidth: 1,
-                                borderColor: Colors.cardBorder,
                             }}
                         >
                             <Text style={{ fontSize: 12, fontFamily: 'Inter-SemiBold', color: Colors.primary }}>
@@ -303,7 +347,7 @@ export default function ArtisanDashboard() {
                                 No jobs yet
                             </Text>
                             <Text style={[Typography.body, { textAlign: 'center', fontSize: 14 }]}>
-                                Stay online and you'll be notified when a job comes in.
+                                Stay online and you&apo;ll be notified when a job comes in.
                             </Text>
                         </View>
                     ) : (

@@ -1,4 +1,4 @@
-import { SubAppHeader } from '@/components/AppSubHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { EmptyState } from '@/components/ui/StateComponents';
@@ -54,10 +54,8 @@ export default function NotificationsScreen() {
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
             <LoomThread variant="minimal" opacity={0.3} animated />
-            <SubAppHeader
-                label="ALERTS"
+            <AppHeader
                 title="Notifications"
-                description="Stay updated with your latest activities."
                 showBack
                 onBack={() => router.back()}
                 showNotification={false}

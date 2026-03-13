@@ -1,4 +1,4 @@
-import { Colors, Radius, Shadows, Typography } from '@/theme';
+import { Colors, Radius, Shadows } from '@/theme';
 import type { JobRequest } from '@/types';
 import { formatNaira, timeAgo } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
@@ -51,7 +51,7 @@ export const RequestCard = React.memo(({ job, onPress, isArtisanView }: RequestC
                         fontFamily: 'Inter-SemiBold',
                         color: Colors.ink,
                     }}>
-                        {job.category === 'not_sure' ? 'General' : job.category.replace('_', ' ')}
+                        {job.category === 'not_sure' ? 'GENERAL' : job.category.toUpperCase().replace('_', ' ')}
                     </Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
@@ -112,8 +112,8 @@ export const RequestCard = React.memo(({ job, onPress, isArtisanView }: RequestC
                         <Ionicons name="person-outline" size={14} color={Colors.primary} />
                     </View>
                     <View>
-                        <Text style={{ fontSize: 9, fontFamily: 'Inter-Regular', color: Colors.muted, marginBottom: 2 }}>
-                            {isArtisanView ? 'Client' : 'Assigned pro'}
+                        <Text style={{ fontSize: 9, fontFamily: 'Inter-Regular', color: Colors.muted, marginBottom: 2, textTransform: 'uppercase' }}>
+                            {isArtisanView ? 'Client' : 'Artisan'}
                         </Text>
                         <Text style={{ fontSize: 13, fontFamily: 'Inter-SemiBold', color: Colors.ink }}>
                             {isArtisanView ? job.clientName : (job.artisanName || 'Matching...')}
@@ -127,3 +127,5 @@ export const RequestCard = React.memo(({ job, onPress, isArtisanView }: RequestC
         </Card>
     );
 });
+
+RequestCard.displayName = 'RequestCard';

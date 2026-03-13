@@ -1,24 +1,26 @@
-import { SubAppHeader } from '@/components/AppSubHeader';
+import { AppHeader } from '@/components/AppHeader';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { Card } from '@/components/ui/CardChipBadge';
 import { AppTextInput } from '@/components/ui/TextInputs';
 import { artisanApi } from '@/services/api';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 
 export default function VerificationScreen() {
     const router = useRouter();
+    const { from } = useLocalSearchParams<{ from?: string }>();
+    const isFromOnboarding = from === 'onboarding';
+
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [verification, setVerification] = useState<any>(null);
 
     const [docType, setDocType] = useState('nin');
     const [docNumber, setDocNumber] = useState('');
-    const [docUrl, setDocUrl] = useState('https://example.com/mock-id.jpg'); // Placeholder for now
 
     const loadStatus = async () => {
         try {
@@ -44,10 +46,14 @@ export default function VerificationScreen() {
             const res = await artisanApi.submitVerification({
                 documentType: docType,
                 documentNumber: docNumber,
-                documentUrl: docUrl
+                documentUrl: 'https://loom-assets.s3.amazonaws.com/verifications/pending-id.jpg'
             });
             setVerification(res);
-            Alert.alert('Success', 'Verification documents submitted for review.');
+            Alert.alert(
+                'Submission Successful', 
+                'Your verification documents have been received and are now under review. You will be notified once they are approved.',
+                [{ text: 'Continue to Dashboard', onPress: () => router.replace('/(tabs)/dashboard') }]
+            );
         } catch (err: any) {
             Alert.alert('Error', err.message || 'Submission failed');
         } finally {
@@ -63,15 +69,37 @@ export default function VerificationScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <SubAppHeader
-                label="IDENTITY"
-                title="Verification"
-                description="Secure your profile and build trust with clients."
-                showBack
+            <AppHeader
+                title={isFromOnboarding ? "Final Step" : "Verification"}
+                showBack={!isFromOnboarding}
                 onBack={() => router.back()}
+                showNotification={false}
             />
 
             <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>
+                {isFromOnboarding && !verification && (
+                    <Animated.View entering={FadeInUp.delay(200).springify()}>
+                        <Card style={{ backgroundColor: Colors.primary, marginBottom: 32, padding: 20 }}>
+                            <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
+                                <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white + '20', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Ionicons name="sparkles" size={20} color={Colors.white} />
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={[Typography.h3, { color: Colors.white, fontSize: 16 }]}>Welcome to Loom! 🎊</Text>
+                                    <Text style={[Typography.bodySmall, { color: Colors.white, opacity: 0.9, marginTop: 4 }]}>
+                                        You&apos;re almost there. Verify your identity now to unlock all features and start earning.
+                                    </Text>
+                                </View>
+                            </View>
+                            <TouchableOpacity 
+                                onPress={() => router.replace('/(tabs)/dashboard')}
+                                style={{ marginTop: 16, alignSelf: 'flex-end', padding: 8 }}
+                            >
+                                <Text style={[Typography.label, { color: Colors.white, fontSize: 10, textDecorationLine: 'underline' }]}>I&apos;LL DO THIS LATER</Text>
+                            </TouchableOpacity>
+                        </Card>
+                    </Animated.View>
+                )}
                 {verification ? (
                     <Animated.View entering={FadeInUp.springify()}>
                         <Card style={{ padding: 24, alignItems: 'center' }}>
@@ -101,10 +129,16 @@ export default function VerificationScreen() {
                                         : `Verification rejected: ${verification.rejection_reason || 'Please try again with clear documents.'}`}
                             </Text>
 
-                            {verification.status === 'rejected' && (
+                            {(verification.status === 'rejected' || verification.status === 'approved') && (
                                 <PrimaryButton
-                                    title="RETRY VERIFICATION"
-                                    onPress={() => setVerification(null)}
+                                    title={verification.status === 'approved' ? "CONTINUE TO DASHBOARD" : "RETRY VERIFICATION"}
+                                    onPress={() => {
+                                        if (verification.status === 'approved') {
+                                            router.replace('/(tabs)/dashboard');
+                                        } else {
+                                            setVerification(null);
+                                        }
+                                    }}
                                     style={{ marginTop: 24, width: '100%' }}
                                 />
                             )}
@@ -121,7 +155,7 @@ export default function VerificationScreen() {
                                     style={{
                                         flex: 1,
                                         paddingVertical: 12,
-                                        borderRadius: Radius.md,
+                                        borderRadius: Radius.xs,
                                         borderWidth: 1.5,
                                         borderColor: docType === type ? Colors.primary : Colors.cardBorder,
                                         backgroundColor: docType === type ? Colors.primary + '10' : Colors.white,
@@ -165,7 +199,7 @@ export default function VerificationScreen() {
                             title="SUBMIT FOR REVIEW"
                             onPress={handleSubmit}
                             loading={submitting}
-                            style={{ marginTop: 40, height: 60, borderRadius: Radius.md, ...Shadows.md }}
+                            style={{ marginTop: 40, height: 60, borderRadius: Radius.sm, ...Shadows.md }}
                         />
                     </Animated.View>
                 )}

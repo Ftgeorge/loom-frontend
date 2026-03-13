@@ -55,7 +55,7 @@ export function PostJobCTA({ onPress }: PostJobCTAProps) {
                         What do you need done?
                     </Text>
                     <Text style={[Typography.bodySmall, { fontSize: 12, marginTop: 4 }]}>
-                        Post a request and let Loom find the right professional
+                        Post a request and let Loom find the right artisans
                     </Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color={Colors.primary} />

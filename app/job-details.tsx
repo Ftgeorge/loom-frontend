@@ -218,7 +218,19 @@ export default function JobDetailsScreen() {
                     <View style={{ flexDirection: 'row', gap: 12 }}>
                         <SecondaryButton
                             title="MESSAGE"
-                            onPress={() => router.push({ pathname: '/chat', params: { threadId: 't1' } })}
+                            onPress={async () => {
+                                try {
+                                    const { threadApi } = await import('@/services/api');
+                                    const res = await threadApi.create({ 
+                                        artisanProfileId: '', // Backend will infer from user id
+                                        jobRequestId: job.id 
+                                    });
+                                    router.push({ pathname: '/chat', params: { threadId: res.id } });
+                                } catch (err) {
+                                    console.error('[JobDetails] Chat error:', err);
+                                    Alert.alert('Error', 'Unable to start chat with client.');
+                                }
+                            }}
                             style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
                             textStyle={[Typography.label, { color: Colors.primary }]}
                         />

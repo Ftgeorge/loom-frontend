@@ -10,9 +10,9 @@ import { mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
 import { Colors, Radius, Typography } from '@/theme';
 import type { JobRequest } from '@/types';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, Text, View } from 'react-native';
+import { FlatList, RefreshControl, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const SEGMENTS = ['INCOMING', 'ACTIVE', 'HISTORY'];
@@ -24,11 +24,12 @@ export default function JobsScreen() {
     const [jobs, setJobs] = useState<JobRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
 
     const load = useCallback(async () => {
         try {
             setError(false);
-            setLoading(true);
+            if (!refreshing) setLoading(true);
             const res = await jobApi.list({ limit: 50 });
             const mapped = (res.results as any[]).map(mapJob);
             setJobs(mapped);
@@ -37,10 +38,17 @@ export default function JobsScreen() {
             setError(true);
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
-    }, []);
+    }, [refreshing]);
 
     useEffect(() => { load(); }, [load]);
+
+    useFocusEffect(
+        useCallback(() => {
+            load();
+        }, [load])
+    );
 
     const filtered = jobs.filter((j) => {
         if (segIdx === 0) return j.status === 'submitted';
@@ -99,6 +107,16 @@ export default function JobsScreen() {
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
                     showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={() => {
+                                setRefreshing(true);
+                                load();
+                            }}
+                            tintColor={Colors.primary}
+                        />
+                    }
                     renderItem={({ item, index }) => (
                         <Animated.View entering={FadeInDown.delay(index * 100).springify()}>
                             <RequestCard

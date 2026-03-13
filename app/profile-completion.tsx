@@ -2,7 +2,6 @@ import { AppHeader } from '@/components/AppHeader';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { Chip } from '@/components/ui/CardChipBadge';
-import { AppTextInput } from '@/components/ui/TextInputs';
 import { userApi } from '@/services/api';
 import { useAppStore } from '@/store';
 import { Colors, Radius, Shadows, Typography } from '@/theme';
@@ -271,7 +270,7 @@ export default function ProfileCompletionScreen() {
                             What services do you need?
                         </Text>
                         <Text style={{ fontSize: 16, color: Colors.textSecondary, lineHeight: 24, marginBottom: 32 }}>
-                            We'll customize your home feed based on your interests.
+                            We&apos;ll customize your home feed based on your interests.
                         </Text>
 
                         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>

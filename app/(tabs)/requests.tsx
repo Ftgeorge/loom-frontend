@@ -9,7 +9,7 @@ import { jobApi } from '@/services/api';
 import { mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
 import { Colors, Radius, Typography } from '@/theme';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
@@ -52,6 +52,12 @@ export default function RequestsScreen() {
     }, [segIdx, refreshing, setJobs]);
 
     useEffect(() => { load(); }, [load]);
+
+    useFocusEffect(
+        useCallback(() => {
+            load();
+        }, [load])
+    );
 
     return (
         <View style={{ flex: 1, backgroundColor: Colors.background }}>
