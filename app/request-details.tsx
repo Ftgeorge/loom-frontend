@@ -66,14 +66,14 @@ export default function RequestDetailsScreen() {
     if (loading) return (
         <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.4} />
-            <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="REQUEST DETAILS" showBack onBack={() => router.back()} showNotification={false} />
             <View className="p-6"><SkeletonList count={3} /></View>
         </View>
     );
 
     if (error || !job) return (
         <View className="flex-1 bg-background">
-            <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="REQUEST DETAILS" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
@@ -83,35 +83,36 @@ export default function RequestDetailsScreen() {
     return (
         <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.2} animated />
-            <AppHeader title="Mission Log" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="MISSION LOG" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView
+                className="flex-1"
                 contentContainerStyle={{ padding: 24, paddingBottom: 120 }}
                 showsVerticalScrollIndicator={false}
             >
                 {/* Service Identity */}
-                <Animated.View entering={FadeInDown.springify()} className="mb-10">
-                    <Text className="text-label text-primary mb-2 tracking-[2px] uppercase">Service Type</Text>
-                    <Text className="text-h1 text-[32px] uppercase">{job.category.replace('_', ' / ')}</Text>
+                <Animated.View entering={FadeInDown.springify()} className="mb-10 px-1">
+                    <Text className="text-label text-primary mb-2 tracking-[2px] uppercase font-jakarta-bold">Service Type</Text>
+                    <Text className="text-h1 text-[32px] uppercase italic font-jakarta-extrabold tracking-tight">{job.category.replace('_', ' / ')}</Text>
                     <View className="flex-row items-center gap-3 mt-4">
-                        <View className={`px-3 py-1 rounded-xs border shadow-sm ${
-                            isTerminated ? 'bg-error/5 border-error' : 'bg-success/5 border-success'
+                        <View className={`px-3 py-1.5 rounded-xs border shadow-sm ${
+                            isTerminated ? 'bg-error/10 border-error' : 'bg-success/10 border-success'
                         }`}>
-                            <Text className={`text-label text-[10px] font-jakarta-extrabold uppercase ${
+                            <Text className={`text-label text-[10px] font-jakarta-extrabold uppercase tracking-widest ${
                                 isTerminated ? 'text-error' : 'text-success'
                             }`}>
                                 {isTerminated ? 'CANCELLED' : 'ACTIVE'}
                             </Text>
                         </View>
-                        <Text className="text-label text-muted text-[10px] uppercase">REF: {job.id.substring(0, 8)}</Text>
+                        <Text className="text-label text-muted text-[10px] uppercase font-jakarta-bold">REF: {job.id.substring(0, 8)}</Text>
                     </View>
                 </Animated.View>
 
                 {/* Status Timeline */}
                 {!isTerminated && (
                     <Animated.View entering={FadeInDown.delay(100).springify()}>
-                        <Card className="mb-6 p-6 bg-white border-[1.5px] border-card-border shadow-sm">
-                            <Text className="text-label text-primary mb-5 uppercase">Progress Tracker</Text>
+                        <Card className="mb-8 p-6 bg-white border-[1.5px] border-card-border shadow-md rounded-[20px]">
+                            <Text className="text-label text-primary mb-5 uppercase tracking-widest text-[10px] font-jakarta-bold">Progress Tracker</Text>
                             <StatusTimeline steps={getJobStatusSteps(job.status)} />
                         </Card>
                     </Animated.View>
@@ -119,8 +120,8 @@ export default function RequestDetailsScreen() {
 
                 {/* Operational Details */}
                 <Animated.View entering={FadeInDown.delay(200).springify()}>
-                    <Card className="p-6 bg-white border-[1.5px] border-card-border shadow-sm">
-                        <Text className="text-label text-primary mb-6 uppercase">Details</Text>
+                    <Card className="p-8 bg-white border-[1.5px] border-card-border shadow-md rounded-[24px]">
+                        <Text className="text-label text-primary mb-6 uppercase tracking-widest text-[10px] font-jakarta-bold">Mission Protocol</Text>
 
                         <DetailItem label="AREA" value={job.location.area.toUpperCase()} />
                         <DetailItem label="DESCRIPTION" value={job.description} />
@@ -133,30 +134,30 @@ export default function RequestDetailsScreen() {
                 {/* Artisan assigned info */}
                 {job.artisanName && (
                     <Animated.View entering={FadeInDown.delay(300).springify()}>
-                        <Card className="mt-6 p-6 bg-primary shadow-md">
-                            <Text className="text-label text-white/60 mb-5 uppercase">Artisan Assigned</Text>
+                        <Card className="mt-8 p-6 bg-primary shadow-lg rounded-[24px] border border-primary">
+                            <Text className="text-label text-white/60 mb-5 uppercase tracking-widest text-[10px] font-jakarta-bold">Artisan Assigned</Text>
                             <TouchableOpacity
                                 activeOpacity={0.8}
-                                className="flex-row items-center gap-4 bg-white/10 p-4 rounded-md border border-white/20"
+                                className="flex-row items-center gap-4 bg-white/10 p-4 rounded-xl border border-white/20 shadow-sm"
                                 onPress={() => job.artisanId && router.push({ pathname: '/artisan-profile', params: { id: job.artisanId } })}
                             >
-                                <View className="w-12 h-12 rounded-xs bg-white items-center justify-center">
-                                    <Text className="text-h3 text-primary uppercase">{job.artisanName[0]}</Text>
+                                <View className="w-12 h-12 rounded-lg bg-white items-center justify-center border border-white/40">
+                                    <Text className="text-h3 text-primary uppercase font-jakarta-extrabold">{job.artisanName[0]}</Text>
                                 </View>
                                 <View className="flex-1">
-                                    <Text className="text-h3 text-white uppercase">{job.artisanName}</Text>
-                                    <Text className="text-label text-accent text-[8px] mt-1 uppercase">View Profile</Text>
+                                    <Text className="text-body font-jakarta-extrabold text-white uppercase tracking-tight">{job.artisanName}</Text>
+                                    <Text className="text-label text-accent text-[8px] mt-1 uppercase font-jakarta-bold tracking-widest">View Profile</Text>
                                 </View>
-                                <Ionicons name="chevron-forward" size={20} color="white" />
+                                <Ionicons name="chevron-forward" size={18} color="white" />
                             </TouchableOpacity>
                         </Card>
                     </Animated.View>
                 )}
 
-                {/* Actions */}
-                <Animated.View entering={FadeInDown.delay(400).springify()} className="mt-12 gap-4">
+                {/* Actions Suite */}
+                <Animated.View entering={FadeInDown.delay(400).springify()} className="mt-12 gap-5 px-1">
                     {job.artisanName && (
-                        <View className="flex-row gap-3">
+                        <View className="flex-row gap-4">
                             <SecondaryButton
                                 title="MESSAGE"
                                 onPress={async () => {
@@ -173,15 +174,15 @@ export default function RequestDetailsScreen() {
                                         Alert.alert('Error', 'Unable to start chat at this time.');
                                     }
                                 }}
-                                className="flex-1 h-16 rounded-md border-primary border-[1.5px]"
+                                className="flex-1 h-16 rounded-xl border-primary border-[1.5px] bg-white shadow-sm"
                                 textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 10, letterSpacing: 1.2 }}
                             />
                             <SecondaryButton
                                 title="CALL"
                                 onPress={() => { }}
-                                className="flex-1 h-16 rounded-md border-primary border-[1.5px]"
+                                className="flex-1 h-16 rounded-xl border-primary border-[1.5px] bg-white shadow-sm"
                                 textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 10, letterSpacing: 1.2 }}
-                                icon={<Ionicons name="call" size={18} color="#00120C" />}
+                                icon={<Ionicons name="call" size={18} color="#00120C" style={{ marginRight: 8 }} />}
                             />
                         </View>
                     )}
@@ -191,16 +192,16 @@ export default function RequestDetailsScreen() {
                             title="RATE & REVIEW"
                             onPress={() => router.push({ pathname: '/rate-review', params: { jobId: job.id } })}
                             variant="accent"
-                            className="h-16 rounded-md shadow-md"
+                            className="h-16 rounded-xl shadow-xl"
                         />
                     )}
 
                     {!['completed', 'cancelled'].includes(job.status) && (
                         <TouchableOpacity
-                            className="items-center p-5 rounded-md border-[1.5px] border-error mt-3 bg-white shadow-sm"
+                            className="items-center p-5 rounded-xl border-[1.5px] border-error mt-4 bg-white shadow-sm"
                             onPress={handleCancel}
                         >
-                            <Text className="text-label text-error font-jakarta-extrabold tracking-[1px] uppercase">Cancel Request</Text>
+                            <Text className="text-label text-error font-jakarta-extrabold tracking-[1px] uppercase text-[11px]">Cancel Request Protocol</Text>
                         </TouchableOpacity>
                     )}
                 </Animated.View>
@@ -211,11 +212,12 @@ export default function RequestDetailsScreen() {
 
 function DetailItem({ label, value }: { label: string; value: string }) {
     return (
-        <View className="mb-6">
-            <Text className="text-label text-[8px] text-muted mb-2 uppercase">{label}</Text>
-            <Text className="text-body text-primary font-jakarta-bold text-[15px] leading-[22px]">{value}</Text>
+        <View className="mb-8">
+            <Text className="text-label text-[9px] text-muted mb-2 uppercase tracking-[1.5px] font-jakarta-extrabold">{label}</Text>
+            <Text className="text-body text-primary font-jakarta-bold text-[16px] leading-[22px] normal-case">{value}</Text>
         </View>
     );
 }
+
 
 

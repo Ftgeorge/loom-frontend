@@ -10,7 +10,6 @@ import {
     FlatList,
     NativeScrollEvent,
     NativeSyntheticEvent,
-    StyleSheet,
     Text,
     TouchableOpacity,
     View,
@@ -24,7 +23,7 @@ const pages = [
         icon: 'scan-outline' as const,
         titleKey: 'onboard1Title' as const,
         descKey: 'onboard1Desc' as const,
-        accent: '#00120C', // Colors.primary
+        accent: '#00120C',
         bgAccent: 'bg-primary',
         textAccent: 'text-primary',
         borderAccent: 'border-primary/20',
@@ -34,7 +33,7 @@ const pages = [
         icon: 'terminal-outline' as const,
         titleKey: 'onboard2Title' as const,
         descKey: 'onboard2Desc' as const,
-        accent: '#7DCCFF', // Colors.accent
+        accent: '#7DCCFF',
         bgAccent: 'bg-accent',
         textAccent: 'text-accent',
         borderAccent: 'border-accent/20',
@@ -44,7 +43,7 @@ const pages = [
         icon: 'shield-checkmark-outline' as const,
         titleKey: 'onboard3Title' as const,
         descKey: 'onboard3Desc' as const,
-        accent: '#1AB26C', // Colors.success
+        accent: '#1AB26C',
         bgAccent: 'bg-success',
         textAccent: 'text-success',
         borderAccent: 'border-success/20',
@@ -82,14 +81,14 @@ export default function OnboardingScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <View style={StyleSheet.absoluteFill}>
+            <View className="absolute inset-0">
                 <LoomThread variant="dense" scale={1.5} opacity={0.4} animated />
             </View>
 
             <View className="absolute top-16 w-full px-8 z-10 flex-row justify-between items-center">
-                <Text className="text-label text-primary text-[8px] uppercase">STEP {currentPage + 1}</Text>
-                <TouchableOpacity onPress={handleSkip} className="bg-gray-100 px-3 py-[6px] rounded-xs">
-                    <Text className="text-label text-muted text-[8px] uppercase">SKIP</Text>
+                <Text className="text-label text-primary text-[8px] uppercase tracking-widest font-jakarta-extrabold italic">MISSION STEP {currentPage + 1}</Text>
+                <TouchableOpacity onPress={handleSkip} className="bg-gray-100/80 px-4 py-2 rounded-xs border border-card-border shadow-xs">
+                    <Text className="text-label text-muted text-[8px] uppercase font-jakarta-bold tracking-tight">SKIP PROTOCOL</Text>
                 </TouchableOpacity>
             </View>
 
@@ -103,30 +102,30 @@ export default function OnboardingScreen() {
                 keyExtractor={(_, i) => `${i}`}
                 renderItem={({ item }) => (
                     <View className="flex-1 px-10" style={{ paddingTop: height * 0.12, width }}>
-                        <View className="items-center mb-14">
+                        <View className="items-center mb-16">
                             <Animated.View
                                 entering={FadeInDown.delay(200).springify()}
-                                className="w-[240px] h-[240px] rounded-md bg-white items-center justify-center shadow-lg border-[1.5px] border-card-border"
+                                className="w-[260px] h-[260px] rounded-2xl bg-white items-center justify-center shadow-2xl border-[1.5px] border-card-border"
                             >
-                                <View className={`absolute w-[180px] h-[180px] rounded-xs border rotate-45 ${item.borderAccent}`} />
-                                <Ionicons name={item.icon} size={80} color={item.accent} />
+                                <View className={`absolute w-[190px] h-[190px] rounded-lg border rotate-45 ${item.borderAccent}`} />
+                                <Ionicons name={item.icon} size={88} color={item.accent} />
 
-                                <View className={`absolute -bottom-3 px-3 py-1 rounded-xs ${item.bgAccent}`}>
-                                    <Text className="text-label text-white text-[8px] uppercase">{item.mission}</Text>
+                                <View className={`absolute -bottom-4 px-5 py-2 rounded-lg shadow-md ${item.bgAccent}`}>
+                                    <Text className="text-label text-white text-[9px] uppercase tracking-widest font-jakarta-extrabold">{item.mission}</Text>
                                 </View>
                             </Animated.View>
                         </View>
 
                         <Animated.Text
                             entering={FadeInDown.delay(400).springify()}
-                            className="text-h1 text-center text-[28px] mb-4"
+                            className="text-h1 text-center text-[32px] mb-6 uppercase italic font-jakarta-extrabold tracking-tight"
                         >
                             {t(item.titleKey, language)}
                         </Animated.Text>
 
                         <Animated.Text
                             entering={FadeInDown.delay(500).springify()}
-                            className="text-body text-center text-muted leading-6"
+                            className="text-body text-center text-muted leading-7 normal-case font-jakarta-medium px-4"
                         >
                             {t(item.descKey, language)}
                         </Animated.Text>
@@ -135,26 +134,31 @@ export default function OnboardingScreen() {
             />
 
             <View className="px-8 pb-16">
-                <View className="flex-row justify-center gap-[6px] mb-10">
+                <View className="flex-row justify-center gap-2 mb-12">
                     {pages.map((_, i) => (
                         <View
                             key={i}
-                            className={`h-[3px] rounded-full ${
-                                i === currentPage ? 'bg-primary w-8' : 'bg-gray-200 w-3'
+                            className={`h-1 rounded-full shadow-sm ${
+                                i === currentPage ? 'bg-primary w-10' : 'bg-gray-200 w-3'
                             }`}
                         />
                     ))}
                 </View>
 
                 <PrimaryButton
-                    title={currentPage === pages.length - 1 ? "Get Started" : "Next"}
+                    title={currentPage === pages.length - 1 ? "INITIALIZE" : "NEXT PHASE"}
                     onPress={handleNext}
-                    className="h-16 rounded-md"
+                    className="h-16 rounded-xl shadow-xl"
                     variant={currentPage === pages.length - 1 ? 'accent' : 'primary'}
                 />
+                
+                <Text className="mt-8 text-center text-[8px] text-muted uppercase tracking-widest opacity-40 font-jakarta-bold">
+                    System Version 2.0.4 • Loom Marketplace
+                </Text>
             </View>
-        </View >
+        </View>
     );
 }
+
 
 

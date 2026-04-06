@@ -8,7 +8,7 @@ import { CategoryId, CATEGORIES } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import { Alert, ScrollView, Text, TouchableOpacity, View, Image } from 'react-native';
 import Animated, { FadeInRight, FadeInUp } from 'react-native-reanimated';
 import { LocationSuggestionInput } from '@/components/ui/LocationSuggestionInput';
 import { NIGERIAN_STATES, NIGERIAN_STATISTICS } from '@/utils/locations';
@@ -102,7 +102,6 @@ export default function ProfileCompletionScreen() {
                 Alert.alert('Required Fields', 'Please tell us where you are located.');
                 return;
             }
-            // If artisan, skip the "Interests" step as they'll pick skills in artisan-onboarding
             if (user?.role === 'artisan') {
                 handleComplete();
             } else {
@@ -115,25 +114,25 @@ export default function ProfileCompletionScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <View style={StyleSheet.absoluteFill}>
+            <View className="absolute inset-0">
                 <LoomThread variant="dense" scale={1.2} animated opacity={0.3} />
             </View>
             <AppHeader
-                title="Profile Setup"
+                title="Profile Activation"
                 showBack={activeStep > 0}
                 onBack={() => setActiveStep(0)}
                 showNotification={false}
             />
 
-            {/* Progress Indicator */}
-            <View className="flex-row px-6 py-4 gap-2 mx-8">
+            {/* Tactical Progress Tracker */}
+            <View className="flex-row px-10 py-6 gap-3">
                 {STEPS.filter((_, i) => user?.role !== 'artisan' || i === 0).map((s, i) => (
-                    <View key={s} className="flex-1 gap-1">
-                        <View className={`h-[3px] rounded-full ${
-                            i <= activeStep ? 'bg-primary' : 'bg-card-border'
+                    <View key={s} className="flex-1 gap-2">
+                        <View className={`h-1.5 rounded-full shadow-sm ${
+                            i <= activeStep ? 'bg-primary' : 'bg-gray-100'
                         }`} />
-                        <Text className={`text-label text-[9px] uppercase ${
-                            i === activeStep ? 'text-primary font-jakarta-bold' : 'text-muted font-jakarta-medium'
+                        <Text className={`text-label text-[10px] uppercase tracking-widest ${
+                            i === activeStep ? 'text-primary font-jakarta-extrabold italic' : 'text-muted font-jakarta-bold'
                         }`}>
                             {s}
                         </Text>
@@ -141,127 +140,134 @@ export default function ProfileCompletionScreen() {
                 ))}
             </View>
 
-            <ScrollView contentContainerStyle={{ paddingBottom: 100 }} keyboardShouldPersistTaps="handled">
+            <ScrollView 
+                className="flex-1"
+                contentContainerStyle={{ paddingBottom: 100 }} 
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+            >
                 {activeStep === 0 && (
-                    <Animated.View entering={FadeInUp.springify()} className="p-8">
-                        <View className="items-center mb-10">
+                    <Animated.View entering={FadeInUp.springify()} className="px-8 pt-6">
+                        <View className="items-center mb-12">
                             <TouchableOpacity
-                                activeOpacity={0.8}
+                                activeOpacity={0.9}
                                 onPress={pickImage}
-                                className={`w-[140px] h-[140px] rounded-full bg-white border-[1.5px] items-center justify-center p-1 shadow-md ${
-                                    profileImage ? 'border-primary border-solid' : 'border-primary border-dashed'
+                                className={`w-[160px] h-[160px] rounded-full bg-white border-[2px] items-center justify-center p-1.5 shadow-2xl ${
+                                    profileImage ? 'border-primary border-solid' : 'border-primary/40 border-dashed'
                                 }`}
                             >
-                                <View className="w-full h-full rounded-full bg-primary/5 items-center justify-center overflow-hidden">
+                                <View className="w-full h-full rounded-full bg-primary/5 items-center justify-center overflow-hidden border border-card-border/50">
                                     {profileImage ? (
                                         <Image source={{ uri: profileImage }} className="w-full h-full" />
                                     ) : (
-                                        <Ionicons name="person" size={60} color="#00120C" />
+                                        <Ionicons name="person" size={68} color="#00120C" className="opacity-80" />
                                     )}
                                 </View>
-                                <View className="absolute bottom-0 right-1 w-10 h-10 rounded-full bg-accent items-center justify-center border-[3px] border-white shadow-sm">
+                                <View className="absolute bottom-1 right-1 w-11 h-11 rounded-full bg-accent items-center justify-center border-4 border-white shadow-lg">
                                     <Ionicons name={profileImage ? "create" : "camera"} size={20} color="white" />
                                 </View>
                             </TouchableOpacity>
-                            <Text className="text-h3 mt-5 text-[20px]">
-                                {user?.role === 'artisan' ? 'Add Business Photo' : 'Add Profile Photo'}
+                            <Text className="text-h3 mt-6 text-[22px] uppercase italic font-jakarta-extrabold tracking-tight">
+                                {user?.role === 'artisan' ? 'Business Identity' : 'Personal Avatar'}
                             </Text>
-                            <Text className="text-body-sm text-muted mt-1">
-                                {user?.role === 'artisan' ? 'Show clients who you are' : 'Help people recognize you'}
+                            <Text className="text-body-sm text-muted mt-2 normal-case font-jakarta-medium">
+                                {user?.role === 'artisan' ? 'Present a professional image to clients' : 'Help the community recognize you'}
                             </Text>
                         </View>
 
-                        <Text className="text-[24px] font-jakarta-extrabold text-ink mb-2">
-                            {user?.role === 'artisan' ? 'Where are you based?' : 'Where are you based?'}
+                        <Text className="text-[28px] font-jakarta-extrabold text-ink mb-2 uppercase italic tracking-tighter">
+                            Operational Hub
                         </Text>
-                        <Text className="text-base text-ink/70 leading-6 mb-8">
+                        <Text className="text-base text-ink/70 leading-7 mb-10 font-jakarta-medium">
                             {user?.role === 'artisan'
-                                ? 'This helps clients in your area find and book your services.'
-                                : 'This helps us show you pros in your neighborhood.'}
+                                ? 'Specify your primary deployment zone for service inquiries.'
+                                : 'Identify your residence to streamline professional matching.'}
                         </Text>
 
-                        <LocationSuggestionInput
-                            label="State"
-                            placeholder="e.g. Lagos"
-                            value={state}
-                            onChangeText={(text) => {
-                                setState(text);
-                                // Reset city and area if state changes
-                                setCity('');
-                                setArea('');
-                            }}
-                            suggestions={NIGERIAN_STATES}
-                        />
+                        <View className="gap-6">
+                            <LocationSuggestionInput
+                                label="TERRITORY (STATE)"
+                                placeholder="e.g. Lagos"
+                                value={state}
+                                onChangeText={(text) => {
+                                    setState(text);
+                                    setCity('');
+                                    setArea('');
+                                }}
+                                suggestions={NIGERIAN_STATES}
+                            />
 
-                        <LocationSuggestionInput
-                            label="City"
-                            placeholder="e.g. Ikeja"
-                            value={city}
-                            onChangeText={(text) => {
-                                setCity(text);
-                                setArea('');
-                            }}
-                            suggestions={
-                                (state && NIGERIAN_STATISTICS[state as keyof typeof NIGERIAN_STATISTICS])
-                                    ? NIGERIAN_STATISTICS[state as keyof typeof NIGERIAN_STATISTICS].cities
-                                    : []
-                            }
-                        />
+                            <LocationSuggestionInput
+                                label="OPERATIONAL CITY"
+                                placeholder="e.g. Ikeja"
+                                value={city}
+                                onChangeText={(text) => {
+                                    setCity(text);
+                                    setArea('');
+                                }}
+                                suggestions={
+                                    (state && NIGERIAN_STATISTICS[state as keyof typeof NIGERIAN_STATISTICS])
+                                        ? NIGERIAN_STATISTICS[state as keyof typeof NIGERIAN_STATISTICS].cities
+                                        : []
+                                }
+                            />
 
-                        <LocationSuggestionInput
-                            label="Area / Neighborhood"
-                            placeholder="e.g. Opebi"
-                            value={area}
-                            onChangeText={setArea}
-                            suggestions={
-                                (state && city && NIGERIAN_STATISTICS[state as keyof typeof NIGERIAN_STATISTICS])
-                                    ? NIGERIAN_STATISTICS[state as keyof typeof NIGERIAN_STATISTICS].areas
-                                    : []
-                            }
-                        />
+                            <LocationSuggestionInput
+                                label="SPECIFIC AREA / NEIGHBORHOOD"
+                                placeholder="e.g. Opebi"
+                                value={area}
+                                onChangeText={setArea}
+                                suggestions={
+                                    (state && city && NIGERIAN_STATISTICS[state as keyof typeof NIGERIAN_STATISTICS])
+                                        ? NIGERIAN_STATISTICS[state as keyof typeof NIGERIAN_STATISTICS].areas
+                                        : []
+                                }
+                            />
+                        </View>
 
                         <PrimaryButton
-                            title="Continue"
+                            title="SYNC PARAMETERS"
                             onPress={nextStep}
-                            className="mt-6 h-[60px] rounded-md"
+                            className="mt-12 h-16 rounded-xl shadow-xl border border-primary/20"
                         />
                     </Animated.View>
                 )}
 
                 {activeStep === 1 && (
-                    <Animated.View entering={FadeInRight} className="p-8">
-                        <Text className="text-[24px] font-jakarta-extrabold text-ink mb-2">
-                            What services do you need?
+                    <Animated.View entering={FadeInRight.springify()} className="px-8 pt-8">
+                        <Text className="text-[28px] font-jakarta-extrabold text-ink mb-2 uppercase italic tracking-tighter">
+                            Service Interests
                         </Text>
-                        <Text className="text-base text-ink/70 leading-6 mb-8">
-                            We&apos;ll customize your home feed based on your interests.
+                        <Text className="text-base text-ink/70 leading-7 mb-10 font-jakarta-medium">
+                            Optimize your home terminal with specialized service classifications.
                         </Text>
 
-                        <View className="flex-row flex-wrap gap-[10px]">
+                        <View className="flex-row flex-wrap gap-3">
                             {CATEGORIES.map((cat) => (
                                 <View key={cat.id} className="mb-1">
                                     <Chip
-                                        label={cat.label}
+                                        label={cat.label.toUpperCase()}
                                         selected={selectedInterests.includes(cat.id)}
                                         onPress={() => toggleInterest(cat.id)}
+                                        className="py-3 px-6 rounded-2xl"
                                     />
                                 </View>
                             ))}
                         </View>
 
                         <PrimaryButton
-                            title="Complete Setup"
+                            title="INITIALIZE ECOSYSTEM"
                             onPress={nextStep}
                             loading={loading}
-                            className="mt-10"
+                            className="mt-16 h-16 rounded-xl shadow-xl"
                             disabled={selectedInterests.length === 0}
                         />
 
                         <TouchableOpacity
                             onPress={handleComplete}
-                            className="items-center mt-4 p-2"
+                            className="items-center mt-6 p-4 rounded-xl bg-surface/50 border border-card-border"
                         >
-                            <Text className="text-muted font-jakarta-semibold">Skip for now</Text>
+                            <Text className="text-muted font-jakarta-extrabold uppercase text-[10px] tracking-widest italic opacity-60">Bypass for Now</Text>
                         </TouchableOpacity>
                     </Animated.View>
                 )}
@@ -269,4 +275,5 @@ export default function ProfileCompletionScreen() {
         </View>
     );
 }
+
 
