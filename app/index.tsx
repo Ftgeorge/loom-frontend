@@ -14,45 +14,10 @@ import Animated, {
 } from "react-native-reanimated";
 
 const LETTERS = ["L", "o", "o", "m"];
-const LETTER_DELAY = 80;
+import { AnimatedLetter } from '@/components/splash/AnimatedLetter';
+
 const TAGLINE_DELAY = 800;
 const INDICATOR_DELAY = 1200;
-
-function AnimatedLetter({
-  letter,
-  index,
-}: {
-  letter: string;
-  index: number;
-}) {
-  const progress = useSharedValue(0);
-
-  useEffect(() => {
-    progress.value = withDelay(
-      index * LETTER_DELAY,
-      withSpring(1, {
-        damping: 15, stiffness: 100, mass: 1,
-      })
-    );
-  }, []);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(progress.value, [0, 0.5, 1], [0, 0.7, 1]),
-    transform: [
-      { translateY: interpolate(progress.value, [0, 1], [40, 0]) },
-      { scale: interpolate(progress.value, [0, 1], [0.8, 1]) },
-    ],
-  }));
-
-  return (
-    <Animated.Text
-      style={animatedStyle}
-      className={`font-jakarta-extrabold italic text-[88px] text-white tracking-[-5px] ${index === 0 ? 'text-white' : 'text-white/90'}`}
-    >
-      {letter}
-    </Animated.Text>
-  );
-}
 
 export default function SplashScreen() {
   const router = useRouter();
