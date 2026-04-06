@@ -62,7 +62,7 @@ export default function ProfileCompletionScreen() {
         try {
             let finalAvatarUrl = undefined;
 
-            if (profileImage) {
+            if (profileImage && !profileImage.startsWith('http')) {
                 const uploadRes = await userApi.uploadAvatar(profileImage);
                 finalAvatarUrl = uploadRes.avatar_url;
             }
@@ -90,7 +90,7 @@ export default function ProfileCompletionScreen() {
                 router.replace('/(tabs)/home');
             }
         } catch (err: any) {
-            Alert.alert('Error', err.message || 'Could not update your profile');
+            Alert.alert('Transmission Error', err.message || 'Could not update your profile data.');
         } finally {
             setLoading(false);
         }
@@ -99,7 +99,7 @@ export default function ProfileCompletionScreen() {
     const nextStep = () => {
         if (activeStep === 0) {
             if (!city || !state || !area) {
-                Alert.alert('Required Fields', 'Please tell us where you are located.');
+                Alert.alert('Required Fields', 'Please specify your primary deployment zone.');
                 return;
             }
             if (user?.role === 'artisan') {
@@ -115,26 +115,26 @@ export default function ProfileCompletionScreen() {
     return (
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
-                <LoomThread variant="dense" scale={1.2} animated opacity={0.3} />
+                <LoomThread variant="minimal" opacity={0.2} animated scale={1.3} />
             </View>
             <AppHeader
-                title="Profile Activation"
+                title="PROFILE ACTIVATION"
                 showBack={activeStep > 0}
                 onBack={() => setActiveStep(0)}
                 showNotification={false}
             />
 
-            {/* Tactical Progress Tracker */}
+            {/* ─── Tactical Stepper Matrix ───────────────────────────────────── */}
             <View className="flex-row px-10 py-6 gap-3">
                 {STEPS.filter((_, i) => user?.role !== 'artisan' || i === 0).map((s, i) => (
                     <View key={s} className="flex-1 gap-2">
                         <View className={`h-1.5 rounded-full shadow-sm ${
-                            i <= activeStep ? 'bg-primary' : 'bg-gray-100'
+                            i <= activeStep ? 'bg-primary shadow-primary/20' : 'bg-card-border/30'
                         }`} />
-                        <Text className={`text-label text-[10px] uppercase tracking-widest ${
-                            i === activeStep ? 'text-primary font-jakarta-extrabold italic' : 'text-muted font-jakarta-bold'
+                        <Text className={`text-label text-[9px] uppercase tracking-[3px] ${
+                            i === activeStep ? 'text-primary font-jakarta-extrabold italic' : 'text-ink/20 font-jakarta-bold'
                         }`}>
-                            {s}
+                            {s.toUpperCase()}
                         </Text>
                     </View>
                 ))}
@@ -142,7 +142,7 @@ export default function ProfileCompletionScreen() {
 
             <ScrollView 
                 className="flex-1"
-                contentContainerStyle={{ paddingBottom: 100 }} 
+                contentContainerStyle={{ paddingBottom: 160 }} 
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
             >
@@ -152,42 +152,44 @@ export default function ProfileCompletionScreen() {
                             <TouchableOpacity
                                 activeOpacity={0.9}
                                 onPress={pickImage}
-                                className={`w-[160px] h-[160px] rounded-full bg-white border-[2px] items-center justify-center p-1.5 shadow-2xl ${
+                                className={`w-36 h-36 rounded-full bg-white border-[2px] items-center justify-center p-2 shadow-2xl ${
                                     profileImage ? 'border-primary border-solid' : 'border-primary/40 border-dashed'
                                 }`}
                             >
-                                <View className="w-full h-full rounded-full bg-primary/5 items-center justify-center overflow-hidden border border-card-border/50">
+                                <View className="w-full h-full rounded-full bg-background items-center justify-center overflow-hidden border border-card-border/50 shadow-inner">
                                     {profileImage ? (
-                                        <Image source={{ uri: profileImage }} className="w-full h-full" />
+                                        <Image source={{ uri: profileImage }} className="w-full h-full" resizeMode="cover" />
                                     ) : (
-                                        <Ionicons name="person" size={68} color="#00120C" className="opacity-80" />
+                                        <Ionicons name="person" size={56} color="#00120C" className="opacity-40" />
                                     )}
                                 </View>
                                 <View className="absolute bottom-1 right-1 w-11 h-11 rounded-full bg-accent items-center justify-center border-4 border-white shadow-lg">
-                                    <Ionicons name={profileImage ? "create" : "camera"} size={20} color="white" />
+                                    <Ionicons name={profileImage ? "create" : "camera"} size={18} color="white" />
                                 </View>
                             </TouchableOpacity>
-                            <Text className="text-h3 mt-6 text-[22px] uppercase italic font-jakarta-extrabold tracking-tight">
-                                {user?.role === 'artisan' ? 'Business Identity' : 'Personal Avatar'}
+                            <Text className="text-[20px] mt-6 uppercase italic font-jakarta-extrabold tracking-tight text-ink">
+                                {user?.role === 'artisan' ? 'PROFESSIONAL IDENTITY' : 'CLIENT AVATAR'}
                             </Text>
-                            <Text className="text-body-sm text-muted mt-2 normal-case font-jakarta-medium">
-                                {user?.role === 'artisan' ? 'Present a professional image to clients' : 'Help the community recognize you'}
+                            <Text className="text-[14px] text-ink/40 mt-2 text-center italic font-jakarta-medium px-4">
+                                {user?.role === 'artisan' ? 'Present a professional image to the service grid.' : 'Help the community recognize your operative profile.'}
                             </Text>
                         </View>
 
-                        <Text className="text-[28px] font-jakarta-extrabold text-ink mb-2 uppercase italic tracking-tighter">
-                            Operational Hub
-                        </Text>
-                        <Text className="text-base text-ink/70 leading-7 mb-10 font-jakarta-medium">
+                        <View className="flex-row items-center gap-2 mb-3 px-1">
+                            <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+                            <Text className="text-label text-primary tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">GEOGRAPHICAL SYNC</Text>
+                        </View>
+                        <Text className="text-h1 text-[40px] uppercase italic font-jakarta-extrabold tracking-tighter mb-4 text-ink">DEPLOYMENT HUB</Text>
+                        <Text className="text-[15px] text-ink/60 mb-12 normal-case font-jakarta-medium italic leading-6">
                             {user?.role === 'artisan'
-                                ? 'Specify your primary deployment zone for service inquiries.'
-                                : 'Identify your residence to streamline professional matching.'}
+                                ? 'Specify your primary operational territory for service inquiries.'
+                                : 'Identify your residence to streamline professional discovery.'}
                         </Text>
 
-                        <View className="gap-6">
+                        <View className="gap-6 mb-12">
                             <LocationSuggestionInput
                                 label="TERRITORY (STATE)"
-                                placeholder="e.g. Lagos"
+                                placeholder="E.G. LAGOS"
                                 value={state}
                                 onChangeText={(text) => {
                                     setState(text);
@@ -199,7 +201,7 @@ export default function ProfileCompletionScreen() {
 
                             <LocationSuggestionInput
                                 label="OPERATIONAL CITY"
-                                placeholder="e.g. Ikeja"
+                                placeholder="E.G. IKEJA"
                                 value={city}
                                 onChangeText={(text) => {
                                     setCity(text);
@@ -213,8 +215,8 @@ export default function ProfileCompletionScreen() {
                             />
 
                             <LocationSuggestionInput
-                                label="SPECIFIC AREA / NEIGHBORHOOD"
-                                placeholder="e.g. Opebi"
+                                label="SPECIFIC AREA / SECTOR"
+                                placeholder="E.G. OPEBI"
                                 value={area}
                                 onChangeText={setArea}
                                 suggestions={
@@ -228,52 +230,58 @@ export default function ProfileCompletionScreen() {
                         <PrimaryButton
                             title="SYNC PARAMETERS"
                             onPress={nextStep}
-                            className="mt-12 h-16 rounded-xl shadow-xl border border-primary/20"
+                            className="h-18 rounded-[20px] shadow-2xl border border-white/10"
                         />
                     </Animated.View>
                 )}
 
                 {activeStep === 1 && (
                     <Animated.View entering={FadeInRight.springify()} className="px-8 pt-8">
-                        <Text className="text-[28px] font-jakarta-extrabold text-ink mb-2 uppercase italic tracking-tighter">
-                            Service Interests
-                        </Text>
-                        <Text className="text-base text-ink/70 leading-7 mb-10 font-jakarta-medium">
-                            Optimize your home terminal with specialized service classifications.
+                        <View className="flex-row items-center gap-2 mb-3 px-1">
+                            <View className="w-1.5 h-1.5 rounded-full bg-accent shadow-sm" />
+                            <Text className="text-label text-accent tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">PREFERENCE MATRIX</Text>
+                        </View>
+                        <Text className="text-h1 text-[40px] uppercase italic font-jakarta-extrabold tracking-tighter mb-4 text-ink">FIELD INTERESTS</Text>
+                        <Text className="text-[15px] text-ink/60 mb-12 normal-case font-jakarta-medium italic leading-6">
+                            Optimize your command center with specialized service classifications.
                         </Text>
 
-                        <View className="flex-row flex-wrap gap-3">
+                        <View className="flex-row flex-wrap gap-4 py-8 px-6 bg-white rounded-[42px] border-[1.5px] border-card-border/50 shadow-2xl">
                             {CATEGORIES.map((cat) => (
-                                <View key={cat.id} className="mb-1">
+                                <View key={cat.id}>
                                     <Chip
                                         label={cat.label.toUpperCase()}
                                         selected={selectedInterests.includes(cat.id)}
                                         onPress={() => toggleInterest(cat.id)}
-                                        className="py-3 px-6 rounded-2xl"
+                                        className="py-4 px-7 rounded-[20px]"
                                     />
                                 </View>
                             ))}
                         </View>
 
                         <PrimaryButton
-                            title="INITIALIZE ECOSYSTEM"
+                            title="INITIALIZE PROTOCOL"
                             onPress={nextStep}
                             loading={loading}
-                            className="mt-16 h-16 rounded-xl shadow-xl"
+                            variant="accent"
+                            className="mt-16 h-18 rounded-[20px] shadow-2xl border border-white/10"
                             disabled={selectedInterests.length === 0}
                         />
 
                         <TouchableOpacity
                             onPress={handleComplete}
-                            className="items-center mt-6 p-4 rounded-xl bg-surface/50 border border-card-border"
+                            activeOpacity={0.8}
+                            className="items-center mt-10 p-5 rounded-[20px] bg-background border border-card-border/50 shadow-inner"
                         >
-                            <Text className="text-muted font-jakarta-extrabold uppercase text-[10px] tracking-widest italic opacity-60">Bypass for Now</Text>
+                            <Text className="text-ink/40 font-jakarta-extrabold uppercase text-[10px] tracking-[4px] italic">BYPASS INITIALIZATION</Text>
                         </TouchableOpacity>
                     </Animated.View>
                 )}
             </ScrollView>
+            
+            <View className="absolute bottom-12 left-0 right-0 items-center pointer-events-none opacity-20">
+                <Text className="text-[9px] text-muted uppercase tracking-[5px] font-jakarta-bold italic">Identity Sync Protocol v4.2 • Loom Command</Text>
+            </View>
         </View>
     );
 }
-
-

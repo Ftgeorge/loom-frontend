@@ -11,12 +11,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
 
-const TYPE_ICONS: Record<string, { icon: string; color: string; bg: string }> = {
-    job_update: { icon: 'briefcase-outline', color: '#078365', bg: '#0783651A' },
-    message: { icon: 'chatbubbles-outline', color: '#078365', bg: '#0783651A' },
-    booking: { icon: 'calendar-outline', color: '#078365', bg: '#0783651A' },
-    review: { icon: 'star-outline', color: '#F59E0B', bg: '#F59E0B1A' },
-    system: { icon: 'shield-outline', color: '#64748B', bg: '#F1F5F9' },
+const TYPE_ICONS: Record<string, { icon: string; color: string; bgClass: string; iconColorClass: string }> = {
+    job_update: { icon: 'briefcase-outline', color: '#078365', bgClass: 'bg-primary/10', iconColorClass: 'text-primary' },
+    message: { icon: 'chatbubbles-outline', color: '#078365', bgClass: 'bg-primary/10', iconColorClass: 'text-primary' },
+    booking: { icon: 'calendar-outline', color: '#078365', bgClass: 'bg-primary/10', iconColorClass: 'text-primary' },
+    review: { icon: 'star-outline', color: '#F59E0B', bgClass: 'bg-accent/10', iconColorClass: 'text-accent' },
+    system: { icon: 'shield-outline', color: '#64748B', bgClass: 'bg-background', iconColorClass: 'text-muted' },
 };
 
 export default function NotificationsScreen() {
@@ -53,36 +53,48 @@ export default function NotificationsScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <LoomThread variant="minimal" opacity={0.3} animated />
+            <View className="absolute inset-0">
+                <LoomThread variant="minimal" opacity={0.3} animated scale={1.3} />
+            </View>
             <AppHeader
-                title="Notifications"
+                title="COMM CENTER"
                 showBack
                 onBack={() => router.back()}
                 showNotification={false}
             />
 
             {!loading && notifications.length > 0 && (
-                <TouchableOpacity 
-                    onPress={handleMarkAllRead}
-                    className="self-end mx-6 mb-4 py-2 px-3 rounded-full bg-surface border border-card-border"
-                >
-                    <Text className="text-label text-[10px] text-primary uppercase">Mark all read</Text>
-                </TouchableOpacity>
+                <View className="flex-row justify-between items-center px-8 py-6">
+                    <View className="flex-row items-center gap-2">
+                        <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+                        <Text className="text-label text-primary tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">SIGNAL HUB</Text>
+                    </View>
+                    <TouchableOpacity 
+                        onPress={handleMarkAllRead}
+                        className="py-2.5 px-5 rounded-full bg-white/60 border border-card-border/50 shadow-sm backdrop-blur-md active:bg-white"
+                    >
+                        <Text className="text-label text-[10px] text-primary uppercase font-jakarta-extrabold italic tracking-widest">CLEAR ALL SIGNALS</Text>
+                    </TouchableOpacity>
+                </View>
             )}
 
             {loading ? (
-                <View className="p-6"><SkeletonList count={5} type="notification" /></View>
+                <View className="px-8 pt-6"><SkeletonList count={6} type="notification" /></View>
             ) : notifications.length === 0 ? (
-                <EmptyState
-                    icon="notifications-off-outline"
-                    title="No Notifications"
-                    message="You're all caught up! We'll let you know when something new arrives."
-                />
+                <View className="flex-1 justify-center items-center px-12">
+                     <View className="w-24 h-24 rounded-[32px] bg-white border border-card-border items-center justify-center mb-8 shadow-inner opacity-40">
+                        <Ionicons name="notifications-off-outline" size={48} color="#94A3B8" />
+                    </View>
+                    <Text className="text-h1 text-center text-muted uppercase italic font-jakarta-extrabold tracking-tighter opacity-30 text-[32px]">Silence in Sector</Text>
+                    <Text className="text-body text-center mt-4 normal-case font-jakarta-medium italic opacity-40">
+                        You're all caught up. The communication grid is currently stable with no pending transmissions.
+                    </Text>
+                </View>
             ) : (
                 <FlatList
                     data={notifications}
                     keyExtractor={(item) => item.id}
-                    contentContainerStyle={{ paddingBottom: 120, paddingHorizontal: 24 }}
+                    contentContainerStyle={{ paddingBottom: 160, paddingHorizontal: 32 }}
                     showsVerticalScrollIndicator={false}
                     initialNumToRender={15}
                     maxToRenderPerBatch={15}
@@ -93,48 +105,51 @@ export default function NotificationsScreen() {
                         return (
                             <Animated.View entering={FadeInRight.delay(index * 30).springify()}>
                                 <TouchableOpacity
-                                    className={`flex-row p-5 gap-4 rounded-lg mb-3 border ${
-                                        item.read ? 'bg-canvas border-divider' : 'bg-white border-card-border shadow-md'
+                                    className={`flex-row p-6 gap-5 rounded-[32px] mb-5 border-[1.5px] active:scale-[0.98] transition-transform ${
+                                        item.read ? 'bg-background/40 border-card-border/30 opacity-60' : 'bg-white border-card-border/50 shadow-2xl shadow-primary/5'
                                     }`}
                                     onPress={() => markNotificationRead(item.id)}
                                     activeOpacity={0.8}
                                 >
                                     <View 
-                                        className="w-12 h-12 rounded-md items-center justify-center"
-                                        style={{ backgroundColor: typeInfo.bg }}
+                                        className={`w-14 h-14 rounded-2xl items-center justify-center shadow-inner border border-white/40 ${typeInfo.bgClass}`}
                                     >
                                         <Ionicons
                                             name={typeInfo.icon as any}
-                                            size={22}
+                                            size={26}
+                                            className={typeInfo.iconColorClass}
                                             color={typeInfo.color}
                                         />
                                     </View>
 
-                                    <View className="flex-1">
-                                        <View className="flex-row justify-between items-center mb-1">
+                                    <View className="flex-1 justify-center">
+                                        <View className="flex-row justify-between items-start mb-2">
                                             <Text 
-                                                className={`text-h3 text-[15px] flex-1 text-ink uppercase ${
-                                                    item.read ? 'font-jakarta-semibold' : 'font-jakarta-bold'
+                                                className={`text-[16px] flex-1 text-ink uppercase italic tracking-tight ${
+                                                    item.read ? 'font-jakarta-extrabold' : 'font-jakarta-extrabold'
                                                 }`} 
                                                 numberOfLines={1}
                                             >
                                                 {item.title}
                                             </Text>
                                             {!item.read && (
-                                                <View className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                                                <View className="w-2.5 h-2.5 rounded-full bg-accent shadow-accent/50 shadow-inner mt-1" />
                                             )}
                                         </View>
                                         <Text
-                                            className={`text-body-sm text-[13px] leading-[20px] normal-case ${
-                                                item.read ? 'text-muted' : 'text-body'
+                                            className={`text-[14px] leading-5 normal-case font-jakarta-medium italic ${
+                                                item.read ? 'text-ink/40' : 'text-ink/70'
                                             }`}
                                             numberOfLines={2}
                                         >
                                             {item.body}
                                         </Text>
-                                        <Text className="text-label text-[9px] text-muted mt-2 uppercase italic tracking-normal">
-                                            {timeAgo(item.createdAt)}
-                                        </Text>
+                                        <View className="flex-row items-center gap-2 mt-4">
+                                            <Ionicons name="time-outline" size={10} color="#94A3B8" />
+                                            <Text className="text-label text-[9px] text-muted uppercase font-jakarta-extrabold italic tracking-widest">
+                                                {timeAgo(item.createdAt)}
+                                            </Text>
+                                        </View>
                                     </View>
                                 </TouchableOpacity>
                             </Animated.View>
@@ -142,7 +157,10 @@ export default function NotificationsScreen() {
                     }}
                 />
             )}
+            
+            <View className="absolute bottom-12 left-0 right-0 items-center pointer-events-none opacity-20">
+                <Text className="text-[9px] text-muted uppercase tracking-[5px] font-jakarta-bold italic">Signal Registry Protocol v4.2 • Secure Encryption Active</Text>
+            </View>
         </View>
     );
 }
-

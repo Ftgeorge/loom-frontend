@@ -14,7 +14,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { LoomThread } from "@/components/ui/LoomThread";
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import { SettingItem } from "@/components/ui/SettingItem";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -55,89 +57,84 @@ export default function SettingsScreen() {
     ], { cancelable: true });
   };
 
-  const SettingItem = ({ icon, label, value, onPress, isLast = false, colorClass = 'bg-primary/10', iconColor = '#078365' }: any) => (
-    <TouchableOpacity
-      className={`flex-row items-center py-5 px-6 bg-white ${!isLast ? 'border-b border-card-border' : ''}`}
-      onPress={onPress}
-      activeOpacity={0.7}
-    >
-      <View className={`w-10 h-10 rounded-xl items-center justify-center mr-4 shadow-sm border border-card-border/50 ${colorClass}`}>
-        <Ionicons name={icon} size={20} color={iconColor} />
-      </View>
-      <View className="flex-1">
-        <Text className="text-body text-[15px] font-jakarta-bold text-ink uppercase tracking-tight">{label}</Text>
-        {value && <Text className="text-body-sm text-[12px] text-muted mt-1 normal-case italic font-jakarta-medium">{value}</Text>}
-      </View>
-      {onPress && <Ionicons name="chevron-forward" size={18} color="#94A3B8" />}
-    </TouchableOpacity>
-  );
-
   return (
     <View className="flex-1 bg-background">
+      <View className="absolute inset-0">
+         <LoomThread variant="minimal" opacity={0.2} animated scale={1.3} />
+      </View>
       <SubAppHeader
-        label="PREFERENCES"
+        label="CORE PREFERENCES"
         title="SETTINGS"
-        description="Customize your ecosystem experience and profile security."
+        description="Customize your ecosystem experience and profile security protocols."
         showBack
         onBack={() => router.back()}
-        onNotification={() => {}}
+        onNotification={() => router.push('/notifications')}
       />
 
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
+        contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 24, paddingBottom: 160 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Identity Card */}
-        <Animated.View entering={FadeInUp.delay(100).springify()} className="mb-10">
-          <Card className="p-6 flex-row items-center gap-5 bg-white rounded-[24px] border-[1.5px] border-card-border shadow-md">
-            <View className="w-16 h-16 rounded-full bg-primary items-center justify-center border-4 border-primary/10 shadow-lg">
-              <Text className="text-h2 text-white text-[24px] font-jakarta-extrabold uppercase italic">{user?.name?.[0]}</Text>
+        {/* ─── Profile Identity Matrix ────────────────────────────────────────── */}
+        <Animated.View entering={FadeInUp.delay(100).springify()} className="mb-12">
+          <View className="p-8 flex-row items-center gap-6 bg-white rounded-[42px] border-[1.5px] border-card-border/50 shadow-2xl">
+            <View className="w-18 h-18 rounded-[24px] bg-primary items-center justify-center border-[4px] border-primary/10 shadow-xl">
+              <Text className="text-[28px] text-white font-jakarta-extrabold uppercase italic tracking-tighter">{user?.name?.[0]}</Text>
             </View>
             <View className="flex-1">
-              <Text className="text-h3 text-ink uppercase font-jakarta-extrabold italic tracking-tight">{user?.name}</Text>
-              <View className="flex-row items-center gap-1.5 mt-1">
-                <View className="w-1.5 h-1.5 rounded-full bg-accent shadow-sm" />
-                <Text className="text-body-sm text-muted uppercase text-[9px] tracking-widest font-jakarta-bold">{user?.role === 'artisan' ? 'Professional Artisan' : 'Active Client'}</Text>
+              <Text className="text-[22px] text-ink uppercase font-jakarta-extrabold italic tracking-tighter leading-tight" numberOfLines={1}>{user?.name}</Text>
+              <View className="flex-row items-center gap-2 mt-2">
+                <View className="w-2 h-2 rounded-full bg-accent shadow-accent/50 shadow-inner" />
+                <Text className="text-body-sm text-ink/50 uppercase text-[10px] tracking-[4px] font-jakarta-extrabold italic">{user?.role === 'artisan' ? 'PROFESSIONAL' : 'ACTIVE CLIENT'}</Text>
               </View>
             </View>
             <TouchableOpacity 
-              className="p-3 bg-surface rounded-xl border border-card-border shadow-sm"
+              className="w-12 h-12 bg-background rounded-2xl border border-card-border/50 items-center justify-center shadow-inner active:scale-95"
               onPress={() => router.push('/profile-completion')}
             >
               <Ionicons name="pencil-outline" size={20} color="#00120C" />
             </TouchableOpacity>
-          </Card>
+          </View>
         </Animated.View>
 
-        {/* Section: Localization */}
-        <Text className="text-label mb-3 ml-2 uppercase tracking-widest text-[10px] text-primary font-jakarta-bold">Localization</Text>
-        <Card className="mb-10 overflow-hidden p-0 bg-white rounded-[24px] border-[1.5px] border-card-border shadow-sm">
+        {/* ─── Localization Registry ────────────────────────────────────────── */}
+        <View className="flex-row items-center gap-2 mb-4 px-1">
+            <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+            <Text className="text-label text-primary tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">LOCALIZATION</Text>
+        </View>
+        <View className="mb-12 overflow-hidden bg-white rounded-[42px] border-[1.5px] border-card-border/50 shadow-2xl">
           {(Object.keys(languageNames) as Language[]).map((lang, i, arr) => (
             <TouchableOpacity
               key={lang}
-              className={`flex-row items-center justify-between py-5 px-6 ${i < arr.length - 1 ? 'border-b border-card-border' : ''}`}
+              className={`flex-row items-center justify-between py-6 px-8 ${i < arr.length - 1 ? 'border-b border-card-border/30' : ''} active:bg-gray-50`}
               onPress={() => setLanguage(lang)}
             >
-              <Text className={`text-body uppercase tracking-tight ${language === lang ? 'text-primary font-jakarta-extrabold italic' : 'text-ink font-jakarta-bold'}`}>{languageNames[lang]}</Text>
+              <Text className={`text-[15px] uppercase tracking-tighter ${language === lang ? 'text-primary font-jakarta-extrabold italic scale-105' : 'text-ink font-jakarta-extrabold italic opacity-40'}`}>{languageNames[lang].toUpperCase()}</Text>
               {language === lang && (
-                <View className="bg-primary/10 w-7 h-7 rounded-full items-center justify-center">
-                  <Ionicons name="checkmark-circle" size={20} color="#00120C" />
+                <View className="bg-primary/10 w-8 h-8 rounded-full items-center justify-center border border-primary/20">
+                  <Ionicons name="checkmark-done" size={18} color="#00120C" />
                 </View>
               )}
             </TouchableOpacity>
           ))}
-        </Card>
+        </View>
 
-        {/* Section: Operational Preferences */}
-        <Text className="text-label mb-3 ml-2 uppercase tracking-widest text-[10px] text-primary font-jakarta-bold">Operations</Text>
-        <Card className="mb-10 overflow-hidden p-0 bg-white rounded-[24px] border-[1.5px] border-card-border shadow-sm">
+        {/* ─── Operational Controls ────────────────────────────────────────── */}
+        <View className="flex-row items-center gap-2 mb-4 px-1">
+            <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+            <Text className="text-label text-primary tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">OPERATIONAL CONTROL</Text>
+        </View>
+        <View className="mb-12 overflow-hidden bg-white rounded-[42px] border-[1.5px] border-card-border/50 shadow-2xl">
           {/* Push Intelligence */}
-          <View className="flex-row items-center p-6 border-b border-card-border">
-            <View className="w-10 h-10 rounded-xl bg-info/10 items-center justify-center mr-4 border border-info/20 shadow-xs">
-              <Ionicons name="notifications-outline" size={22} color="#3B82F6" />
+          <View className="flex-row items-center p-8 border-b border-card-border/30">
+            <View className="w-12 h-12 rounded-2xl bg-primary/10 items-center justify-center mr-5 border border-primary/20 shadow-inner">
+              <Ionicons name="notifications-outline" size={24} color="#078365" />
             </View>
-            <Text className="text-body flex-1 font-jakarta-extrabold uppercase tracking-tight text-ink">Push Intelligence</Text>
+            <View className="flex-1">
+                <Text className="text-[15px] font-jakarta-extrabold uppercase italic tracking-tighter text-ink">PUSH INTEL</Text>
+                <Text className="text-[11px] text-ink/40 mt-1 italic font-jakarta-bold">REAL-TIME GRID ALERTS</Text>
+            </View>
             <Switch
               value={notifEnabled}
               onValueChange={setNotifEnabled}
@@ -146,88 +143,93 @@ export default function SettingsScreen() {
             />
           </View>
 
-          {/* Aesthetic Appearance */}
-          <View className="p-6">
-            <View className="flex-row items-center mb-6">
-              <View className="w-10 h-10 rounded-xl bg-violet-500/10 items-center justify-center mr-4 border border-violet-500/20 shadow-xs">
-                <Ionicons name="moon-outline" size={22} color="#8B5CF6" />
+          {/* Mission Aesthetics */}
+          <View className="p-8">
+            <View className="flex-row items-center mb-8">
+              <View className="w-12 h-12 rounded-2xl bg-accent/10 items-center justify-center mr-5 border border-accent/20 shadow-inner">
+                <Ionicons name="color-palette-outline" size={24} color="#00120C" />
               </View>
-              <Text className="text-body flex-1 font-jakarta-extrabold uppercase tracking-tight text-ink">Mission Aesthetics</Text>
+              <View className="flex-1">
+                <Text className="text-[15px] font-jakarta-extrabold uppercase italic tracking-tighter text-ink">AESTHETIC GRID</Text>
+                <Text className="text-[11px] text-ink/40 mt-1 italic font-jakarta-bold">SYSTEM INTERFACE MODE</Text>
+              </View>
             </View>
-            <View className="flex-row gap-3">
+            <View className="flex-row gap-4">
               {(['light', 'dark', 'system'] as const).map((mode) => (
                 <TouchableOpacity
                   key={mode}
                   onPress={() => setThemeMode(mode)}
-                  className={`flex-1 py-4 rounded-xl items-center border shadow-sm ${
-                    themeMode === mode ? 'bg-primary border-primary' : 'bg-surface border-card-border'
+                  className={`flex-1 py-5 rounded-2xl items-center border shadow-xl transition-all ${
+                    themeMode === mode ? 'bg-primary border-primary shadow-primary/20' : 'bg-background border-card-border/30 opacity-60'
                   }`}
-                  style={{ transform: [{ scale: themeMode === mode ? 1.02 : 1 }] }}
+                  style={{ transform: [{ scale: themeMode === mode ? 1.05 : 1 }] }}
                 >
                   <Ionicons
-                    name={mode === 'light' ? 'sunny-outline' : mode === 'dark' ? 'moon-outline' : 'phone-portrait-outline'}
-                    size={18}
+                    name={mode === 'light' ? 'sunny' : mode === 'dark' ? 'moon' : 'infinite'}
+                    size={22}
                     color={themeMode === mode ? 'white' : '#64748B'}
                   />
-                  <Text className={`text-[10px] font-jakarta-extrabold mt-2 uppercase tracking-widest ${
+                  <Text className={`text-[10px] font-jakarta-extrabold mt-3 uppercase tracking-[3px] italic ${
                     themeMode === mode ? 'text-white' : 'text-muted'
                   }`}>
-                    {mode === 'system' ? 'Auto' : mode}
+                    {mode === 'system' ? 'AUTO' : mode.toUpperCase()}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
-        </Card>
+        </View>
 
-        {/* Section: Security & Protocol */}
-        <Text className="text-label mb-3 ml-2 uppercase tracking-widest text-[10px] text-primary font-jakarta-bold">Security & Protocols</Text>
-        <Card className="mb-10 overflow-hidden p-0 bg-white rounded-[24px] border-[1.5px] border-card-border shadow-sm">
+        {/* ─── Security Protocols ────────────────────────────────────────── */}
+        <View className="flex-row items-center gap-2 mb-4 px-1">
+            <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+            <Text className="text-label text-primary tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">SECURITY & PROTOCOL</Text>
+        </View>
+        <View className="mb-14 overflow-hidden bg-white rounded-[42px] border-[1.5px] border-card-border/50 shadow-2xl">
           <SettingItem
             icon="swap-horizontal"
-            label="Switch Protocol"
-            value={`Active Role: ${user?.role === 'artisan' ? 'Professional Artisan' : 'Private Client'}`}
+            label="SWITCH PROTOCOL"
+            value={`CURRENT IDENTITY: ${user?.role === 'artisan' ? 'PROFESSIONAL ARTISAN' : 'PRIVATE CLIENT'}`}
             onPress={handleRoleSwitch}
             colorClass="bg-accent/10"
-            iconColor="#7DCCFF"
+            iconColor="#00120C"
           />
           <SettingItem
             icon="help-circle-outline"
-            label="Mission Support"
+            label="MISSION SUPPORT"
+            value="DIRECT LINE TO COMMAND CENTER"
             onPress={() => router.push("/help")}
             colorClass="bg-info/10"
             iconColor="#3B82F6"
           />
           <SettingItem
             icon="shield-checkmark-outline"
-            label="Legal Integrity"
+            label="LEGAL INTEGRITY"
+            value="PRIVACY & OPERATIONAL TERMS"
             onPress={() => { }}
             isLast={true}
             colorClass="bg-success/10"
             iconColor="#1AB26C"
           />
-        </Card>
+        </View>
 
-        {/* Terminate Session */}
+        {/* ─── Termination Protocol ─────────────────────────────────────── */}
         <TouchableOpacity
-          className="flex-row items-center justify-center gap-3 mt-4 p-6 bg-error/10 rounded-[20px] border border-error/20 shadow-sm"
+          className="flex-row items-center justify-center gap-4 p-8 bg-error/10 rounded-[32px] border-[2px] border-error/20 shadow-2xl active:bg-error/20"
           onPress={handleLogout}
         >
-          <Ionicons name="log-out-outline" size={24} color="#EF4444" />
-          <Text className="text-body text-error font-jakarta-extrabold uppercase tracking-widest text-[11px]">Terminate Session</Text>
+          <Ionicons name="power-outline" size={24} color="#EF4444" />
+          <Text className="text-[13px] text-error font-jakarta-extrabold uppercase tracking-[4px] italic">TERMINATE SESSION</Text>
         </TouchableOpacity>
 
-        <View className="mt-16 items-center">
-          <View className="flex-row items-center gap-2 mb-2 opacity-50">
-            <Ionicons name="infinite" size={14} color="#64748B" />
-            <Text className="text-label text-[9px] text-muted uppercase tracking-widest font-jakarta-bold italic">Loom Tactical Marketplace</Text>
+        <View className="mt-20 items-center opacity-30 pointer-events-none">
+          <View className="flex-row items-center gap-3 mb-3">
+            <Ionicons name="infinite" size={16} color="#64748B" />
+            <Text className="text-label text-[10px] text-muted uppercase tracking-[6px] font-jakarta-extrabold italic">LOOM TACTICAL SYSTEM</Text>
           </View>
-          <Text className="text-label text-[8px] text-muted uppercase tracking-tighter opacity-30 font-jakarta-medium">Build Core 1.0.4 • Stable Branch</Text>
+          <Text className="text-label text-[8px] text-muted uppercase tracking-widest font-jakarta-extrabold">BUILD v4.2.0 • CORE STABLE</Text>
         </View>
       </ScrollView>
     </View >
   );
 }
-
-
-

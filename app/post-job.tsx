@@ -26,9 +26,9 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 const { width } = Dimensions.get('window');
 
 const URGENCY_OPTIONS: { label: string; value: Urgency }[] = [
-    { label: '🔴 Now', value: 'now' },
-    { label: '🟡 Today', value: 'today' },
-    { label: '🟢 This Week', value: 'this_week' },
+    { label: '🔴 NOW', value: 'now' },
+    { label: '🟡 TODAY', value: 'today' },
+    { label: '🟢 WEEK', value: 'this_week' },
 ];
 
 export default function PostJobScreen() {
@@ -44,7 +44,7 @@ export default function PostJobScreen() {
     const [submitted, setSubmitted] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const steps = ['Type', 'Info', 'Where', 'OK'];
+    const steps = ['Protocol', 'Intel', 'Logistics', 'Final'];
 
     const handleSubmit = async () => {
         const result = JobRequestSchema.safeParse({
@@ -78,7 +78,7 @@ export default function PostJobScreen() {
             addJob(mapJob(backendJob));
             setSubmitted(true);
         } catch (err: any) {
-            Alert.alert('Error', err.message ?? 'Something went wrong. Please try again.');
+            Alert.alert('System Error', err.message ?? 'Transmission failed. Re-initiating backup protocols...');
         } finally {
             setLoading(false);
         }
@@ -87,36 +87,38 @@ export default function PostJobScreen() {
     if (submitted) {
         return (
             <View className="flex-1 bg-background px-10 justify-center items-center">
-                <LoomThread variant="dense" opacity={0.3} animated />
+                <View className="absolute inset-0">
+                    <LoomThread variant="dense" opacity={0.3} animated scale={1.5} />
+                </View>
                 <Animated.View 
                     entering={FadeIn.duration(800).springify()} 
-                    className="w-32 h-32 rounded-full bg-success/10 items-center justify-center mb-12 shadow-2xl border border-success/20"
+                    className="w-32 h-32 rounded-[48px] bg-success/10 items-center justify-center mb-12 shadow-2xl border border-success/20 backdrop-blur-md"
                 >
                     <Ionicons name="shield-checkmark" size={68} color="#1AB26C" />
                 </Animated.View>
 
-                <Text className="text-h1 text-center text-[40px] uppercase italic font-jakarta-extrabold tracking-tighter">Mission Live</Text>
-                <Text className="text-body text-center mt-6 text-muted leading-7 normal-case font-jakarta-medium px-4">
+                <Text className="text-h1 text-center text-[44px] uppercase italic font-jakarta-extrabold tracking-tighter text-ink leading-tight">MISSION{"\n"}LIVE</Text>
+                <Text className="text-[15px] text-center mt-6 text-ink/60 leading-7 normal-case font-jakarta-medium px-4 italic">
                     Your request has been broadcasted. Our intelligence is currently matching the perfect artisan for your project.
                 </Text>
 
-                <View className="w-full mt-16 gap-4">
+                <View className="w-full mt-16 gap-5">
                     <PrimaryButton
                         title="TRACK MISSION"
                         onPress={() => router.push({ pathname: '/matched-artisans', params: { skill: category } })}
                         variant="accent"
-                        className="h-16 rounded-xl shadow-xl"
+                        className="h-18 rounded-2xl shadow-2xl border border-white/10"
                     />
-                    <SecondaryButton
-                        title="BACK TO COMMAND"
+                    <TouchableOpacity
                         onPress={() => router.replace('/')}
-                        className="h-15 rounded-xl border-primary bg-white border-[1.5px] shadow-sm"
-                        textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 11, letterSpacing: 1 }}
-                    />
+                        className="h-18 rounded-2xl border-[2.5px] border-primary bg-white items-center justify-center flex-row shadow-lg active:bg-gray-50"
+                    >
+                        <Text className="text-primary font-jakarta-extrabold uppercase italic tracking-tighter text-[13px]">BACK TO COMMAND</Text>
+                    </TouchableOpacity>
                 </View>
                 
-                <Text className="mt-12 text-center text-[8px] text-muted uppercase tracking-widest opacity-40 font-jakarta-bold">
-                    Mission Reference: {Math.random().toString(36).substring(7).toUpperCase()}
+                <Text className="mt-12 text-center text-[9px] text-muted uppercase tracking-[5px] font-jakarta-extrabold italic opacity-30">
+                    MISSION REF: {Math.random().toString(36).substring(7).toUpperCase()}
                 </Text>
             </View>
         );
@@ -124,22 +126,24 @@ export default function PostJobScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <LoomThread variant="minimal" opacity={0.3} animated />
+            <View className="absolute inset-0">
+                <LoomThread variant="minimal" opacity={0.2} animated scale={1.3} />
+            </View>
             <SubAppHeader
-                label="SERVICE PROCUREMENT"
-                title="INITIATE REQUEST"
+                label={step === 0 ? "SERVICE PROCUREMENT" : "MISSION CALIBRATION"}
+                title={step === 0 ? "INITIATE" : steps[step].toUpperCase()}
                 description={step === 0 ? "Select the category of support required." : "Provide specific mission parameters below."}
                 showBack
                 onBack={() => (step > 0 ? setStep(step - 1) : router.back())}
                 showNotification={false}
             />
 
-            {/* Tactical Stepper */}
-            <View className="flex-row px-8 py-6 gap-4 bg-white/50">
+            {/* ─── Tactical Stepper Matrix ───────────────────────────────────── */}
+            <View className="flex-row px-8 py-8 gap-5 bg-white/40 border-b border-card-border/50">
                 {steps.map((s, i) => (
-                    <View key={s} className="flex-1 gap-2">
-                        <View className={`h-1 rounded-full ${i <= step ? 'bg-primary shadow-sm' : 'bg-gray-100'}`} />
-                        <Text className={`text-label text-[9px] uppercase tracking-widest ${i === step ? 'text-primary font-jakarta-extrabold italic' : 'text-gray-400 font-jakarta-bold'}`}>
+                    <View key={s} className="flex-1 gap-2.5">
+                        <View className={`h-1.5 rounded-full ${i <= step ? 'bg-primary shadow-primary/20' : 'bg-card-border/30'}`} />
+                        <Text className={`text-label text-[10px] uppercase tracking-[2px] ${i === step ? 'text-primary font-jakarta-extrabold italic' : 'text-ink/20 font-jakarta-bold'}`}>
                             {s}
                         </Text>
                     </View>
@@ -148,14 +152,14 @@ export default function PostJobScreen() {
 
             <ScrollView
                 className="flex-1"
-                contentContainerStyle={{ paddingBottom: 150 }}
+                contentContainerStyle={{ paddingBottom: 160 }}
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
             >
-                {/* Step 1: Category Intelligence */}
+                {/* ─── Step 1: Protocol Classification ─────────────────────────── */}
                 {step === 0 && (
-                    <Animated.View entering={FadeInDown.springify()} className="px-8 pt-6">
-                        <View className="flex-row flex-wrap gap-4">
+                    <Animated.View entering={FadeInDown.springify()} className="px-8 pt-8">
+                        <View className="flex-row flex-wrap gap-5">
                             {[...CATEGORIES, { id: 'not_sure', label: 'Others', icon: 'help-circle' }].map((cat) => {
                                 const image = CATEGORY_IMAGES[cat.id];
                                 const isSelected = category === cat.id;
@@ -167,10 +171,10 @@ export default function PostJobScreen() {
                                             setCategory(cat.id);
                                             setErrors(prev => ({ ...prev, category: '' }));
                                         }}
-                                        className={`rounded-[24px] overflow-hidden border-[1.5px] shadow-md ${
-                                            isSelected ? 'border-primary' : (errors.category ? 'border-error' : 'border-card-border')
+                                        className={`rounded-[32px] overflow-hidden border-[1.5px] shadow-lg transition-transform ${
+                                            isSelected ? 'border-primary -translate-y-1 shadow-primary/20 shadow-2xl' : (errors.category ? 'border-error/50' : 'border-card-border/50')
                                         }`}
-                                        style={{ width: (width - 64 - 16) / 2, height: 180 }}
+                                        style={{ width: (width - 64 - 20) / 2, height: 200 }}
                                     >
                                         <ImageBackground
                                             source={image || { uri: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=800&auto=format&fit=crop' }}
@@ -179,22 +183,22 @@ export default function PostJobScreen() {
                                         >
                                             <View className={`absolute inset-0 ${isSelected ? 'bg-primary/80' : 'bg-ink/50'}`} />
                                             
-                                            <View className="absolute top-4 left-4 w-10 h-10 rounded-xl bg-white/20 border border-white/30 items-center justify-center backdrop-blur-sm">
+                                            <View className="absolute top-5 left-5 w-12 h-12 rounded-2xl bg-white/20 border border-white/30 items-center justify-center backdrop-blur-md shadow-inner">
                                                 <Ionicons
                                                     name={(cat as any).icon || 'hammer-outline'}
-                                                    size={22}
+                                                    size={24}
                                                     color="white"
                                                 />
                                             </View>
 
                                             {isSelected && (
-                                                <View className="absolute top-4 right-4 w-7 h-7 rounded-full bg-white items-center justify-center shadow-lg">
-                                                    <Ionicons name="checkmark" size={18} color="#00120C" />
+                                                <View className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white items-center justify-center shadow-2xl">
+                                                    <Ionicons name="checkmark-done" size={20} color="#00120C" />
                                                 </View>
                                             )}
 
-                                            <View className="absolute bottom-5 left-5 right-5">
-                                                <Text className="text-[15px] font-jakarta-extrabold text-white uppercase italic tracking-tight">
+                                            <View className="absolute bottom-6 left-6 right-6">
+                                                <Text className="text-[16px] font-jakarta-extrabold text-white uppercase italic tracking-tighter">
                                                     {cat.label}
                                                 </Text>
                                             </View>
@@ -203,36 +207,39 @@ export default function PostJobScreen() {
                                 );
                             })}
                         </View>
-                        {errors.category && <Text className="text-label text-error mt-6 text-[10px] normal-case px-2 font-jakarta-bold">{errors.category}</Text>}
+                        {errors.category && <Text className="text-label text-error mt-6 text-[11px] uppercase italic px-2 font-jakarta-extrabold tracking-widest">{errors.category}</Text>}
 
                         <PrimaryButton
-                            title="PROCEED"
+                            title="INITIALIZE INTEL PHASE"
                             onPress={() => {
                                 if (!category) {
-                                    setErrors({ category: 'Mission parameter missing: select a service' });
+                                    setErrors({ category: 'MISSION PARAMETER MISSING: SELECT SERVICE' });
                                 } else {
                                     setStep(1);
                                 }
                             }}
-                            className="mt-16 h-16 rounded-xl shadow-lg border border-primary"
-                            variant="primary"
+                            className="mt-16 h-18 rounded-2xl shadow-2xl border border-white/10"
                         />
                     </Animated.View>
                 )}
 
-                {/* Step 2: Mission Brief */}
+                {/* ─── Step 2: Intel Acquisition ───────────────────────────────── */}
                 {step === 1 && (
-                    <Animated.View entering={FadeInDown.springify()} className="px-8 pt-8">
-                        <Text className="text-h1 text-[32px] mb-2 uppercase italic font-jakarta-extrabold tracking-tight">Mission Brief</Text>
-                        <Text className="text-body text-muted mb-10 normal-case font-jakarta-medium">Detail the specific requirements for this mission.</Text>
+                    <Animated.View entering={FadeInDown.springify()} className="px-8 pt-10">
+                        <View className="flex-row items-center gap-2 mb-3 px-1">
+                            <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+                            <Text className="text-label text-primary tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">MISSION DEBRIEF</Text>
+                        </View>
+                        <Text className="text-h1 text-[40px] mb-3 uppercase italic font-jakarta-extrabold tracking-tighter text-ink">INTEL LOG</Text>
+                        <Text className="text-[15px] text-ink/60 mb-12 normal-case font-jakarta-medium italic">Detail the specific parameters for this operational objective.</Text>
 
-                        <View className={`bg-white rounded-[24px] border-[1.5px] overflow-hidden shadow-lg ${
-                            errors.description ? 'border-error' : 'border-card-border'
+                        <View className={`bg-white rounded-[32px] border-[1.5px] overflow-hidden shadow-2xl ${
+                            errors.description ? 'border-error/50 shadow-error/10' : 'border-card-border/50'
                         }`}>
                             <TextInput
-                                className="text-body text-ink text-base p-6 min-h-[160px] font-jakarta-medium leading-6"
+                                className="text-[16px] text-ink p-8 min-h-[220px] font-jakarta-medium italic leading-7"
                                 style={{ textAlignVertical: 'top' }}
-                                placeholder='Commence briefing here...'
+                                placeholder='Commence mission briefing here...'
                                 placeholderTextColor="#94A3B8"
                                 multiline
                                 autoFocus
@@ -243,109 +250,115 @@ export default function PostJobScreen() {
                                 }}
                             />
 
-                            <View className="flex-row items-center justify-between border-t border-gray-50 p-5 bg-surface/50">
-                                <View className="flex-row gap-3">
-                                    <TouchableOpacity className="flex-row items-center gap-[10px] bg-primary/10 px-4 py-2.5 rounded-lg border border-primary/20">
+                            <View className="flex-row items-center justify-between border-t border-card-border/30 p-6 bg-background shadow-inner">
+                                <View className="flex-row gap-4">
+                                    <TouchableOpacity className="flex-row items-center gap-2.5 bg-primary/10 px-5 py-3 rounded-2xl border border-primary/20 active:bg-primary/20">
                                         <Ionicons name="mic-outline" size={20} color="#00120C" />
-                                        <Text className="text-label text-primary text-[10px] uppercase font-jakarta-extrabold">Audio Log</Text>
+                                        <Text className="text-label text-primary text-[10px] uppercase font-jakarta-extrabold italic tracking-tight">AUDIO LOG</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity className="flex-row items-center gap-[10px] bg-white px-4 py-2.5 rounded-lg border border-card-border shadow-sm">
+                                    <TouchableOpacity className="flex-row items-center gap-2.5 bg-white px-5 py-3 rounded-2xl border border-card-border items-center justify-center shadow-sm active:bg-gray-50">
                                         <Ionicons name="images-outline" size={20} color="#64748B" />
-                                        <Text className="text-label text-muted text-[10px] uppercase font-jakarta-bold">Vision</Text>
+                                        <Text className="text-label text-ink/40 text-[10px] uppercase font-jakarta-extrabold italic tracking-tight">ASSET</Text>
                                     </TouchableOpacity>
                                 </View>
-                                <Text className="text-label text-muted text-[9px] uppercase font-jakarta-bold">{description.length}/500</Text>
+                                <View className="bg-white/80 px-4 py-2 rounded-full border border-card-border/50">
+                                    <Text className="text-label text-ink/30 text-[10px] uppercase font-jakarta-extrabold italic tracking-tighter">{description.length}/500</Text>
+                                </View>
                             </View>
                         </View>
-                        {errors.description && <Text className="text-label text-error mt-6 text-[10px] normal-case px-2 font-jakarta-bold">{errors.description}</Text>}
+                        {errors.description && <Text className="text-label text-error mt-6 text-[11px] uppercase italic px-2 font-jakarta-extrabold tracking-widest">{errors.description}</Text>}
 
                         <PrimaryButton
-                            title="ESTABLISH PARAMETERS"
+                            title="STAMP LOG & PROCEED"
                             onPress={() => {
                                 if (description.length < 10) {
-                                    setErrors({ description: 'Briefing insufficent: min 10 characters required' });
+                                    setErrors({ description: 'INTEL INSUFFICIENT: MIN 10 CHARACTERS' });
                                 } else {
                                     setStep(2);
                                 }
                             }}
-                            className="mt-16 h-16 rounded-xl shadow-lg"
+                            className="mt-16 h-18 rounded-2xl shadow-2xl border border-white/10"
                         />
                     </Animated.View>
                 )}
 
-                {/* Step 3: Location & Logistics */}
+                {/* ─── Step 3: Logistics & Priority ───────────────────────────── */}
                 {step === 2 && (
-                    <Animated.View entering={FadeInDown.springify()} className="px-8 pt-8">
-                        <Text className="text-h1 text-[32px] mb-2 uppercase italic font-jakarta-extrabold tracking-tight">Logistics</Text>
-                        <Text className="text-body text-muted mb-10 normal-case font-jakarta-medium">Define operational zone and budget allocation.</Text>
+                    <Animated.View entering={FadeInDown.springify()} className="px-8 pt-10">
+                        <View className="flex-row items-center gap-2 mb-3 px-1">
+                            <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+                            <Text className="text-label text-primary tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">LOGISTICAL PARAMETERS</Text>
+                        </View>
+                        <Text className="text-h1 text-[40px] mb-3 uppercase italic font-jakarta-extrabold tracking-tighter text-ink">LOGISTICS</Text>
+                        <Text className="text-[15px] text-ink/60 mb-12 normal-case font-jakarta-medium italic">Define operational zone and budget allocation matrix.</Text>
 
-                        <Text className="text-label mb-4 text-primary uppercase tracking-widest text-[10px] font-jakarta-extrabold">Deployment Zone</Text>
-                        <View className={`flex-row items-center bg-white rounded-2xl border-[1.5px] px-6 h-16 shadow-md gap-4 ${
-                            errors.address ? 'border-error' : 'border-card-border'
+                        <Text className="text-label mb-5 text-primary uppercase tracking-[5px] text-[10px] font-jakarta-extrabold italic px-1">DEPLOYMENT ZONE</Text>
+                        <View className={`flex-row items-center bg-white rounded-[24px] border-[1.5px] px-7 h-18 shadow-2xl gap-5 ${
+                            errors.address ? 'border-error/50 shadow-error/10' : 'border-card-border/50'
                         }`}>
-                            <Ionicons name="navigate-outline" size={24} color="#00120C" />
+                            <Ionicons name="navigate-outline" size={26} color="#00120C" />
                             <TextInput
-                                className="text-body flex-1 text-ink text-base font-jakarta-semibold"
+                                className="text-[16px] flex-1 text-ink font-jakarta-extrabold italic uppercase tracking-tight"
                                 value={address}
                                 onChangeText={(val) => {
                                     setAddress(val);
                                     if (val.length > 3) setErrors(prev => ({ ...prev, address: '' }));
                                 }}
-                                placeholder="Specify Area Code or Name"
+                                placeholder="SPECIFY AREA CODE OR NAME"
                                 placeholderTextColor="#94A3B8"
                             />
                         </View>
-                        {errors.address && <Text className="text-label text-error mt-4 text-[10px] normal-case px-2 font-jakarta-bold">{errors.address}</Text>}
+                        {errors.address && <Text className="text-label text-error mt-4 text-[11px] uppercase italic px-2 font-jakarta-extrabold tracking-widest">{errors.address}</Text>}
 
-                        <Text className="text-label mb-4 mt-12 text-primary uppercase tracking-widest text-[10px] font-jakarta-extrabold">Resource Allocation</Text>
-                        <Card className="bg-white rounded-[24px] p-6 border-[1.5px] border-card-border shadow-lg">
-                            <View className="flex-row items-center justify-between bg-surface rounded-xl p-3 border border-card-border/50">
+                        <Text className="text-label mb-5 mt-14 text-primary uppercase tracking-[5px] text-[10px] font-jakarta-extrabold italic px-1">BUDGET PROTOCOL</Text>
+                        <View className="bg-white rounded-[42px] p-10 border-[1.5px] border-card-border/50 shadow-2xl">
+                            <View className="flex-row items-center justify-between bg-background rounded-[28px] p-4 border border-card-border/30 shadow-inner">
                                 <TouchableOpacity
                                     onPress={() => setBudget(Math.max(1000, budget - 1000))}
-                                    activeOpacity={0.7}
-                                    className="w-14 h-14 rounded-lg bg-white items-center justify-center shadow-md border border-card-border"
+                                    activeOpacity={0.8}
+                                    className="w-16 h-16 rounded-2xl bg-white items-center justify-center shadow-xl border border-card-border active:scale-95"
                                 >
-                                    <Ionicons name="remove" size={24} color="#00120C" />
+                                    <Ionicons name="remove" size={30} color="#00120C" />
                                 </TouchableOpacity>
                                 
                                 <View className="items-center flex-1">
-                                    <Text className="text-h1 text-[36px] text-ink italic font-jakarta-extrabold tracking-tighter">{formatNaira(budget)}</Text>
+                                    <Text className="text-[38px] text-primary italic font-jakarta-extrabold tracking-tighter">{formatNaira(budget)}</Text>
                                 </View>
 
                                 <TouchableOpacity
                                     onPress={() => setBudget(budget + 1000)}
-                                    activeOpacity={0.7}
-                                    className="w-14 h-14 rounded-lg bg-primary items-center justify-center shadow-md border border-primary px-1"
+                                    activeOpacity={0.8}
+                                    className="w-16 h-16 rounded-2xl bg-primary items-center justify-center shadow-xl border border-primary active:scale-95 px-1"
                                 >
-                                    <Ionicons name="add" size={24} color="white" />
+                                    <Ionicons name="add" size={30} color="white" />
                                 </TouchableOpacity>
                             </View>
-                            <View className="mt-5 flex-row justify-center items-center gap-2">
+                            <View className="mt-8 flex-row justify-center items-center gap-3 opacity-40">
                                 <View className="w-1.5 h-1.5 rounded-full bg-accent" />
-                                <Text className="text-label text-muted text-[10px] uppercase font-jakarta-bold tracking-tight">
-                                    Suggested Range: ₦5k — ₦45k
+                                <Text className="text-label text-ink text-[10px] uppercase font-jakarta-extrabold tracking-[4px] italic">
+                                    SUGGESTED RANGE: ₦5K — ₦50K
                                 </Text>
                             </View>
-                        </Card>
+                        </View>
 
-                        <View className="mt-12 gap-5">
-                            <Text className="text-label text-primary uppercase tracking-widest text-[10px] font-jakarta-extrabold">Urgency Protocol</Text>
-                            <View className="flex-row gap-3">
+                        <View className="mt-14 gap-6">
+                            <Text className="text-label text-primary uppercase tracking-[5px] text-[10px] font-jakarta-extrabold italic px-1">URGENCY TERMINAL</Text>
+                            <View className="flex-row gap-4">
                                 {URGENCY_OPTIONS.map((opt) => {
                                     const isSelected = urgency === opt.value;
                                     return (
                                         <TouchableOpacity
                                             key={opt.value}
-                                            activeOpacity={0.8}
+                                            activeOpacity={0.9}
                                             onPress={() => setUrgency(opt.value)}
-                                            className={`flex-1 py-5 rounded-xl border-[1.5px] items-center justify-center shadow-sm ${
+                                            className={`flex-1 py-6 rounded-2xl border-[1.5px] items-center justify-center shadow-lg transition-transform ${
                                                 isSelected 
-                                                    ? (opt.value === 'now' ? 'bg-error border-error' : 'bg-primary border-primary') 
-                                                    : 'bg-white border-card-border'
+                                                    ? (opt.value === 'now' ? 'bg-error border-error shadow-error/20 -translate-y-1' : 'bg-primary border-primary shadow-primary/20 -translate-y-1') 
+                                                    : 'bg-white border-card-border/50'
                                             }`}
                                         >
-                                            <Text className={`text-label text-[10px] tracking-widest uppercase ${
-                                                isSelected ? 'text-white font-jakarta-extrabold' : 'text-ink font-jakarta-bold'
+                                            <Text className={`text-[11px] tracking-[2px] uppercase font-jakarta-extrabold italic ${
+                                                isSelected ? 'text-white' : 'text-ink'
                                             }`}>
                                                 {opt.label.split(' ')[1]}
                                             </Text>
@@ -356,87 +369,96 @@ export default function PostJobScreen() {
                         </View>
 
                         <PrimaryButton
-                            title="REVIEW PROTOCOL"
+                            title="VERIFY MISSION AUDIT"
                             onPress={() => {
                                 if (!address || address.length < 3) {
-                                    setErrors({ address: 'Deployment zone invalid: specify a valid area' });
+                                    setErrors({ address: 'INVALID ZONE: SPECIFY AREA' });
                                 } else {
                                     setStep(3);
                                 }
                             }}
-                            className="mt-16 h-16 rounded-xl shadow-xl border border-primary/10"
+                            className="mt-16 h-18 rounded-2xl shadow-2xl border border-white/10"
                         />
                     </Animated.View>
                 )}
 
-                {/* Step 4: Final Validation */}
+                {/* ─── Step 4: Final Mission Audit ─────────────────────────────── */}
                 {step === 3 && (
-                    <Animated.View entering={FadeInDown.springify()} className="px-8 pt-8">
-                        <Text className="text-h1 text-[32px] mb-2 uppercase italic font-jakarta-extrabold tracking-tight">Final Audit</Text>
-                        <Text className="text-body text-muted mb-10 normal-case font-jakarta-medium">Verify mission parameters before broadcast.</Text>
+                    <Animated.View entering={FadeInDown.springify()} className="px-8 pt-10">
+                        <View className="flex-row items-center gap-2 mb-3 px-1">
+                            <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+                            <Text className="text-label text-primary tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">TRANSMISSION REVIEW</Text>
+                        </View>
+                        <Text className="text-h1 text-[40px] mb-3 uppercase italic font-jakarta-extrabold tracking-tighter text-ink">FINAL AUDIT</Text>
+                        <Text className="text-[15px] text-ink/60 mb-12 normal-case font-jakarta-medium italic">Verify mission parameters before system-wide broadcast.</Text>
 
-                        <Card className="gap-10 p-8 bg-white border-[1.5px] border-card-border rounded-[32px] shadow-2xl overflow-hidden">
+                        <View className="gap-12 p-10 bg-white border-[1.5px] border-card-border/50 rounded-[42px] shadow-3xl overflow-hidden">
                             <View className="flex-row justify-between items-center">
-                                <View className="gap-2">
-                                    <Text className="text-label text-primary text-[10px] uppercase font-jakarta-extrabold tracking-widest">Service Classification</Text>
-                                    <Text className="text-h2 text-ink uppercase italic font-jakarta-extrabold">
-                                        {CATEGORIES.find((c) => c.id === category)?.label || 'Other Support'}
+                                <View className="gap-3">
+                                    <Text className="text-label text-primary text-[10px] uppercase font-jakarta-extrabold tracking-[5px] italic">CLASSIFICATION</Text>
+                                    <Text className="text-[26px] text-ink uppercase italic font-jakarta-extrabold tracking-tighter">
+                                        {CATEGORIES.find((c) => c.id === category)?.label || 'OTHER SUPPORT'}
                                     </Text>
                                 </View>
-                                <View className="w-14 h-14 rounded-2xl bg-primary/5 items-center justify-center border border-primary/10">
-                                    <Ionicons name={CATEGORIES.find((c) => c.id === category)?.icon as any || 'shield'} size={32} color="#00120C" />
+                                <View className="w-16 h-16 rounded-3xl bg-background items-center justify-center border border-card-border/50 shadow-inner">
+                                    <Ionicons name={CATEGORIES.find((c) => c.id === category)?.icon as any || 'shield-outline'} size={32} color="#00120C" />
                                 </View>
                             </View>
 
-                            <View className="gap-3">
-                                <Text className="text-label text-primary text-[10px] uppercase font-jakarta-extrabold tracking-widest">Mission Objective</Text>
-                                <Text className="text-body text-ink leading-7 normal-case font-jakarta-medium" numberOfLines={5}>{description}</Text>
+                            <View className="gap-4">
+                                <Text className="text-label text-primary text-[10px] uppercase font-jakarta-extrabold tracking-[5px] italic">MISSION OBJECTIVE</Text>
+                                <Text className="text-[15px] text-ink/70 leading-7 italic font-jakarta-medium" numberOfLines={6}>{description}</Text>
                             </View>
 
-                            <View className="h-[1px] bg-gray-50" />
+                            <View className="h-[1.5px] bg-card-border/20" />
 
                             <View className="flex-row justify-between items-end">
-                                <View className="gap-2 flex-1">
-                                    <Text className="text-label text-primary text-[10px] uppercase font-jakarta-extrabold tracking-widest">Operational Zone</Text>
-                                    <Text className="text-body font-jakarta-bold uppercase text-ink tracking-tight shadow-sm">{address}</Text>
+                                <View className="gap-3 flex-1">
+                                    <Text className="text-label text-primary text-[10px] uppercase font-jakarta-extrabold tracking-[5px] italic">TARGET ZONE</Text>
+                                    <View className="flex-row items-center gap-2">
+                                        <Ionicons name="navigate" size={14} color="#00120C" />
+                                        <Text className="text-[16px] font-jakarta-extrabold uppercase text-ink tracking-tight italic">{address}</Text>
+                                    </View>
                                 </View>
-                                <View className="gap-2 items-end">
-                                    <Text className="text-label text-primary text-[10px] uppercase font-jakarta-extrabold tracking-widest">Priority</Text>
+                                <View className="gap-3 items-end">
+                                    <Text className="text-label text-primary text-[10px] uppercase font-jakarta-extrabold tracking-[5px] italic">PRIORITY</Text>
                                     <Badge label={URGENCY_OPTIONS.find(o => o.value === urgency)?.label.split(' ')[1].toUpperCase()} variant={urgency === 'now' ? 'accent' : 'success'} />
                                 </View>
                             </View>
 
-                            <View className="bg-primary rounded-[20px] p-8 flex-row justify-between items-center shadow-xl border border-primary">
+                            <View className="bg-ink rounded-[42px] p-10 flex-row justify-between items-center shadow-3xl border border-white/10 mt-2">
                                 <View>
-                                    <Text className="text-label text-white/50 text-[10px] uppercase font-jakarta-bold tracking-widest">Resource Allocation</Text>
-                                    <Text className="text-h2 text-white text-[32px] uppercase italic font-jakarta-extrabold tracking-tighter mt-1">{formatNaira(budget)}</Text>
+                                    <Text className="text-label text-white/40 text-[10px] uppercase font-jakarta-extrabold tracking-[5px] italic">RESOURCE UNIT</Text>
+                                    <Text className="text-[34px] text-white uppercase italic font-jakarta-extrabold tracking-tighter mt-2">{formatNaira(budget)}</Text>
                                 </View>
-                                <View className="w-12 h-12 rounded-full bg-white/10 items-center justify-center border border-white/20">
-                                    <Ionicons name="wallet-outline" size={24} color="white" />
+                                <View className="w-16 h-16 rounded-[48px] bg-white/10 items-center justify-center border border-white/20 shadow-inner">
+                                    <Ionicons name="wallet-outline" size={30} color="white" />
                                 </View>
                             </View>
-                        </Card>
+                        </View>
 
-                        <View className="mt-14 gap-5">
+                        <View className="mt-16 gap-6">
                             <PrimaryButton
-                                title="LOAD TO GRID"
+                                title="BROADCAST TO GRID"
                                 onPress={handleSubmit}
                                 loading={loading}
                                 variant="accent"
-                                className="h-16 rounded-xl shadow-2xl"
+                                className="h-18 rounded-2xl shadow-3xl border border-white/10"
                             />
-                            <View className="flex-row justify-center items-center gap-2">
-                                <Ionicons name="lock-closed-outline" size={12} color="#94A3B8" />
-                                <Text className="text-label text-center text-muted text-[10px] uppercase tracking-widest opacity-60 font-jakarta-bold">
-                                    Secure Transmission protocol active
+                            <View className="flex-row justify-center items-center gap-2.5 opacity-30 pointer-events-none">
+                                <Ionicons name="lock-closed" size={12} color="#94A3B8" />
+                                <Text className="text-label text-center text-muted text-[9px] uppercase tracking-[5px] font-jakarta-extrabold italic">
+                                    SECURE TRANSMISSION PROTOCOL ACTIVE
                                 </Text>
                             </View>
                         </View>
                     </Animated.View>
                 )}
+                
+                <View className="mt-20 items-center opacity-20 pointer-events-none">
+                    <Text className="text-[9px] text-muted uppercase tracking-[5px] font-jakarta-bold italic">Operational Directive Matrix v4.2 • Loom Command</Text>
+                </View>
             </ScrollView>
         </View>
     );
 }
-
-
