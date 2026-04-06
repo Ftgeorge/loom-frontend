@@ -4,7 +4,6 @@ import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { EmptyState } from '@/components/ui/StateComponents';
 import { notificationApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { timeAgo } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -13,11 +12,11 @@ import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
 
 const TYPE_ICONS: Record<string, { icon: string; color: string; bg: string }> = {
-    job_update: { icon: 'briefcase-outline', color: Colors.primary, bg: Colors.primaryLight },
-    message: { icon: 'chatbubbles-outline', color: Colors.primary, bg: Colors.primaryLight },
-    booking: { icon: 'calendar-outline', color: Colors.primary, bg: Colors.primaryLight },
-    review: { icon: 'star-outline', color: Colors.accent, bg: Colors.accentLight },
-    system: { icon: 'shield-outline', color: Colors.muted, bg: Colors.gray100 },
+    job_update: { icon: 'briefcase-outline', color: '#078365', bg: '#0783651A' },
+    message: { icon: 'chatbubbles-outline', color: '#078365', bg: '#0783651A' },
+    booking: { icon: 'calendar-outline', color: '#078365', bg: '#0783651A' },
+    review: { icon: 'star-outline', color: '#F59E0B', bg: '#F59E0B1A' },
+    system: { icon: 'shield-outline', color: '#64748B', bg: '#F1F5F9' },
 };
 
 export default function NotificationsScreen() {
@@ -36,6 +35,7 @@ export default function NotificationsScreen() {
                 message: row.body,
                 read: Boolean(row.read),
                 createdAt: row.created_at,
+                metadata: row.metadata,
             }));
             setNotifications(mapped || []);
         } catch {
@@ -52,7 +52,7 @@ export default function NotificationsScreen() {
     useEffect(() => { load(); }, [load]);
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.3} animated />
             <AppHeader
                 title="Notifications"
@@ -64,24 +64,14 @@ export default function NotificationsScreen() {
             {!loading && notifications.length > 0 && (
                 <TouchableOpacity 
                     onPress={handleMarkAllRead}
-                    style={{ 
-                        alignSelf: 'flex-end', 
-                        marginHorizontal: 24, 
-                        marginBottom: 16,
-                        paddingVertical: 8,
-                        paddingHorizontal: 12,
-                        borderRadius: Radius.full,
-                        backgroundColor: Colors.surface,
-                        borderWidth: 1,
-                        borderColor: Colors.cardBorder
-                    }}
+                    className="self-end mx-6 mb-4 py-2 px-3 rounded-full bg-surface border border-card-border"
                 >
-                    <Text style={[Typography.label, { fontSize: 10, color: Colors.primary }]}>MARK ALL READ</Text>
+                    <Text className="text-label text-[10px] text-primary uppercase">Mark all read</Text>
                 </TouchableOpacity>
             )}
 
             {loading ? (
-                <View style={{ padding: 24 }}><SkeletonList count={5} type="notification" /></View>
+                <View className="p-6"><SkeletonList count={5} type="notification" /></View>
             ) : notifications.length === 0 ? (
                 <EmptyState
                     icon="notifications-off-outline"
@@ -103,69 +93,47 @@ export default function NotificationsScreen() {
                         return (
                             <Animated.View entering={FadeInRight.delay(index * 30).springify()}>
                                 <TouchableOpacity
-                                    style={{
-                                        flexDirection: 'row',
-                                        padding: 20,
-                                        gap: 16,
-                                        backgroundColor: item.read ? Colors.canvas : Colors.white,
-                                        borderRadius: Radius.lg,
-                                        marginBottom: 12,
-                                        borderWidth: 1,
-                                        borderColor: item.read ? Colors.divider : Colors.cardBorder,
-                                        ...(!item.read ? Shadows.md : {})
-                                    }}
+                                    className={`flex-row p-5 gap-4 rounded-lg mb-3 border ${
+                                        item.read ? 'bg-canvas border-divider' : 'bg-white border-card-border shadow-md'
+                                    }`}
                                     onPress={() => markNotificationRead(item.id)}
                                     activeOpacity={0.8}
                                 >
-                                    <View style={{
-                                        width: 48,
-                                        height: 48,
-                                        borderRadius: Radius.md,
-                                        backgroundColor: typeInfo.bg || Colors.primaryLight,
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                    }}>
+                                    <View 
+                                        className="w-12 h-12 rounded-md items-center justify-center"
+                                        style={{ backgroundColor: typeInfo.bg }}
+                                    >
                                         <Ionicons
                                             name={typeInfo.icon as any}
                                             size={22}
-                                            color={typeInfo.color || Colors.primary}
+                                            color={typeInfo.color}
                                         />
                                     </View>
 
-                                    <View style={{ flex: 1 }}>
-                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                                    <View className="flex-1">
+                                        <View className="flex-row justify-between items-center mb-1">
                                             <Text 
-                                                style={[Typography.h3, { 
-                                                    fontSize: 15, 
-                                                    flex: 1, 
-                                                    color: Colors.ink,
-                                                    fontFamily: item.read ? 'PlusJakartaSans-SemiBold' : 'PlusJakartaSans-Bold'
-                                                }]} 
+                                                className={`text-h3 text-[15px] flex-1 text-ink uppercase ${
+                                                    item.read ? 'font-jakarta-semibold' : 'font-jakarta-bold'
+                                                }`} 
                                                 numberOfLines={1}
                                             >
                                                 {item.title}
                                             </Text>
                                             {!item.read && (
-                                                <View style={{
-                                                    width: 8,
-                                                    height: 8,
-                                                    borderRadius: 4,
-                                                    backgroundColor: Colors.accent,
-                                                }} />
+                                                <View className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                                             )}
                                         </View>
                                         <Text
-                                            style={[Typography.bodySmall, { 
-                                                color: item.read ? Colors.muted : Colors.text, 
-                                                lineHeight: 20,
-                                                fontSize: 13
-                                            }]}
+                                            className={`text-body-sm text-[13px] leading-[20px] normal-case ${
+                                                item.read ? 'text-muted' : 'text-body'
+                                            }`}
                                             numberOfLines={2}
                                         >
                                             {item.body}
                                         </Text>
-                                        <Text style={[Typography.label, { fontSize: 9, color: Colors.muted, letterSpacing: 0, marginTop: 8 }]}>
-                                            {timeAgo(item.createdAt).toUpperCase()}
+                                        <Text className="text-label text-[9px] text-muted mt-2 uppercase italic tracking-normal">
+                                            {timeAgo(item.createdAt)}
                                         </Text>
                                     </View>
                                 </TouchableOpacity>
@@ -177,3 +145,4 @@ export default function NotificationsScreen() {
         </View>
     );
 }
+

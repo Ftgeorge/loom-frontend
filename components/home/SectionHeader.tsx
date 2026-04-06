@@ -1,4 +1,3 @@
-import { Colors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -8,49 +7,32 @@ interface SectionHeaderProps {
     title: string;
     action?: string;
     onAction?: () => void;
+    className?: string;
 }
 
-export function SectionHeader({ overline, title, action, onAction }: SectionHeaderProps) {
+export function SectionHeader({ overline, title, action, onAction, className = '' }: SectionHeaderProps) {
     return (
-        <View style={{
-            flexDirection: 'row',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            marginBottom: 20,
-        }}>
+        <View className={`flex-row items-end justify-between mb-5 ${className}`}>
             <View>
-                <Text style={{
-                    fontSize: 10, fontFamily: 'Inter-SemiBold',
-                    color: Colors.muted, letterSpacing: 0.8,
-                    textTransform: 'uppercase', marginBottom: 4,
-                }}>
+                <Text className="text-[10px] font-inter-semibold text-muted tracking-[0.8px] uppercase mb-1">
                     {overline}
                 </Text>
-                <Text style={{ fontSize: 20, fontFamily: 'PlusJakartaSans-Bold', color: Colors.ink }}>
+                <Text className="text-[20px] font-jakarta-bold text-ink">
                     {title}
                 </Text>
             </View>
             {action && onAction && (
                 <TouchableOpacity
                     onPress={onAction}
-                    style={{
-                        // backgroundColor: Colors.canvas,
-                        // paddingHorizontal: 12,
-                        paddingVertical: 6,
-                        // borderRadius: Radius.full,
-                        // borderWidth: 1,
-                        // borderColor: Colors.cardBorder,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: 4,
-                    }}
+                    className="py-[6px] flex-row items-center gap-1"
                 >
-                    <Text style={{ fontSize: 12, fontFamily: 'Inter-SemiBold', color: Colors.primary }}>
+                    <Text className="text-[12px] font-inter-semibold text-primary">
                         {action}
                     </Text>
-                    <Ionicons name="chevron-forward" size={11} color={Colors.primary} />
+                    <Ionicons name="chevron-forward" size={11} className="text-primary" />
                 </TouchableOpacity>
             )}
         </View>
     );
 }
+

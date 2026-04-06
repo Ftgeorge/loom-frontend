@@ -1,9 +1,8 @@
 import { LoomThread } from '@/components/ui/LoomThread';
 import { useAppStore } from "@/store";
-import { Colors, Radius, Shadows, Typography } from "@/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { ActivityIndicator, Dimensions, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
 import Animated, {
   Easing,
   interpolate,
@@ -13,8 +12,6 @@ import Animated, {
   withSpring,
   withTiming
 } from "react-native-reanimated";
-
-const { width } = Dimensions.get('window');
 
 const LETTERS = ["L", "o", "o", "m"];
 const LETTER_DELAY = 80;
@@ -34,9 +31,7 @@ function AnimatedLetter({
     progress.value = withDelay(
       index * LETTER_DELAY,
       withSpring(1, {
-        damping: 15,
-        stiffness: 100,
-        mass: 1,
+        damping: 15, stiffness: 100, mass: 1,
       })
     );
   }, []);
@@ -51,7 +46,8 @@ function AnimatedLetter({
 
   return (
     <Animated.Text
-      style={[styles.letter, animatedStyle]}
+      style={animatedStyle}
+      className="font-jakarta-extrabold text-[84px] text-white tracking-[-6px]"
     >
       {letter}
     </Animated.Text>
@@ -76,7 +72,6 @@ export default function SplashScreen() {
       withTiming(1, { duration: 800, easing: Easing.out(Easing.quad) }),
     );
 
-    // Auto-navigation timer (3.5 seconds)
     const timer = setTimeout(() => {
       handleContinue();
     }, 3500);
@@ -108,119 +103,40 @@ export default function SplashScreen() {
   }));
 
   return (
-    <View style={styles.container}>
-      <View style={StyleSheet.absoluteFill}>
+    <View className="flex-1 bg-primary items-center justify-center">
+      <View className="absolute inset-0">
         <LoomThread
           variant="complex"
-          color={Colors.accent}
+          color="#CCFF00" 
           opacity={0.15}
           animated
         />
       </View>
 
-      <View style={styles.center}>
-        <View style={styles.wordRow}>
+      <View className="items-center z-10">
+        <View className="flex-row items-center">
           {LETTERS.map((letter, i) => (
             <AnimatedLetter key={i} letter={letter} index={i} />
           ))}
         </View>
 
-        <Animated.View style={[styles.taglineBox, taglineStyle]}>
-          <View style={styles.labelLine} />
-          <Text style={styles.tagline}>
+        <Animated.View style={taglineStyle} className="flex-row items-center gap-3 mt-3">
+          <View className="h-[1px] w-5 bg-white/20" />
+          <Text className="text-[9px] text-white/50 font-jakarta-bold tracking-[3px] uppercase">
             SERVICES. SIMPLIFIED.
           </Text>
-          <View style={styles.labelLine} />
+          <View className="h-[1px] w-5 bg-white/20" />
         </Animated.View>
       </View>
 
-      <Animated.View style={[styles.footer, indicatorStyle]}>
-        <ActivityIndicator color={Colors.white} size="small" style={{ marginBottom: 20 }} />
-        <Text style={styles.version}>LOADING...</Text>
+      <Animated.View style={indicatorStyle} className="absolute bottom-16 w-full px-10 items-center">
+        <ActivityIndicator color="white" size="small" className="mb-5" />
+        <Text className="mt-2 text-[8px] text-white/30 font-inter-medium tracking-[2px] uppercase">Loading Content</Text>
       </Animated.View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  center: {
-    alignItems: "center",
-    zIndex: 10,
-  },
-  wordRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  letter: {
-    fontFamily: "PlusJakartaSans-ExtraBold",
-    fontSize: 84,
-    color: Colors.white,
-    letterSpacing: -6,
-  },
-  taglineBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
-  },
-  labelLine: {
-    height: 1,
-    width: 20,
-    backgroundColor: Colors.gray300,
-    opacity: 0.5,
-  },
-  tagline: {
-    fontSize: 9,
-    color: Colors.gray300,
-    fontFamily: "PlusJakartaSans-Bold",
-    letterSpacing: 3,
-    textTransform: 'uppercase',
-  },
-  footer: {
-    position: "absolute",
-    bottom: 64,
-    width: '100%',
-    paddingHorizontal: 40,
-    alignItems: 'center',
-  },
-  button: {
-    backgroundColor: Colors.white,
-    height: 64,
-    width: '100%',
-    borderRadius: Radius.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    ...Shadows.lg,
-  },
-  buttonText: {
-    color: Colors.primary,
-    fontSize: 12,
-    fontFamily: "PlusJakartaSans-Bold",
-    letterSpacing: 1,
-  },
-  btnIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: Radius.xs,
-    backgroundColor: Colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  version: {
-    marginTop: 24,
-    fontSize: 8,
-    color: 'rgba(255,255,255,0.3)',
-    fontFamily: "Inter-Medium",
-    letterSpacing: 2,
-  }
-});
+
 
 

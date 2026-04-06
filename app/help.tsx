@@ -2,7 +2,6 @@ import { AppHeader } from "@/components/AppHeader";
 import { PrimaryButton } from "@/components/ui/Buttons";
 import { Card } from "@/components/ui/CardChipBadge";
 import { AppTextInput } from "@/components/ui/TextInputs";
-import { Colors } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -50,32 +49,32 @@ export default function HelpScreen() {
       />
 
       <ScrollView
-        contentContainerStyle={{ padding: 20, paddingBottom: 100 }}
+        contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        <Text className="text-2xl font-bold mb-5">
+        <Text className="text-h1 text-[24px] mb-6 uppercase">
           Frequently Asked Questions
         </Text>
 
         {FAQ_ITEMS.map((item, i) => (
-          <Card key={i} className="mb-2" noPadding>
+          <Card key={i} className="mb-3 overflow-hidden p-0">
             <TouchableOpacity
               className="flex-row justify-between items-center p-5"
               onPress={() => setExpanded(expanded === i ? null : i)}
               activeOpacity={0.7}
             >
-              <Text className="text-base font-medium flex-1 mr-2">
+              <Text className={`text-body text-[15px] flex-1 mr-4 uppercase tracking-tighter ${expanded === i ? 'text-primary font-jakarta-bold' : 'text-ink font-jakarta-semibold'}`}>
                 {item.q}
               </Text>
               <Ionicons
                 name={expanded === i ? "chevron-up" : "chevron-down"}
                 size={20}
-                color={Colors.gray500}
+                color={expanded === i ? "#078365" : "#94A3B8"}
               />
             </TouchableOpacity>
             {expanded === i && (
-              <View className="px-5 pb-5">
-                <Text className="text-sm text-gray-600 leading-[22px]">
+              <View className="px-5 pb-5 border-t border-gray-50 pt-4">
+                <Text className="text-body text-muted leading-[22px] normal-case">
                   {item.a}
                 </Text>
               </View>
@@ -83,35 +82,41 @@ export default function HelpScreen() {
           </Card>
         ))}
 
-        <Text className="text-2xl font-bold mt-10 mb-5">Contact Support</Text>
+        <Text className="text-h1 text-[24px] mt-12 mb-6 uppercase">Contact Support</Text>
         <AppTextInput
-          placeholder="Describe your issue..."
+          placeholder="DESCRIBE YOUR ISSUE..."
           value={contactMsg}
           onChangeText={setContactMsg}
           multiline
           numberOfLines={4}
-          style={{ minHeight: 100, textAlignVertical: "top" }}
+          className="min-h-[140px] p-5 shadow-sm"
+          style={{ textAlignVertical: "top" }}
         />
         <PrimaryButton
-          title="Send Message"
+          title="SEND MESSAGE"
           onPress={() => {
             setContactMsg("");
           }}
           disabled={!contactMsg.trim()}
-          style={{ marginTop: 16 }}
+          className="mt-6 h-15 rounded-md"
         />
 
-        <View className="mt-8 gap-4">
-          <View className="flex-row items-center gap-2">
-            <Ionicons name="mail-outline" size={18} color={Colors.gray500} />
-            <Text className="text-base text-gray-600">support@loom.ng</Text>
+        <View className="mt-12 gap-5 px-1">
+          <View className="flex-row items-center gap-4 bg-surface p-4 rounded-xl border border-card-border shadow-xs">
+            <View className="w-10 h-10 rounded-full bg-primary/10 items-center justify-center">
+              <Ionicons name="mail-outline" size={18} color="#078365" />
+            </View>
+            <Text className="text-body text-ink font-jakarta-bold">support@loom.ng</Text>
           </View>
-          <View className="flex-row items-center gap-2">
-            <Ionicons name="call-outline" size={18} color={Colors.gray500} />
-            <Text className="text-base text-gray-600">+234 901 234 5678</Text>
+          <View className="flex-row items-center gap-4 bg-surface p-4 rounded-xl border border-card-border shadow-xs">
+            <View className="w-10 h-10 rounded-full bg-info/10 items-center justify-center">
+              <Ionicons name="call-outline" size={18} color="#3B82F6" />
+            </View>
+            <Text className="text-body text-ink font-jakarta-bold">+234 901 234 5678</Text>
           </View>
         </View>
       </ScrollView>
     </View>
   );
 }
+

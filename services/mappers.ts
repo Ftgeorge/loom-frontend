@@ -242,6 +242,9 @@ function mapJobStatus(status: string): JobRequest["status"] {
     switch (status) {
         case "open": return "submitted";
         case "assigned": return "matched";
+        case "accepted": return "accepted";
+        case "on_the_way": return "on_the_way";
+        case "in_progress": return "in_progress";
         case "completed": return "completed";
         case "cancelled": return "cancelled";
         default: return "submitted";

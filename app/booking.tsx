@@ -4,7 +4,6 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { artisanApi, jobApi } from '@/services/api';
 import { mapArtisan } from '@/services/mappers';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { Artisan } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -56,7 +55,6 @@ export default function BookingScreen() {
         if (!artisan) return;
         setLoading(true);
         try {
-            // 1. Create Job Request
             const jobRes = await jobApi.create({
                 description: notes || `Service booking with ${artisan.name}`,
                 skill: artisan.skills[0] || 'general',
@@ -65,9 +63,7 @@ export default function BookingScreen() {
                 location: `${user?.location?.area}, ${user?.location?.city}`
             });
 
-            // 2. Assign to this specific artisan
             await jobApi.assign(jobRes.id, artisan.id);
-
             router.push('/(tabs)/requests');
         } catch (err: any) {
             console.error("[Booking] Error:", err);
@@ -81,7 +77,7 @@ export default function BookingScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.3} animated />
             <SubAppHeader
                 label="BOOKING"
@@ -93,59 +89,39 @@ export default function BookingScreen() {
             />
 
             <ScrollView
+                className="flex-1"
                 contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Protocol Header */}
-                {/* Content Removed (Now in Header) */}
-
                 {/* Date Selection */}
                 <Animated.View entering={FadeInDown.delay(100).springify()}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                        <Ionicons name="calendar-outline" size={14} color={Colors.primary} />
-                        <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>CHOOSE DATE</Text>
+                    <View className="flex-row items-center gap-2 mb-4">
+                        <Ionicons name="calendar-outline" size={14} color="#078365" />
+                        <Text className="text-label text-primary text-[10px] uppercase">Choose Date</Text>
                     </View>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -24 }}>
-                        <View style={{ flexDirection: 'row', paddingHorizontal: 24, gap: 12 }}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} className="-mx-6">
+                        <View className="flex-row px-6 gap-3">
                             {DAYS.map((d) => (
                                 <TouchableOpacity
                                     key={d.date}
                                     activeOpacity={0.8}
                                     onPress={() => setSelectedDate(d.date)}
-                                    style={{
-                                        width: 72,
-                                        height: 100,
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        borderRadius: Radius.md,
-                                        backgroundColor: selectedDate === d.date ? Colors.primary : Colors.white,
-                                        borderWidth: 1.5,
-                                        borderColor: selectedDate === d.date ? Colors.primary : Colors.cardBorder,
-                                        ...Shadows.sm
-                                    }}
+                                    className={`w-[72px] h-[100px] items-center justify-center rounded-md border-[1.5px] shadow-sm ${
+                                        selectedDate === d.date ? 'bg-primary border-primary' : 'bg-white border-card-border'
+                                    }`}
                                 >
-                                    <View style={{
-                                        position: 'absolute',
-                                        top: 8,
-                                        width: 12,
-                                        height: 1,
-                                        backgroundColor: selectedDate === d.date ? Colors.accent : Colors.cardBorder,
-                                    }} />
-                                    <Text style={[Typography.label, {
-                                        color: selectedDate === d.date ? 'rgba(255,255,255,0.6)' : Colors.muted,
-                                        fontSize: 9,
-                                        textTransform: 'uppercase'
-                                    }]}>{d.day}</Text>
-                                    <Text style={[Typography.h2, {
-                                        color: selectedDate === d.date ? Colors.white : Colors.text,
-                                        fontSize: 24,
-                                        marginVertical: 4
-                                    }]}>{d.num}</Text>
-                                    <Text style={[Typography.label, {
-                                        color: selectedDate === d.date ? Colors.accent : Colors.primary,
-                                        fontSize: 9,
-                                        fontWeight: '800'
-                                    }]}>{d.month.toUpperCase()}</Text>
+                                    <View className={`absolute top-2 w-3 h-[1px] ${
+                                        selectedDate === d.date ? 'bg-accent' : 'bg-card-border'
+                                    }`} />
+                                    <Text className={`text-label text-[9px] uppercase font-jakarta-medium ${
+                                        selectedDate === d.date ? 'text-white/60' : 'text-muted'
+                                    }`}>{d.day}</Text>
+                                    <Text className={`text-h2 text-[24px] my-1 font-jakarta-bold ${
+                                        selectedDate === d.date ? 'text-white' : 'text-body'
+                                    }`}>{d.num}</Text>
+                                    <Text className={`text-label text-[9px] uppercase font-jakarta-extrabold ${
+                                        selectedDate === d.date ? 'text-accent' : 'text-primary'
+                                    }`}>{d.month}</Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
@@ -153,83 +129,61 @@ export default function BookingScreen() {
                 </Animated.View>
 
                 {/* Time Selection */}
-                <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginTop: 40 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                        <Ionicons name="time-outline" size={14} color={Colors.primary} />
-                        <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>SELECT TIME</Text>
+                <Animated.View entering={FadeInDown.delay(200).springify()} className="mt-10">
+                    <View className="flex-row items-center gap-2 mb-4">
+                        <Ionicons name="time-outline" size={14} color="#078365" />
+                        <Text className="text-label text-primary text-[10px] uppercase">Select Time</Text>
                     </View>
-                    {/* Profile Header Removed (Now in Header) */}
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                    <View className="flex-row flex-wrap gap-3">
                         {TIME_SLOTS.map((t) => (
                             <TouchableOpacity
                                 key={t}
                                 activeOpacity={0.8}
                                 onPress={() => setSelectedTime(t)}
-                                style={{
-                                    paddingHorizontal: 16,
-                                    paddingVertical: 12,
-                                    borderRadius: Radius.xs,
-                                    backgroundColor: selectedTime === t ? Colors.accent : Colors.white,
-                                    borderWidth: 1.5,
-                                    borderColor: selectedTime === t ? Colors.accent : Colors.cardBorder,
-                                    ...Shadows.sm
-                                }}
+                                className={`px-4 py-3 rounded-xs border-[1.5px] shadow-sm ${
+                                    selectedTime === t ? 'bg-accent border-accent' : 'bg-white border-card-border'
+                                }`}
                             >
-                                <Text style={[Typography.label, {
-                                    fontSize: 10,
-                                    color: selectedTime === t ? Colors.white : Colors.primary,
-                                    fontWeight: '800'
-                                }]}>{t}</Text>
+                                <Text className={`text-label text-[10px] font-jakarta-extrabold uppercase ${
+                                    selectedTime === t ? 'text-white' : 'text-primary'
+                                }`}>{t}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>
                 </Animated.View>
 
-                {/* Mission Data */}
-                <Animated.View entering={FadeInDown.delay(300).springify()} style={{ marginTop: 40 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                        <Ionicons name="document-text-outline" size={14} color={Colors.primary} />
-                        <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>SERVICE DETAILS</Text>
+                {/* Service Details */}
+                <Animated.View entering={FadeInDown.delay(300).springify()} className="mt-10">
+                    <View className="flex-row items-center gap-2 mb-4">
+                        <Ionicons name="document-text-outline" size={14} color="#078365" />
+                        <Text className="text-label text-primary text-[10px] uppercase">Service Details</Text>
                     </View>
-                    <View style={{
-                        backgroundColor: Colors.white,
-                        borderRadius: Radius.md,
-                        borderWidth: 1.5,
-                        borderColor: Colors.cardBorder,
-                        padding: 16,
-                        minHeight: 140,
-                        ...Shadows.sm
-                    }}>
+                    <View className="bg-white rounded-md border-[1.5px] border-card-border p-4 min-h-[140px] shadow-sm">
                         <TextInput
-                            style={[Typography.body, { color: Colors.text, textAlignVertical: 'top', fontSize: 14 }]}
-                            placeholder="Tell the artisan:  more about what you need..."
-                            placeholderTextColor={Colors.muted}
+                            className="text-body text-ink text-[14px] p-0"
+                            placeholder="Tell the artisan more about what you need..."
+                            placeholderTextColor="#94A3B8"
                             multiline
                             value={notes}
                             onChangeText={setNotes}
+                            style={{ textAlignVertical: 'top' }}
                         />
                     </View>
                 </Animated.View>
 
-                {/* Protocol Deployment */}
-                <Animated.View entering={FadeInDown.delay(400).springify()} style={{ marginTop: 48 }}>
+                {/* Footer Action */}
+                <Animated.View entering={FadeInDown.delay(400).springify()} className="mt-12">
                     <PrimaryButton
                         title="CONFIRM BOOKING"
                         onPress={handleConfirm}
                         loading={loading}
                         disabled={!selectedTime}
                         variant="accent"
-                        style={{ height: 64, borderRadius: Radius.md, ...Shadows.md }}
+                        className="h-16 rounded-md shadow-md"
                     />
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 8,
-                        marginTop: 20
-                    }}>
-                        <Ionicons name="shield-checkmark" size={12} color={Colors.success} />
-                        <Text style={[Typography.label, { textAlign: 'center', color: Colors.muted, fontSize: 8, textTransform: 'none' }]}>
+                    <View className="flex-row items-center justify-center gap-2 mt-5">
+                        <Ionicons name="shield-checkmark" size={12} color="#22C55E" />
+                        <Text className="text-label text-muted text-[8px] normal-case font-jakarta-medium">
                             PROFESSIONAL SERVICE GUARANTEED
                         </Text>
                     </View>
@@ -238,3 +192,4 @@ export default function BookingScreen() {
         </View>
     );
 }
+

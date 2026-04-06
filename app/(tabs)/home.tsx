@@ -1,6 +1,5 @@
 import { artisanApi, jobApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors } from '@/theme';
 import type { Artisan } from '@/types';
 import { CATEGORIES } from '@/types';
 import { useRouter, useFocusEffect } from 'expo-router';
@@ -31,7 +30,7 @@ export default function ClientHomeScreen() {
     const { user, jobs, selectedState, selectedCity } = useAppStore();
     const [artisans, setArtisans] = useState<Artisan[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
+    const [, setError] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [viewLayout, setViewLayout] = useState<'grid' | 'list'>('grid');
 
@@ -76,7 +75,7 @@ export default function ClientHomeScreen() {
     const firstName = user?.name?.split(' ')[0] || 'there';
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.canvas }}>
+        <View className="flex-1 bg-canvas">
             <LoomThread variant="minimal" opacity={0.3} animated />
             <SubAppHeader
                 showLocation
@@ -89,11 +88,9 @@ export default function ClientHomeScreen() {
 
             <ScrollView
                 contentContainerStyle={{ padding: 24, paddingBottom: 130 }}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00120C" />}
                 showsVerticalScrollIndicator={false}
             >
-                {/* ─── Greeting Removed (Now in Header) ───────────────────────── */}
-
                 {/* ─── Active Job Banner ─────────────────────────────────────── */}
                 {activeJobs.length > 0 && (
                     <ActiveJobBanner
@@ -102,18 +99,13 @@ export default function ClientHomeScreen() {
                     />
                 )}
 
-                {/* ─── Natural Language Search ───────────────────────────────── */}
-                {/* <Animated.View entering={FadeInDown.delay(160).springify()}>
-                    <NLSearchBar onPress={() => router.push({ pathname: '/search', params: { category: 'all' } })} />
-                </Animated.View> */}
-
                 {/* ─── Post a Job CTA ────────────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(380).springify()}>
                     <PostJobCTA onPress={() => router.push('/post-job')} />
                 </Animated.View>
 
                 {/* ─── Categories ────────────────────────────────────────────── */}
-                <Animated.View entering={FadeInDown.delay(220).springify()} style={{ marginBottom: 48 }}>
+                <Animated.View entering={FadeInDown.delay(220).springify()} className="mb-12">
                     <SectionHeader
                         overline="Categories"
                         title="What type of service?"
@@ -123,7 +115,7 @@ export default function ClientHomeScreen() {
                     <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator={false}
-                        style={{ marginHorizontal: -24 }}
+                        className="-mx-6"
                         contentContainerStyle={{ paddingHorizontal: 24, gap: 12, paddingBottom: 4 }}
                     >
                         {CATEGORIES.map((cat) => (
@@ -136,58 +128,22 @@ export default function ClientHomeScreen() {
                     </ScrollView>
                 </Animated.View>
 
-
-                {/* ─── Top Professionals ─────────────────────────────────────── */}
-                {/* <Animated.View entering={FadeInDown.delay(300).springify()} style={{ marginBottom: 48 }}>
-                    <SectionHeader
-                        overline="Top artisans"
-                        title="Highest Rated Near You"
-                        action="View all"
-                        onAction={() => router.push('/search')}
-                    />
-
-                    {loading ? (
-                        <SkeletonHorizontalList count={3} />
-                    ) : error ? (
-                        <ErrorState onRetry={load} />
-                    ) : (
-                        <FlatList
-                            data={topRated}
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            style={{ marginHorizontal: -24 }}
-                            contentContainerStyle={{ paddingHorizontal: 24, gap: 12 }}
-                            keyExtractor={item => item.id}
-                            initialNumToRender={4}
-                            renderItem={({ item, index }) => (
-                                <Animated.View entering={FadeInRight.delay(340 + index * 80).springify()}>
-                                    <ArtisanCard
-                                        artisan={item}
-                                        featured={index === 0}
-                                        onPress={() => router.push({ pathname: '/artisan-profile', params: { id: item.id } })}
-                                    />
-                                </Animated.View>
-                            )}
-                        />
-                    )}
-                </Animated.View> */}
-
                 {/* ─── Nearby Artisans ──────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(440).springify()}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                    <View className="flex-row justify-between items-center mb-5">
                         <View>
-                            <Text style={{ fontSize: 10, fontFamily: 'Inter-SemiBold', color: Colors.muted, letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 4 }}>
+                            <Text className="text-[10px] font-inter-semibold text-muted tracking-[0.8px] uppercase mb-1">
                                 NEARBY
                             </Text>
-                            <Text style={{ fontSize: 20, fontFamily: 'PlusJakartaSans-Bold', color: Colors.ink }}>
+                            <Text className="text-[20px] font-jakarta-bold text-ink">
                                 Available Artisans
                             </Text>
                         </View>
 
                         {/* Layout Switch */}
                         <LayoutSwitch
-                        viewLayout={viewLayout}
-                        setViewLayout={setViewLayout}
+                            viewLayout={viewLayout}
+                            setViewLayout={setViewLayout}
                         />
                     </View>
 
@@ -202,12 +158,12 @@ export default function ClientHomeScreen() {
                             onAction={() => router.push('/profile-completion')}
                         />
                     ) : (
-                        <View style={viewLayout === 'grid' ? { flexDirection: 'row', flexWrap: 'wrap', gap: 12 } : { gap: 16 }}>
+                        <View className={viewLayout === 'grid' ? "flex-row flex-wrap gap-3" : "gap-4"}>
                             {artisans.slice(0, 10).map((art, index) => (
                                 <Animated.View
                                     key={art.id}
                                     entering={FadeInDown.delay(480 + index * 80).springify()}
-                                    style={viewLayout === 'grid' ? { width: '48.2%' } : { width: '100%' }}
+                                    className={viewLayout === 'grid' ? "w-[48.2%]" : "w-full"}
                                 >
                                     <ArtisanCard
                                         artisan={art}
@@ -224,3 +180,4 @@ export default function ClientHomeScreen() {
         </View>
     );
 }
+

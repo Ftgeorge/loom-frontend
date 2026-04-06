@@ -35,7 +35,7 @@ export default function ForgotPasswordScreen() {
                     <Animated.View entering={FadeInDown.delay(100)}>
                         <Text style={Typography.h1}>Check Your Phone</Text>
                         <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 8, marginBottom: 40 }]}>
-                            We've sent a password reset link to your phone number. Follow the link to reset your password.
+                            We&apos;ve sent a password reset link to your phone number. Follow the link to reset your password.
                         </Text>
                         <PrimaryButton
                             title="Back to Sign In"
@@ -62,7 +62,7 @@ export default function ForgotPasswordScreen() {
                 <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 40, marginTop: 24 }}>
                     <Text style={Typography.h1}>Forgot Password?</Text>
                     <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 8 }]}>
-                        Enter your phone number and we'll send you a link to reset your password.
+                        Enter your phone number and we&apos;ll send you a link to reset your password.
                     </Text>
                 </Animated.View>
 

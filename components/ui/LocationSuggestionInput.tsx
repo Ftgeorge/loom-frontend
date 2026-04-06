@@ -3,12 +3,8 @@ import {
     View,
     Text,
     TouchableOpacity,
-    FlatList,
-    StyleSheet,
-    Platform
 } from 'react-native';
 import { AppTextInput } from './TextInputs';
-import { Colors, Radius, Typography, Shadows } from '@/theme';
 
 interface LocationSuggestionInputProps {
     label: string;
@@ -18,6 +14,7 @@ interface LocationSuggestionInputProps {
     suggestions: string[];
     error?: string;
     containerStyle?: any;
+    className?: string;
 }
 
 export function LocationSuggestionInput({
@@ -27,7 +24,8 @@ export function LocationSuggestionInput({
     onChangeText,
     suggestions,
     error,
-    containerStyle
+    containerStyle,
+    className = ''
 }: LocationSuggestionInputProps) {
     const [isFocused, setIsFocused] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -40,7 +38,10 @@ export function LocationSuggestionInput({
     }, [value, suggestions]);
 
     return (
-        <View style={[{ zIndex: showSuggestions && filteredSuggestions.length > 0 ? 100 : 1 }, containerStyle]}>
+        <View 
+            style={[containerStyle]} 
+            className={`${showSuggestions && filteredSuggestions.length > 0 ? 'z-[100]' : 'z-[1]'} ${className}`}
+        >
             <AppTextInput
                 label={label}
                 placeholder={placeholder}
@@ -63,20 +64,17 @@ export function LocationSuggestionInput({
             />
 
             {showSuggestions && filteredSuggestions.length > 0 && (
-                <View style={styles.suggestionsContainer}>
+                <View className="absolute top-[85px] left-0 right-0 bg-surface rounded-sm border-[1px] border-card-border shadow-md z-[1000] elevation-10">
                     {filteredSuggestions.map((item, index) => (
                         <TouchableOpacity
                             key={item}
-                            style={[
-                                styles.suggestionItem,
-                                index === filteredSuggestions.length - 1 && { borderBottomWidth: 0 }
-                            ]}
+                            className={`py-[14px] px-4 border-b-[1px] border-divider ${index === filteredSuggestions.length - 1 ? 'border-b-0' : ''}`}
                             onPress={() => {
                                 onChangeText(item);
                                 setShowSuggestions(false);
                             }}
                         >
-                            <Text style={styles.suggestionText}>
+                            <Text className="text-body text-ink text-[14px]">
                                 {item}
                             </Text>
                         </TouchableOpacity>
@@ -87,29 +85,3 @@ export function LocationSuggestionInput({
     );
 }
 
-const styles = StyleSheet.create({
-    suggestionsContainer: {
-        position: 'absolute',
-        top: 85, // Adjust based on input height + label
-        left: 0,
-        right: 0,
-        backgroundColor: Colors.white,
-        borderRadius: Radius.sm,
-        borderWidth: 1,
-        borderColor: Colors.cardBorder,
-        ...Shadows.md,
-        zIndex: 1000,
-        elevation: 10,
-    },
-    suggestionItem: {
-        paddingVertical: 14,
-        paddingHorizontal: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: Colors.divider,
-    },
-    suggestionText: {
-        ...Typography.body,
-        fontSize: 14,
-        color: Colors.ink,
-    }
-});

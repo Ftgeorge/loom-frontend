@@ -5,7 +5,7 @@ import { AppTextInput, PasswordInput } from "@/components/ui/TextInputs";
 import { authApi } from "@/services/api";
 import { mapUser } from "@/services/mappers";
 import { useAppStore } from "@/store";
-import { Colors, Radius, Shadows, Typography } from "@/theme";
+import { Colors, Radius, Typography } from "@/theme";
 import { SignInSchema, mapZodErrors } from "@/utils/helpers";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -131,7 +131,7 @@ export default function SignInScreen() {
             borderColor: Colors.cardBorder
           }}>
             <Text style={[Typography.label, { color: Colors.muted, fontSize: 10, textTransform: 'none' }]}>
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Text
                 onPress={() => router.push("/role-selection")}
                 style={{ color: Colors.primary, fontWeight: "800" }}

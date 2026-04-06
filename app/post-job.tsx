@@ -1,11 +1,10 @@
 import { SubAppHeader } from '@/components/AppSubHeader';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
-import { Badge, Card, Chip } from '@/components/ui/CardChipBadge';
+import { Badge, Card } from '@/components/ui/CardChipBadge';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { jobApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
-import type { CategoryId, Urgency } from '@/types';
+import type { Urgency } from '@/types';
 import { CATEGORIES } from '@/types';
 import { CATEGORY_IMAGES } from '@/components/home/CategoryPill';
 import { JobRequestSchema, mapZodErrors, formatNaira } from '@/utils/helpers';
@@ -22,7 +21,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import Animated, { FadeIn, FadeInDown, useAnimatedStyle, withSpring, useSharedValue, interpolateColor } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 const { width } = Dimensions.get('window');
 
@@ -48,7 +47,6 @@ export default function PostJobScreen() {
     const steps = ['Type', 'Info', 'Where', 'OK'];
 
     const handleSubmit = async () => {
-        // Final validation
         const result = JobRequestSchema.safeParse({
             category,
             description,
@@ -60,7 +58,6 @@ export default function PostJobScreen() {
         if (!result.success) {
             const errs = mapZodErrors(result.error);
             setErrors(errs);
-            // Go to step with error
             if (errs.category) setStep(0);
             else if (errs.description) setStep(1);
             else if (errs.address || errs.budget) setStep(2);
@@ -69,7 +66,6 @@ export default function PostJobScreen() {
 
         setLoading(true);
         try {
-            // POST /jobs — backend schema: { title, description, location }
             const backendJob = await jobApi.create({
                 skill: category,
                 description,
@@ -78,10 +74,8 @@ export default function PostJobScreen() {
                 urgency,
             });
 
-            // Map the response to our frontend type
             const { mapJob } = require('@/services/mappers');
             addJob(mapJob(backendJob));
-
             setSubmitted(true);
         } catch (err: any) {
             Alert.alert('Error', err.message ?? 'Something went wrong. Please try again.');
@@ -92,38 +86,29 @@ export default function PostJobScreen() {
 
     if (submitted) {
         return (
-            <View style={{ flex: 1, backgroundColor: Colors.background, paddingHorizontal: 32, justifyContent: 'center', alignItems: 'center' }}>
+            <View className="flex-1 bg-background px-8 justify-center items-center">
                 <LoomThread variant="dense" opacity={0.2} animated />
-                <Animated.View entering={FadeIn.duration(800).springify()} style={{
-                    width: 120,
-                    height: 120,
-                    borderRadius: 60,
-                    backgroundColor: Colors.primaryLight,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: 40,
-                    ...Shadows.lg
-                }}>
-                    <Ionicons name="shield-checkmark" size={64} color={Colors.primary} />
+                <Animated.View entering={FadeIn.duration(800).springify()} className="w-30 h-30 rounded-full bg-primary/10 items-center justify-center mb-10 shadow-lg">
+                    <Ionicons name="shield-checkmark" size={64} color="#078365" />
                 </Animated.View>
 
-                <Text style={[Typography.h1, { textAlign: 'center', fontSize: 32 }]}>Done!</Text>
-                <Text style={[Typography.body, { textAlign: 'center', marginTop: 16, color: Colors.muted, lineHeight: 24 }]}>
+                <Text className="text-h1 text-center text-[32px] uppercase">Done!</Text>
+                <Text className="text-body text-center mt-4 text-muted leading-6">
                     Your job is out! We are looking for the best hands for you.
                 </Text>
 
-                <View style={{ width: '100%', marginTop: 56, gap: 12 }}>
+                <View className="w-full mt-14 gap-3">
                     <PrimaryButton
-                        title="Who's in?"
+                        title="WHO'S IN?"
                         onPress={() => router.push({ pathname: '/matched-artisans', params: { skill: category } })}
                         variant="accent"
-                        style={{ height: 64, borderRadius: Radius.md, ...Shadows.md }}
+                        className="h-16 rounded-md shadow-md"
                     />
                     <SecondaryButton
-                        title="Home"
+                        title="HOME"
                         onPress={() => router.back()}
-                        style={{ height: 60, borderRadius: Radius.md, borderColor: Colors.primary }}
-                        textStyle={{ color: Colors.primary }}
+                        className="h-15 rounded-md border-primary"
+                        textStyle={{ color: '#078365', fontFamily: 'PlusJakartaSans-Bold' }}
                     />
                 </View>
             </View>
@@ -131,7 +116,7 @@ export default function PostJobScreen() {
     }
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.3} animated />
             <SubAppHeader
                 label="POST A JOB"
@@ -143,23 +128,12 @@ export default function PostJobScreen() {
             />
 
             {/* Technical Stepper */}
-            <View style={{ flexDirection: 'row', paddingHorizontal: 24, paddingVertical: 20, gap: 12 }}>
+            <View className="flex-row px-6 py-5 gap-3">
                 {steps.map((s, i) => (
-                    <View key={s} style={{ flex: 1, gap: 6 }}>
-                        <View style={{
-                            height: 3,
-                            borderRadius: 1.5,
-                            backgroundColor: i <= step ? Colors.primary : Colors.gray200
-                        }} />
-                        <Text style={[
-                            Typography.label,
-                            {
-                                color: i === step ? Colors.primary : Colors.gray400,
-                                fontSize: 8,
-                                fontWeight: i === step ? '800' : '600'
-                            }
-                        ]}>
-                            {s.toUpperCase()}
+                    <View key={s} className="flex-1 gap-[6px]">
+                        <View className={`h-[3px] rounded-full ${i <= step ? 'bg-primary' : 'bg-gray-200'}`} />
+                        <Text className={`text-label text-[8px] uppercase ${i === step ? 'text-primary font-jakarta-extrabold' : 'text-gray-400 font-jakarta-bold'}`}>
+                            {s}
                         </Text>
                     </View>
                 ))}
@@ -172,9 +146,9 @@ export default function PostJobScreen() {
             >
                 {/* Step 1: Category */}
                 {step === 0 && (
-                    <Animated.View entering={FadeInDown.springify()} style={{ paddingHorizontal: 24, paddingTop: 16 }}>
+                    <Animated.View entering={FadeInDown.springify()} className="px-6 pt-4">
 
-                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+                        <View className="flex-row flex-wrap gap-3">
                             {[...CATEGORIES, { id: 'not_sure', label: 'Other Support', icon: 'help-circle' }].map((cat) => {
                                 const image = CATEGORY_IMAGES[cat.id];
                                 return (
@@ -185,39 +159,18 @@ export default function PostJobScreen() {
                                             setCategory(cat.id);
                                             setErrors(prev => ({ ...prev, category: '' }));
                                         }}
-                                        style={{
-                                            width: (width - 48 - 12) / 2,
-                                            height: 160,
-                                            borderRadius: Radius.lg,
-                                            overflow: 'hidden',
-                                            borderWidth: 2,
-                                            borderColor: category === cat.id ? Colors.primary : (errors.category ? Colors.error : 'transparent'),
-                                            ...Shadows.sm
-                                        }}
+                                        className={`rounded-lg overflow-hidden border-2 shadow-sm ${
+                                            category === cat.id ? 'border-primary' : (errors.category ? 'border-error' : 'border-transparent')
+                                        }`}
+                                        style={{ width: (width - 48 - 12) / 2, height: 160 }}
                                     >
                                         <ImageBackground
                                             source={image || { uri: 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=800&auto=format&fit=crop' }}
-                                            style={{ width: '100%', height: '100%' }}
+                                            className="w-full h-full"
                                         >
-                                            <View style={{
-                                                position: 'absolute',
-                                                top: 0, left: 0, right: 0, bottom: 0,
-                                                backgroundColor: category === cat.id ? 'rgba(7, 131, 101, 0.7)' : 'rgba(0,0,0,0.45)',
-                                            }} />
+                                            <View className={`absolute inset-0 ${category === cat.id ? 'bg-primary/70' : 'bg-black/45'}`} />
                                             
-                                            <View style={{
-                                                position: 'absolute',
-                                                top: 12,
-                                                left: 12,
-                                                width: 36,
-                                                height: 36,
-                                                borderRadius: 12,
-                                                backgroundColor: 'rgba(255,255,255,0.2)',
-                                                borderWidth: 1,
-                                                borderColor: 'rgba(255,255,255,0.3)',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                            }}>
+                                            <View className="absolute top-3 left-3 w-9 h-9 rounded-xl bg-white/20 border border-white/30 items-center justify-center">
                                                 <Ionicons
                                                     name={(cat as any).icon || 'hammer-outline'}
                                                     size={20}
@@ -226,32 +179,13 @@ export default function PostJobScreen() {
                                             </View>
 
                                             {category === cat.id && (
-                                                <View style={{
-                                                    position: 'absolute',
-                                                    top: 12,
-                                                    right: 12,
-                                                    width: 24,
-                                                    height: 24,
-                                                    borderRadius: 12,
-                                                    backgroundColor: Colors.white,
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}>
-                                                    <Ionicons name="checkmark" size={16} color={Colors.primary} />
+                                                <View className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white items-center justify-center">
+                                                    <Ionicons name="checkmark" size={16} color="#078365" />
                                                 </View>
                                             )}
 
-                                            <View style={{
-                                                position: 'absolute',
-                                                bottom: 12,
-                                                left: 12,
-                                                right: 12
-                                            }}>
-                                                <Text style={{
-                                                    fontSize: 14,
-                                                    fontFamily: 'PlusJakartaSans-Bold',
-                                                    color: Colors.white,
-                                                }}>
+                                            <View className="absolute bottom-3 left-3 right-3">
+                                                <Text className="text-[14px] font-jakarta-bold text-white uppercase">
                                                     {cat.label}
                                                 </Text>
                                             </View>
@@ -260,10 +194,10 @@ export default function PostJobScreen() {
                                 );
                             })}
                         </View>
-                        {errors.category && <Text style={[Typography.label, { color: Colors.error, marginTop: 16, fontSize: 10, textTransform: 'none' }]}>{errors.category}</Text>}
+                        {errors.category && <Text className="text-label text-error mt-4 text-[10px] normal-case">{errors.category}</Text>}
 
                         <PrimaryButton
-                            title="Go"
+                            title="NEXT STEP"
                             onPress={() => {
                                 if (!category) {
                                     setErrors({ category: 'Please select a service' });
@@ -271,7 +205,7 @@ export default function PostJobScreen() {
                                     setStep(1);
                                 }
                             }}
-                            style={{ marginTop: 48, height: 64, borderRadius: Radius.md }}
+                            className="mt-12 h-16 rounded-md"
                             variant="primary"
                         />
                     </Animated.View>
@@ -279,23 +213,18 @@ export default function PostJobScreen() {
 
                 {/* Step 2: Description */}
                 {step === 1 && (
-                    <Animated.View entering={FadeInDown.springify()} style={{ paddingHorizontal: 24, paddingTop: 16 }}>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>Tell us more</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Say everything we need to know.</Text>
+                    <Animated.View entering={FadeInDown.springify()} className="px-6 pt-4">
+                        <Text className="text-h1 text-[28px] mb-2 uppercase">Tell us more</Text>
+                        <Text className="text-body text-muted mb-8 normal-case">Say everything we need to know.</Text>
 
-                        <View style={{
-                            backgroundColor: Colors.white,
-                            borderRadius: Radius.lg,
-                            borderWidth: 1.5,
-                            borderColor: errors.description ? Colors.error : Colors.cardBorder,
-                            padding: 20,
-                            minHeight: 220,
-                            ...Shadows.md
-                        }}>
+                        <View className={`bg-white rounded-lg border-[1.5px] p-5 min-h-[220px] shadow-md ${
+                            errors.description ? 'border-error' : 'border-card-border'
+                        }`}>
                             <TextInput
-                                style={[Typography.body, { color: Colors.text, textAlignVertical: 'top', height: 140, fontSize: 16 }]}
+                                className="text-body text-ink text-base min-h-[140px]"
+                                style={{ textAlignVertical: 'top' }}
                                 placeholder='Write here...'
-                                placeholderTextColor={Colors.gray400}
+                                placeholderTextColor="#94A3B8"
                                 multiline
                                 autoFocus
                                 value={description}
@@ -305,21 +234,21 @@ export default function PostJobScreen() {
                                 }}
                             />
 
-                            <View style={{ flexDirection: 'row', borderTopWidth: 1, borderTopColor: Colors.gray100, paddingTop: 16, gap: 12 }}>
-                                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: Colors.primaryLight, paddingHorizontal: 12, paddingVertical: 8, borderRadius: Radius.xs }}>
-                                    <Ionicons name="mic-outline" size={18} color={Colors.primary} />
-                                    <Text style={[Typography.label, { color: Colors.primary, fontSize: 9, textTransform: 'none' }]}>Voice Note</Text>
+                            <View className="flex-row border-t border-gray-100 pt-4 gap-3">
+                                <TouchableOpacity className="flex-row items-center gap-[6px] bg-primary/10 px-3 py-2 rounded-xs">
+                                    <Ionicons name="mic-outline" size={18} color="#078365" />
+                                    <Text className="text-label text-primary text-[9px] normal-case">Voice Note</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: Colors.gray100, paddingHorizontal: 12, paddingVertical: 8, borderRadius: Radius.xs }}>
-                                    <Ionicons name="images-outline" size={18} color={Colors.muted} />
-                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 9, textTransform: 'none' }]}>Add Photo</Text>
+                                <TouchableOpacity className="flex-row items-center gap-[6px] bg-gray-100 px-3 py-2 rounded-xs">
+                                    <Ionicons name="images-outline" size={18} color="#64748B" />
+                                    <Text className="text-label text-muted text-[9px] normal-case">Add Photo</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        {errors.description && <Text style={[Typography.label, { color: Colors.error, marginTop: 16, fontSize: 10, textTransform: 'none' }]}>{errors.description}</Text>}
+                        {errors.description && <Text className="text-label text-error mt-4 text-[10px] normal-case">{errors.description}</Text>}
 
                         <PrimaryButton
-                            title="Go"
+                            title="NEXT STEP"
                             onPress={() => {
                                 if (description.length < 10) {
                                     setErrors({ description: 'Please provide more details (min 10 chars)' });
@@ -327,108 +256,68 @@ export default function PostJobScreen() {
                                     setStep(2);
                                 }
                             }}
-                            style={{ marginTop: 48, height: 64, borderRadius: Radius.md }}
+                            className="mt-12 h-16 rounded-md"
                         />
                     </Animated.View>
                 )}
 
                 {/* Step 3: Location & Budget */}
                 {step === 2 && (
-                    <Animated.View entering={FadeInDown.springify()} style={{ paddingHorizontal: 24, paddingTop: 16 }}>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>Where & Cash</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 40 }]}>Where and how much cash?</Text>
+                    <Animated.View entering={FadeInDown.springify()} className="px-6 pt-4">
+                        <Text className="text-h1 text-[28px] mb-2 uppercase">Where & Cash</Text>
+                        <Text className="text-body text-muted mb-10 normal-case">Where and how much cash?</Text>
 
-                        <Text style={[Typography.label, { marginBottom: 12, color: Colors.primary }]}>WHERE?</Text>
-                        <View style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            backgroundColor: Colors.white,
-                            borderRadius: Radius.md,
-                            borderWidth: 1.5,
-                            borderColor: errors.address ? Colors.error : Colors.cardBorder,
-                            paddingHorizontal: 20,
-                            height: 64,
-                            marginBottom: 8,
-                            gap: 16,
-                            ...Shadows.sm
-                        }}>
-                            <Ionicons name="navigate-outline" size={24} color={Colors.primary} />
+                        <Text className="text-label mb-3 text-primary uppercase">Where?</Text>
+                        <View className={`flex-row items-center bg-white rounded-md border-[1.5px] px-5 h-16 mb-2 gap-4 shadow-sm ${
+                            errors.address ? 'border-error' : 'border-card-border'
+                        }`}>
+                            <Ionicons name="navigate-outline" size={24} color="#078365" />
                             <TextInput
-                                style={[Typography.body, { flex: 1, color: Colors.text, fontSize: 16 }]}
+                                className="text-body flex-1 text-ink text-base"
                                 value={address}
                                 onChangeText={(val) => {
                                     setAddress(val);
                                     if (val.length > 3) setErrors(prev => ({ ...prev, address: '' }));
                                 }}
                                 placeholder="Your area"
-                                placeholderTextColor={Colors.gray400}
+                                placeholderTextColor="#94A3B8"
                             />
                         </View>
-                        {errors.address && <Text style={[Typography.label, { color: Colors.error, marginBottom: 16, fontSize: 10, textTransform: 'none' }]}>{errors.address}</Text>}
+                        {errors.address && <Text className="text-label text-error mb-4 text-[10px] normal-case">{errors.address}</Text>}
 
-                        <Text style={[Typography.label, { marginBottom: 16, marginTop: 32, color: Colors.primary }]}>CASH?</Text>
-                        <View style={{
-                            backgroundColor: Colors.white,
-                            borderRadius: Radius.lg,
-                            padding: 20,
-                            borderWidth: 1.5,
-                            borderColor: Colors.cardBorder,
-                            ...Shadows.sm
-                        }}>
-                            <View style={{ 
-                                flexDirection: 'row', 
-                                alignItems: 'center', 
-                                justifyContent: 'space-between',
-                                backgroundColor: Colors.gray100,
-                                borderRadius: Radius.md,
-                                padding: 8
-                            }}>
+                        <Text className="text-label mb-4 mt-8 text-primary uppercase">Cash?</Text>
+                        <View className="bg-white rounded-lg p-5 border-[1.5px] border-card-border shadow-sm">
+                            <View className="flex-row items-center justify-between bg-gray-100 rounded-md p-2">
                                 <TouchableOpacity
                                     onPress={() => setBudget(Math.max(1000, budget - 1000))}
                                     activeOpacity={0.7}
-                                    style={{ 
-                                        width: 48, 
-                                        height: 48, 
-                                        borderRadius: Radius.sm, 
-                                        backgroundColor: Colors.white, 
-                                        alignItems: 'center', 
-                                        justifyContent: 'center',
-                                        ...Shadows.xs
-                                    }}
+                                    className="w-12 h-12 rounded-sm bg-white items-center justify-center shadow-xs"
                                 >
-                                    <Ionicons name="remove" size={20} color={Colors.primary} />
+                                    <Ionicons name="remove" size={20} color="#078365" />
                                 </TouchableOpacity>
                                 
-                                <View style={{ alignItems: 'center', flex: 1 }}>
-                                    <Text style={[Typography.h1, { fontSize: 32, color: Colors.text }]}>{formatNaira(budget)}</Text>
+                                <View className="items-center flex-1">
+                                    <Text className="text-h1 text-[32px] text-ink">{formatNaira(budget)}</Text>
                                 </View>
 
                                 <TouchableOpacity
                                     onPress={() => setBudget(budget + 1000)}
                                     activeOpacity={0.7}
-                                    style={{ 
-                                        width: 48, 
-                                        height: 48, 
-                                        borderRadius: Radius.sm, 
-                                        backgroundColor: Colors.primary, 
-                                        alignItems: 'center', 
-                                        justifyContent: 'center',
-                                        ...Shadows.xs
-                                    }}
+                                    className="w-12 h-12 rounded-sm bg-primary items-center justify-center shadow-xs"
                                 >
-                                    <Ionicons name="add" size={20} color={Colors.white} />
+                                    <Ionicons name="add" size={20} color="white" />
                                 </TouchableOpacity>
                             </View>
-                            <View style={{ marginTop: 16, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
-                                <Text style={[Typography.bodySmall, { color: Colors.muted, fontSize: 11 }]}>
+                            <View className="mt-4 flex-row justify-center items-center gap-[6px]">
+                                <Text className="text-body-sm text-muted text-[11px] normal-case">
                                     Suggested: ₦5k — ₦45k
                                 </Text>
                             </View>
                         </View>
 
-                        <View style={{ marginTop: 40, gap: 16 }}>
-                            <Text style={[Typography.label, { color: Colors.primary }]}>WHEN?</Text>
-                            <View style={{ flexDirection: 'row', gap: 10 }}>
+                        <View className="mt-10 gap-4">
+                            <Text className="text-label text-primary uppercase">When?</Text>
+                            <View className="flex-row gap-[10px]">
                                 {URGENCY_OPTIONS.map((opt) => {
                                     const isSelected = urgency === opt.value;
                                     return (
@@ -436,27 +325,17 @@ export default function PostJobScreen() {
                                             key={opt.value}
                                             activeOpacity={0.7}
                                             onPress={() => setUrgency(opt.value)}
-                                            style={{
-                                                flex: 1,
-                                                paddingVertical: 18,
-                                                borderRadius: Radius.md,
-                                                backgroundColor: isSelected ? (opt.value === 'now' ? Colors.error : Colors.primary) : Colors.white,
-                                                borderWidth: 1.5,
-                                                borderColor: isSelected ? 'transparent' : Colors.cardBorder,
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                ...(isSelected ? Shadows.md : {}),
-                                                transform: [{ scale: isSelected ? 1.02 : 1 }]
-                                            }}
+                                            className={`flex-1 py-[18px] rounded-md border-[1.5px] items-center justify-center ${
+                                                isSelected 
+                                                    ? (opt.value === 'now' ? 'bg-error border-error shadow-md' : 'bg-primary border-primary shadow-md') 
+                                                    : 'bg-white border-card-border'
+                                            }`}
+                                            style={{ transform: [{ scale: isSelected ? 1.02 : 1 }] }}
                                         >
-                                            <Text style={[Typography.label, { 
-                                                color: isSelected ? Colors.white : Colors.text,
-                                                fontSize: 10,
-                                                letterSpacing: 1,
-                                                textTransform: 'uppercase',
-                                                fontWeight: isSelected ? '900' : '600'
-                                            }]}>
-                                                {opt.label.split(' ').slice(1).join(' ')}
+                                            <Text className={`text-label text-[10px] tracking-[1px] uppercase ${
+                                                isSelected ? 'text-white font-jakarta-extrabold' : 'text-ink font-jakarta-bold'
+                                            }`}>
+                                                {opt.label.split(' ')[1]}
                                             </Text>
                                         </TouchableOpacity>
                                     );
@@ -465,7 +344,7 @@ export default function PostJobScreen() {
                         </View>
 
                         <PrimaryButton
-                            title="Check Final Info"
+                            title="REVIEW DETAILS"
                             onPress={() => {
                                 if (!address || address.length < 3) {
                                     setErrors({ address: 'Please provide an address' });
@@ -473,87 +352,63 @@ export default function PostJobScreen() {
                                     setStep(3);
                                 }
                             }}
-                            style={{ marginTop: 48, height: 64, borderRadius: Radius.lg }}
-                            variant="primary"
+                            className="mt-12 h-16 rounded-lg"
                         />
                     </Animated.View>
                 )}
 
                 {/* Step 4: Review */}
                 {step === 3 && (
-                    <Animated.View entering={FadeInDown.springify()} style={{ paddingHorizontal: 24, paddingTop: 16 }}>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 8 }]}>Looks good?</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Look am one more time.</Text>
+                    <Animated.View entering={FadeInDown.springify()} className="px-6 pt-4">
+                        <Text className="text-h1 text-[28px] mb-2 uppercase">Looks good?</Text>
+                        <Text className="text-body text-muted mb-8 normal-case">Look am one more time.</Text>
 
-                        <Card style={{
-                            gap: 32,
-                            padding: 24,
-                            borderRadius: Radius.lg,
-                            backgroundColor: Colors.white,
-                            borderWidth: 1.5,
-                            borderColor: Colors.cardBorder,
-                            ...Shadows.lg
-                        }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <View style={{ gap: 6 }}>
-                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>THE VIBE</Text>
-                                    <Text style={[Typography.h3, { color: Colors.primary }]}>
+                        <Card className="gap-8 p-6 bg-white border-[1.5px] border-card-border rounded-lg shadow-lg">
+                            <View className="flex-row justify-between items-center">
+                                <View className="gap-[6px]">
+                                    <Text className="text-label text-muted text-[10px] uppercase">The Vibe</Text>
+                                    <Text className="text-h3 text-primary uppercase">
                                         {CATEGORIES.find((c) => c.id === category)?.label || 'General Support'}
                                     </Text>
                                 </View>
-                                <View style={{
-                                    width: 50,
-                                    height: 50,
-                                    borderRadius: Radius.xs,
-                                    backgroundColor: Colors.primaryLight,
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    <Ionicons name={CATEGORIES.find((c) => c.id === category)?.icon as any || 'shield'} size={28} color={Colors.primary} />
+                                <View className="w-12.5 h-12.5 rounded-xs bg-primary/10 items-center justify-center">
+                                    <Ionicons name={CATEGORIES.find((c) => c.id === category)?.icon as any || 'shield'} size={28} color="#078365" />
                                 </View>
                             </View>
 
-                            <View style={{ gap: 8 }}>
-                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>WHAT TO DO</Text>
-                                <Text style={[Typography.body, { color: Colors.text, lineHeight: 22 }]} numberOfLines={5}>{description}</Text>
+                            <View className="gap-2">
+                                <Text className="text-label text-muted text-[10px] uppercase">What to do</Text>
+                                <Text className="text-body text-ink leading-[22px] normal-case" numberOfLines={5}>{description}</Text>
                             </View>
 
-                            <View style={{ height: 1, backgroundColor: Colors.gray100 }} />
+                            <View className="h-[1px] bg-gray-100" />
 
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                <View style={{ gap: 6, flex: 1 }}>
-                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>WHERE</Text>
-                                    <Text style={[Typography.body, { fontWeight: '700' }]}>{address}</Text>
+                            <View className="flex-row justify-between">
+                                <View className="gap-[6px] flex-1">
+                                    <Text className="text-label text-muted text-[10px] uppercase">Where</Text>
+                                    <Text className="text-body font-jakarta-bold uppercase">{address}</Text>
                                 </View>
-                                <View style={{ gap: 6, alignItems: 'flex-end' }}>
-                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>FAST?</Text>
+                                <View className="gap-[6px] items-end">
+                                    <Text className="text-label text-muted text-[10px] uppercase">Fast?</Text>
                                     <Badge label={URGENCY_OPTIONS.find(o => o.value === urgency)?.label.split(' ')[1].toUpperCase()} variant={urgency === 'now' ? 'accent' : 'success'} />
                                 </View>
                             </View>
 
-                            <View style={{
-                                backgroundColor: Colors.primary,
-                                borderRadius: Radius.md,
-                                padding: 24,
-                                flexDirection: 'row',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                ...Shadows.md
-                            }}>
-                                <Text style={[Typography.label, { color: 'rgba(255,255,255,0.7)', fontSize: 10 }]}>YOU PAY</Text>
-                                <Text style={[Typography.h2, { color: Colors.white, fontSize: 26 }]}>{formatNaira(budget)}</Text>
+                            <View className="bg-primary rounded-md p-6 flex-row justify-between items-center shadow-md">
+                                <Text className="text-label text-white/70 text-[10px] uppercase">You Pay</Text>
+                                <Text className="text-h2 text-white text-[26px] uppercase">{formatNaira(budget)}</Text>
                             </View>
                         </Card>
 
-                        <View style={{ marginTop: 40, gap: 16 }}>
+                        <View className="mt-10 gap-4">
                             <PrimaryButton
                                 title="LOOM IT"
                                 onPress={handleSubmit}
                                 loading={loading}
                                 variant="accent"
-                                style={{ height: 64, borderRadius: Radius.md, ...Shadows.md }}
+                                className="h-16 rounded-md shadow-md"
                             />
-                            <Text style={[Typography.label, { textAlign: 'center', color: Colors.muted, textTransform: 'none', letterSpacing: 0, fontSize: 10 }]}>
+                            <Text className="text-label text-center text-muted text-[10px] normal-case tracking-normal">
                                 Safe and sound.
                             </Text>
                         </View>
@@ -563,3 +418,4 @@ export default function PostJobScreen() {
         </View>
     );
 }
+

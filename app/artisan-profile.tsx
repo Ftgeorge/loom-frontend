@@ -8,7 +8,6 @@ import { ErrorState } from '@/components/ui/StateComponents';
 import { artisanApi, jobApi } from '@/services/api';
 import { mapArtisan, mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { Artisan, JobRequest } from '@/types';
 import { formatDate, formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,14 +19,13 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 export default function ArtisanProfileScreen() {
     const router = useRouter();
     const { id } = useLocalSearchParams<{ id: string }>();
-    const { savedArtisans, toggleSavedArtisan, user } = useAppStore();
+    const { user } = useAppStore();
     const [artisan, setArtisan] = useState<Artisan | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [showAddWork, setShowAddWork] = useState(false);
     const [newWork, setNewWork] = useState({ title: '', description: '', imageUrl: '', ratingId: '' });
     const [completedJobs, setCompletedJobs] = useState<JobRequest[]>([]);
-    const isSaved = id ? savedArtisans.includes(id) : false;
     const isOwner = user?.id === artisan?.userId;
 
     useEffect(() => {
@@ -43,7 +41,6 @@ export default function ArtisanProfileScreen() {
         try {
             setError(false);
             if (!id) return;
-            // GET /artisans/:id
             const row: any = await artisanApi.getById(id);
             if (row) {
                 const normalised: Artisan = mapArtisan(row);
@@ -61,7 +58,7 @@ export default function ArtisanProfileScreen() {
     useEffect(() => { load(); }, [load]);
 
     if (loading) return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.4} />
             <SubAppHeader
                 label="PROFILE"
@@ -71,12 +68,12 @@ export default function ArtisanProfileScreen() {
                 onBack={() => router.back()}
                 onNotification={() => { }}
             />
-            <View style={{ padding: 24 }}><SkeletonProfile /></View>
+            <View className="p-6"><SkeletonProfile /></View>
         </View>
     );
 
     if (error || !artisan) return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <SubAppHeader
                 label="ERROR"
                 title="Profile"
@@ -90,7 +87,7 @@ export default function ArtisanProfileScreen() {
     );
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.3} animated />
             <SubAppHeader
                 label="ARTISAN"
@@ -105,66 +102,42 @@ export default function ArtisanProfileScreen() {
                 contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Header content moved to SubAppHeader */}
-
                 {/* Stats */}
                 <Animated.View entering={FadeInDown.delay(200).springify()}>
-                    <Card style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-around',
-                        alignItems: 'center',
-                        paddingVertical: 24,
-                        marginBottom: 20,
-                        backgroundColor: Colors.white,
-                        borderRadius: Radius.md,
-                        borderColor: Colors.cardBorder,
-                        borderWidth: 1.5,
-                        ...Shadows.md
-                    }}>
-                        <View style={{ alignItems: 'center' }}>
-                            <Text style={[Typography.h1, { color: Colors.primary, fontSize: 24, marginBottom: 4 }]}>{artisan.rating}</Text>
+                    <Card className="flex-row justify-around items-center py-6 mb-5 bg-white rounded-md border-[1.5px] border-card-border shadow-md">
+                        <View className="items-center">
+                            <Text className="font-jakarta-bold text-primary text-[24px] mb-1">{artisan.rating}</Text>
                             <RatingStars rating={artisan.rating} size={8} showValue={false} />
                         </View>
-                        <View style={{ width: 1, height: 40, backgroundColor: Colors.gray100 }} />
-                        <View style={{ alignItems: 'center' }}>
-                            <Text style={[Typography.h1, { fontSize: 24, marginBottom: 4 }]}>{artisan.completedJobs}</Text>
-                            <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>COMPLETED</Text>
+                        <View className="w-[1px] h-10 bg-gray-100" />
+                        <View className="items-center">
+                            <Text className="font-jakarta-bold text-ink text-[24px] mb-1">{artisan.completedJobs}</Text>
+                            <Text className="text-label text-[8px] text-muted uppercase">Completed</Text>
                         </View>
-                        <View style={{ width: 1, height: 40, backgroundColor: Colors.gray100 }} />
-                        <View style={{ alignItems: 'center' }}>
-                            <Text style={[Typography.h1, { fontSize: 24, marginBottom: 4 }]}>{artisan.distance}km</Text>
-                            <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>DISTANCE</Text>
+                        <View className="w-[1px] h-10 bg-gray-100" />
+                        <View className="items-center">
+                            <Text className="font-jakarta-bold text-ink text-[24px] mb-1">{artisan.distance}km</Text>
+                            <Text className="text-label text-[8px] text-muted uppercase">Distance</Text>
                         </View>
                     </Card>
 
-                    <Card style={{
-                        padding: 24,
-                        marginBottom: 40,
-                        backgroundColor: Colors.white,
-                        borderColor: Colors.cardBorder,
-                        borderWidth: 1.5,
-                        borderRadius: Radius.md
-                    }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Card className="p-6 mb-10 bg-white border-[1.5px] border-card-border rounded-md">
+                        <View className="flex-row justify-between items-center">
                             <View>
-                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 8, marginBottom: 8 }]}>SERVICE FEE</Text>
-                                <Text style={[Typography.h2, { color: Colors.primary, fontSize: 22 }]}>
+                                <Text className="text-label text-muted text-[8px] mb-2 uppercase">Service Fee</Text>
+                                <Text className="text-h2 text-primary text-[22px] uppercase">
                                     From {formatNaira(artisan.baseFee)}
                                 </Text>
                             </View>
-                            <View style={{
-                                backgroundColor: artisan.availability === 'online' ? Colors.primary : Colors.surface,
-                                paddingHorizontal: 12,
-                                paddingVertical: 8,
-                                borderRadius: Radius.xs,
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: 8,
-                                borderWidth: 1,
-                                borderColor: artisan.availability === 'online' ? Colors.primary : Colors.cardBorder
-                            }}>
-                                <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: artisan.availability === 'online' ? Colors.white : Colors.muted }} />
-                                <Text style={[Typography.label, { color: artisan.availability === 'online' ? Colors.white : Colors.muted, fontSize: 8 }]}>
+                            <View className={`px-3 py-2 rounded-xs flex-row items-center gap-2 border ${
+                                artisan.availability === 'online' ? 'bg-primary border-primary' : 'bg-surface border-card-border'
+                            }`}>
+                                <View className={`w-[6px] h-[6px] rounded-full ${
+                                    artisan.availability === 'online' ? 'bg-white' : 'bg-muted'
+                                }`} />
+                                <Text className={`text-label text-[8px] uppercase ${
+                                    artisan.availability === 'online' ? 'text-white' : 'text-muted'
+                                }`}>
                                     {artisan.availability === 'online' ? 'AVAILABLE' : 'UNAVAILABLE'}
                                 </Text>
                             </View>
@@ -174,25 +147,18 @@ export default function ArtisanProfileScreen() {
 
                 {/* Work Showcase Gallery */}
                 {artisan.portfolio && artisan.portfolio.length > 0 && (
-                    <View style={{ marginBottom: 40 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                    <View className="mb-10">
+                        <View className="flex-row justify-between items-center mb-5">
                             <View>
-                                <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>EXPERIENCE</Text>
-                                <Text style={[Typography.h3, { fontSize: 20 }]}>Work Gallery</Text>
+                                <Text className="text-label text-primary mb-1 uppercase">Experience</Text>
+                                <Text className="text-h3 text-[20px] uppercase">Work Gallery</Text>
                             </View>
                             {isOwner && (
                                 <TouchableOpacity
                                     onPress={() => setShowAddWork(true)}
-                                    style={{
-                                        paddingHorizontal: 12,
-                                        paddingVertical: 8,
-                                        backgroundColor: Colors.white,
-                                        borderRadius: Radius.xs,
-                                        borderWidth: 1.5,
-                                        borderColor: Colors.primary
-                                    }}
+                                    className="px-3 py-2 bg-white rounded-xs border-[1.5px] border-primary"
                                 >
-                                    <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>+ ADD WORK</Text>
+                                    <Text className="text-label text-primary text-[10px] uppercase">+ Add Work</Text>
                                 </TouchableOpacity>
                             )}
                         </View>
@@ -202,37 +168,24 @@ export default function ArtisanProfileScreen() {
                                 <Animated.View
                                     key={item.id}
                                     entering={FadeInDown.delay(300 + idx * 100).springify()}
-                                    style={{ width: 300 }}
+                                    className="w-[300px]"
                                 >
-                                    <Card style={{
-                                        padding: 0,
-                                        overflow: 'hidden',
-                                        borderRadius: Radius.lg,
-                                        borderWidth: 1.5,
-                                        borderColor: Colors.cardBorder,
-                                        backgroundColor: Colors.white,
-                                        ...Shadows.sm
-                                    }}>
+                                    <Card className="p-0 overflow-hidden rounded-lg border-[1.5px] border-card-border bg-white shadow-sm">
                                         <Image
                                             source={{ uri: item.imageUrl }}
-                                            style={{ width: '100%', height: 180, backgroundColor: Colors.surface }}
+                                            className="w-full h-[180px] bg-surface"
                                         />
-                                        <View style={{ padding: 16 }}>
-                                            <Text style={[Typography.h3, { fontSize: 16, color: Colors.ink }]} numberOfLines={1}>{item.title}</Text>
-                                            <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 4, height: 40 }]} numberOfLines={2}>{item.description}</Text>
+                                        <View className="p-4">
+                                            <Text className="text-h3 text-base text-ink uppercase" numberOfLines={1}>{item.title}</Text>
+                                            <Text className="text-body-sm text-muted mt-1 h-10" numberOfLines={2}>{item.description}</Text>
 
                                             {item.rating && (
-                                                <View style={{
-                                                    marginTop: 12,
-                                                    paddingTop: 12,
-                                                    borderTopWidth: 1,
-                                                    borderTopColor: Colors.gray100
-                                                }}>
-                                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                                                <View className="mt-3 pt-3 border-t border-gray-100">
+                                                    <View className="flex-row items-center gap-[6px] mb-1">
                                                         <RatingStars rating={item.rating} size={10} showValue={false} />
-                                                        <Text style={[Typography.label, { fontSize: 10, color: Colors.ink, fontWeight: '700' }]}>{item.customerName}</Text>
+                                                        <Text className="text-label text-[10px] text-ink font-jakarta-bold uppercase">{item.customerName}</Text>
                                                     </View>
-                                                    <Text style={[Typography.bodySmall, { fontSize: 12, fontStyle: 'italic', color: Colors.text, lineHeight: 18 }]} numberOfLines={2}>
+                                                    <Text className="text-body-sm text-[12px] italic text-ink/70 leading-[18px]" numberOfLines={2}>
                                                         &quot;{item.comment}&quot;
                                                     </Text>
                                                 </View>
@@ -246,44 +199,36 @@ export default function ArtisanProfileScreen() {
                 )}
 
                 {/* Reviews */}
-                <View style={{ marginBottom: 40 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                <View className="mb-10">
+                    <View className="flex-row justify-between items-center mb-6">
                         <View>
-                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>REVIEWS</Text>
-                            <Text style={[Typography.h3, { fontSize: 20 }]}>Client Feedback</Text>
+                            <Text className="text-label text-primary mb-1 uppercase">Reviews</Text>
+                            <Text className="text-h3 text-[20px] uppercase">Client Feedback</Text>
                         </View>
-                        <TouchableOpacity style={{ padding: 8, backgroundColor: Colors.white, borderRadius: Radius.xs, borderWidth: 1, borderColor: Colors.cardBorder }}>
-                            <Text style={[Typography.label, { color: Colors.accent, fontSize: 9 }]}>SEE ALL</Text>
+                        <TouchableOpacity className="p-2 bg-white rounded-xs border border-card-border">
+                            <Text className="text-label text-accent text-[9px] uppercase">See All</Text>
                         </TouchableOpacity>
                     </View>
 
                     {artisan.reviews.map((review, idx) => (
                         <Animated.View key={review.id} entering={FadeInDown.delay(300 + idx * 100).springify()}>
-                            <Card style={{
-                                marginBottom: 16,
-                                padding: 20,
-                                backgroundColor: Colors.white,
-                                borderRadius: Radius.md,
-                                borderWidth: 1.5,
-                                borderColor: Colors.cardBorder,
-                                ...Shadows.sm
-                            }}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                            <Card className="mb-4 p-5 bg-white rounded-md border-[1.5px] border-card-border shadow-sm">
+                                <View className="flex-row justify-between items-start mb-3">
                                     <View>
-                                        <Text style={[Typography.body, { fontWeight: '700', color: Colors.primary, fontSize: 14 }]}>{review.clientName.toUpperCase()}</Text>
-                                        <View style={{ marginTop: 6, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                        <Text className="text-body font-jakarta-bold text-primary text-[14px] uppercase">{review.clientName}</Text>
+                                        <View className="mt-1 flex-row items-center gap-1">
                                             <RatingStars rating={review.rating} size={8} showValue={false} />
                                         </View>
                                     </View>
-                                    <Text style={[Typography.label, { fontSize: 8, color: Colors.muted }]}>{formatDate(review.createdAt).toUpperCase()}</Text>
+                                    <Text className="text-label text-[8px] text-muted uppercase">{formatDate(review.createdAt)}</Text>
                                 </View>
-                                <Text style={[Typography.bodySmall, { color: Colors.text, lineHeight: 20, marginBottom: 16, fontStyle: 'italic' }]}>
+                                <Text className="text-body-sm text-ink italic leading-5 mb-4">
                                     &quot;{review.comment}&quot;
                                 </Text>
-                                <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+                                <View className="flex-row gap-2 flex-wrap">
                                     {review.tags.map((tag) => (
-                                        <View key={tag} style={{ backgroundColor: Colors.surface, paddingHorizontal: 8, paddingVertical: 4, borderRadius: Radius.xs, borderWidth: 1, borderColor: Colors.cardBorder }}>
-                                            <Text style={[Typography.label, { fontSize: 8, color: Colors.primary, letterSpacing: 0 }]}>{tag.toUpperCase()}</Text>
+                                        <View key={tag} className="bg-surface px-2 py-1 rounded-xs border border-card-border">
+                                            <Text className="text-label text-[8px] text-primary uppercase">{tag}</Text>
                                         </View>
                                     ))}
                                 </View>
@@ -294,15 +239,15 @@ export default function ArtisanProfileScreen() {
 
                 {/* Actions */}
                 {!isOwner && (
-                    <View style={{ gap: 12 }}>
+                    <View className="gap-3">
                         <PrimaryButton
                             title="BOOK SERVICE"
                             onPress={() => router.push({ pathname: '/booking', params: { artisanId: artisan.id } })}
-                            icon={<Ionicons name="calendar-outline" size={20} color={Colors.white} style={{ marginRight: 8 }} />}
+                            icon={<Ionicons name="calendar-outline" size={20} color="white" style={{ marginRight: 8 }} />}
                             variant="accent"
-                            style={{ height: 64, borderRadius: Radius.md, ...Shadows.md }}
+                            className="h-16 rounded-md shadow-md"
                         />
-                        <View style={{ flexDirection: 'row', gap: 12 }}>
+                        <View className="flex-row gap-3">
                             <SecondaryButton
                                 title="MESSAGE"
                                 onPress={async () => {
@@ -315,16 +260,16 @@ export default function ArtisanProfileScreen() {
                                         Alert.alert('Error', 'Unable to start a conversation at this time.');
                                     }
                                 }}
-                                style={{ flex: 1, height: 60, borderRadius: Radius.md, borderColor: Colors.primary, backgroundColor: Colors.white, borderWidth: 1.5 }}
-                                textStyle={{ color: Colors.primary, fontSize: 11, letterSpacing: 1 }}
-                                icon={<Ionicons name="chatbubbles-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />}
+                                className="flex-1 h-[60px] rounded-md border-primary bg-white border-[1.5px]"
+                                textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 11, letterSpacing: 1 }}
+                                icon={<Ionicons name="chatbubbles-outline" size={18} color="#00120C" style={{ marginRight: 8 }} />}
                             />
                             <SecondaryButton
                                 title="CALL"
                                 onPress={() => { }}
-                                style={{ flex: 1, height: 60, borderRadius: Radius.md, borderColor: Colors.primary, backgroundColor: Colors.white, borderWidth: 1.5 }}
-                                textStyle={{ color: Colors.primary, fontSize: 11, letterSpacing: 1 }}
-                                icon={<Ionicons name="call-outline" size={18} color={Colors.primary} style={{ marginRight: 8 }} />}
+                                className="flex-1 h-[60px] rounded-md border-primary bg-white border-[1.5px]"
+                                textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 11, letterSpacing: 1 }}
+                                icon={<Ionicons name="call-outline" size={18} color="#00120C" style={{ marginRight: 8 }} />}
                             />
                         </View>
                     </View>
@@ -333,39 +278,27 @@ export default function ArtisanProfileScreen() {
 
             {/* Add Work Modal */}
             <Modal visible={showAddWork} animationType="slide" transparent>
-                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}>
-                    <View style={{
-                        backgroundColor: Colors.white,
-                        borderTopLeftRadius: Radius.xl,
-                        borderTopRightRadius: Radius.xl,
-                        padding: 24,
-                        paddingBottom: 40
-                    }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                            <Text style={Typography.h2}>Showcase New Work</Text>
+                <View className="flex-1 bg-ink/50 justify-end">
+                    <View className="bg-white rounded-t-xl p-6 pb-10">
+                        <View className="flex-row justify-between items-center mb-6">
+                            <Text className="text-h2 uppercase">Showcase New Work</Text>
                             <TouchableOpacity onPress={() => setShowAddWork(false)}>
-                                <Ionicons name="close" size={24} color={Colors.muted} />
+                                <Ionicons name="close" size={24} color="#64748B" />
                             </TouchableOpacity>
                         </View>
 
-                        <Text style={[Typography.label, { marginBottom: 8 }]}>WORK TITLE</Text>
+                        <Text className="text-label mb-2 uppercase">Work Title</Text>
                         <TextInput
-                            style={{
-                                backgroundColor: Colors.surface,
-                                padding: 16,
-                                borderRadius: Radius.md,
-                                marginBottom: 16,
-                                borderWidth: 1,
-                                borderColor: Colors.cardBorder
-                            }}
+                            className="bg-surface p-4 rounded-md mb-4 border border-card-border"
                             placeholder="e.g., Luxury Bathroom Installation"
                             value={newWork.title}
+                            placeholderTextColor="#94A3B8"
                             onChangeText={(t) => setNewWork({ ...newWork, title: t })}
                         />
 
                         {completedJobs.length > 0 && (
-                            <View style={{ marginBottom: 16 }}>
-                                <Text style={[Typography.label, { marginBottom: 8 }]}>LINK TO A RATED JOB</Text>
+                            <View className="mb-4">
+                                <Text className="text-label mb-2 uppercase">Link to a Rated Job</Text>
                                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
                                     {completedJobs.map(job => (
                                         <TouchableOpacity
@@ -377,19 +310,14 @@ export default function ArtisanProfileScreen() {
                                                     title: job.category !== 'not_sure' ? job.category.toUpperCase() : newWork.title
                                                 });
                                             }}
-                                            style={{
-                                                padding: 12,
-                                                borderRadius: Radius.md,
-                                                borderWidth: 1.5,
-                                                borderColor: newWork.ratingId === job.ratingId ? Colors.primary : Colors.cardBorder,
-                                                backgroundColor: Colors.white,
-                                                width: 160
-                                            }}
+                                            className={`p-3 rounded-md border-[1.5px] bg-white w-40 ${
+                                                newWork.ratingId === job.ratingId ? 'border-primary' : 'border-card-border'
+                                            }`}
                                         >
-                                            <Text style={[Typography.label, { fontSize: 10, marginBottom: 4 }]} numberOfLines={1}>{job.category.toUpperCase()}</Text>
-                                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                            <Text className="text-label text-[10px] mb-1 uppercase" numberOfLines={1}>{job.category}</Text>
+                                            <View className="flex-row items-center gap-1">
                                                 <RatingStars rating={job.ratingValue || 0} size={8} showValue={false} />
-                                                <Text style={{ fontSize: 9, color: Colors.muted }}>{job.ratingValue}/5</Text>
+                                                <Text className="text-[9px] text-muted">{job.ratingValue}/5</Text>
                                             </View>
                                         </TouchableOpacity>
                                     ))}
@@ -397,34 +325,21 @@ export default function ArtisanProfileScreen() {
                             </View>
                         )}
 
-                        <Text style={[Typography.label, { marginBottom: 8 }]}>DESCRIPTION</Text>
+                        <Text className="text-label mb-2 uppercase">Description</Text>
                         <TextInput
-                            style={{
-                                backgroundColor: Colors.surface,
-                                padding: 16,
-                                borderRadius: Radius.md,
-                                marginBottom: 16,
-                                borderWidth: 1,
-                                borderColor: Colors.cardBorder,
-                                minHeight: 100
-                            }}
+                            className="bg-surface p-4 rounded-md mb-4 border border-card-border min-h-[100px]"
                             placeholder="Describe what you did..."
                             multiline
+                            placeholderTextColor="#94A3B8"
                             value={newWork.description}
                             onChangeText={(t) => setNewWork({ ...newWork, description: t })}
                         />
 
-                        <Text style={[Typography.label, { marginBottom: 8 }]}>IMAGE URL</Text>
+                        <Text className="text-label mb-2 uppercase">Image URL</Text>
                         <TextInput
-                            style={{
-                                backgroundColor: Colors.surface,
-                                padding: 16,
-                                borderRadius: Radius.md,
-                                marginBottom: 24,
-                                borderWidth: 1,
-                                borderColor: Colors.cardBorder
-                            }}
+                            className="bg-surface p-4 rounded-md mb-6 border border-card-border"
                             placeholder="Paste work image link..."
+                            placeholderTextColor="#94A3B8"
                             value={newWork.imageUrl}
                             onChangeText={(t) => setNewWork({ ...newWork, imageUrl: t })}
                         />
@@ -437,7 +352,7 @@ export default function ArtisanProfileScreen() {
                                     await artisanApi.addPortfolioItem(newWork);
                                     setShowAddWork(false);
                                     setNewWork({ title: '', description: '', imageUrl: '', ratingId: '' });
-                                    load(); // Refresh profile
+                                    load();
                                 } catch (err) {
                                     Alert.alert("Error", "Failed to add work showcase.");
                                 }
@@ -449,4 +364,5 @@ export default function ArtisanProfileScreen() {
         </View>
     );
 }
+
 

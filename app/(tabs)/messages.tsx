@@ -1,4 +1,3 @@
-import { AppHeader } from '@/components/AppHeader';
 import { SubAppHeader } from '@/components/AppSubHeader';
 import { Avatar } from '@/components/ui/AvatarRating';
 import { Badge } from '@/components/ui/CardChipBadge';
@@ -8,8 +7,8 @@ import { t } from '@/i18n';
 import { threadApi } from '@/services/api';
 import { useAppStore } from '@/store';
 import { timeAgo } from '@/utils/helpers';
-import { useRouter } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
 
 export default function MessagesScreen() {
@@ -44,7 +43,11 @@ export default function MessagesScreen() {
         }
     }, []);
 
-    useEffect(() => { load(); }, [load]);
+    useFocusEffect(
+        useCallback(() => {
+            load();
+        }, [load])
+    );
 
     return (
         <View className="flex-1 bg-background">

@@ -2,7 +2,6 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { t } from '@/i18n';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
@@ -16,7 +15,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 const { width, height } = Dimensions.get('window');
 
@@ -25,21 +24,30 @@ const pages = [
         icon: 'scan-outline' as const,
         titleKey: 'onboard1Title' as const,
         descKey: 'onboard1Desc' as const,
-        accent: Colors.primary,
+        accent: '#00120C', // Colors.primary
+        bgAccent: 'bg-primary',
+        textAccent: 'text-primary',
+        borderAccent: 'border-primary/20',
         mission: 'DISCOVER'
     },
     {
         icon: 'terminal-outline' as const,
         titleKey: 'onboard2Title' as const,
         descKey: 'onboard2Desc' as const,
-        accent: Colors.accent,
+        accent: '#7DCCFF', // Colors.accent
+        bgAccent: 'bg-accent',
+        textAccent: 'text-accent',
+        borderAccent: 'border-accent/20',
         mission: 'MATCH'
     },
     {
         icon: 'shield-checkmark-outline' as const,
         titleKey: 'onboard3Title' as const,
         descKey: 'onboard3Desc' as const,
-        accent: Colors.success,
+        accent: '#1AB26C', // Colors.success
+        bgAccent: 'bg-success',
+        textAccent: 'text-success',
+        borderAccent: 'border-success/20',
         mission: 'TRUST'
     },
 ];
@@ -73,15 +81,15 @@ export default function OnboardingScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <View style={StyleSheet.absoluteFill}>
                 <LoomThread variant="dense" scale={1.5} opacity={0.4} animated />
             </View>
 
-            <View style={{ position: 'absolute', top: 64, width: '100%', paddingHorizontal: 32, zIndex: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={[Typography.label, { color: Colors.primary, fontSize: 8 }]}>STEP {currentPage + 1}</Text>
-                <TouchableOpacity onPress={handleSkip} style={{ backgroundColor: Colors.gray100, paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.xs }}>
-                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 8 }]}>SKIP</Text>
+            <View className="absolute top-16 w-full px-8 z-10 flex-row justify-between items-center">
+                <Text className="text-label text-primary text-[8px] uppercase">STEP {currentPage + 1}</Text>
+                <TouchableOpacity onPress={handleSkip} className="bg-gray-100 px-3 py-[6px] rounded-xs">
+                    <Text className="text-label text-muted text-[8px] uppercase">SKIP</Text>
                 </TouchableOpacity>
             </View>
 
@@ -93,50 +101,32 @@ export default function OnboardingScreen() {
                 showsHorizontalScrollIndicator={false}
                 onMomentumScrollEnd={onMomentumScrollEnd}
                 keyExtractor={(_, i) => `${i}`}
-                renderItem={({ item, index }) => (
-                    <View style={{ width, flex: 1, paddingTop: height * 0.12, paddingHorizontal: 40 }}>
-                        <View style={{ alignItems: 'center', marginBottom: 56 }}>
+                renderItem={({ item }) => (
+                    <View className="flex-1 px-10" style={{ paddingTop: height * 0.12, width }}>
+                        <View className="items-center mb-14">
                             <Animated.View
                                 entering={FadeInDown.delay(200).springify()}
-                                style={{
-                                    width: 240,
-                                    height: 240,
-                                    borderRadius: Radius.md,
-                                    backgroundColor: Colors.white,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    ...Shadows.lg,
-                                    borderWidth: 1.5,
-                                    borderColor: Colors.cardBorder
-                                }}
+                                className="w-[240px] h-[240px] rounded-md bg-white items-center justify-center shadow-lg border-[1.5px] border-card-border"
                             >
-                                <View style={{
-                                    position: 'absolute',
-                                    width: 180,
-                                    height: 180,
-                                    borderRadius: Radius.xs,
-                                    borderWidth: 1,
-                                    borderColor: item.accent + '20',
-                                    transform: [{ rotate: '45deg' }]
-                                }} />
+                                <View className={`absolute w-[180px] h-[180px] rounded-xs border rotate-45 ${item.borderAccent}`} />
                                 <Ionicons name={item.icon} size={80} color={item.accent} />
 
-                                <View style={{ position: 'absolute', bottom: -12, backgroundColor: item.accent, paddingHorizontal: 12, paddingVertical: 4, borderRadius: Radius.xs }}>
-                                    <Text style={[Typography.label, { color: Colors.white, fontSize: 8 }]}>{item.mission}</Text>
+                                <View className={`absolute -bottom-3 px-3 py-1 rounded-xs ${item.bgAccent}`}>
+                                    <Text className="text-label text-white text-[8px] uppercase">{item.mission}</Text>
                                 </View>
                             </Animated.View>
                         </View>
 
                         <Animated.Text
                             entering={FadeInDown.delay(400).springify()}
-                            style={[Typography.h1, { textAlign: 'center', fontSize: 28, marginBottom: 16 }]}
+                            className="text-h1 text-center text-[28px] mb-4"
                         >
                             {t(item.titleKey, language)}
                         </Animated.Text>
 
                         <Animated.Text
                             entering={FadeInDown.delay(500).springify()}
-                            style={[Typography.body, { textAlign: 'center', color: Colors.muted, lineHeight: 24 }]}
+                            className="text-body text-center text-muted leading-6"
                         >
                             {t(item.descKey, language)}
                         </Animated.Text>
@@ -144,17 +134,14 @@ export default function OnboardingScreen() {
                 )}
             />
 
-            <View style={{ paddingHorizontal: 32, paddingBottom: 64 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 6, marginBottom: 40 }}>
+            <View className="px-8 pb-16">
+                <View className="flex-row justify-center gap-[6px] mb-10">
                     {pages.map((_, i) => (
                         <View
                             key={i}
-                            style={{
-                                height: 3,
-                                borderRadius: 1.5,
-                                backgroundColor: i === currentPage ? Colors.primary : Colors.gray200,
-                                width: i === currentPage ? 32 : 12,
-                            }}
+                            className={`h-[3px] rounded-full ${
+                                i === currentPage ? 'bg-primary w-8' : 'bg-gray-200 w-3'
+                            }`}
                         />
                     ))}
                 </View>
@@ -162,11 +149,12 @@ export default function OnboardingScreen() {
                 <PrimaryButton
                     title={currentPage === pages.length - 1 ? "Get Started" : "Next"}
                     onPress={handleNext}
-                    style={{ height: 64, borderRadius: Radius.md }}
+                    className="h-16 rounded-md"
                     variant={currentPage === pages.length - 1 ? 'accent' : 'primary'}
                 />
             </View>
         </View >
     );
 }
+
 

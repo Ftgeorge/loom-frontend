@@ -5,7 +5,6 @@ import { ErrorState } from '@/components/ui/StateComponents';
 import { artisanApi, jobApi } from '@/services/api';
 import { mapArtisan, mapJob, mapEarnings } from '@/services/mappers';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { Artisan, JobRequest, EarningsSummary } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -17,7 +16,6 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-// ... existing imports
 import Animated, {
     FadeInDown,
     FadeInRight,
@@ -39,37 +37,28 @@ function StatCard({ label, value, icon, delay, accent }: {
     return (
         <Animated.View
             entering={FadeInUp.delay(delay).springify()}
-            style={{ flex: 1 }}
+            className="flex-1"
         >
-            <View style={{
-                backgroundColor: accent ? Colors.primary : Colors.surface,
-                borderRadius: Radius.sm,
-                padding: 18,
-                borderWidth: 1,
-                borderColor: accent ? 'transparent' : Colors.cardBorder,
-                ...Shadows.sm,
-            }}>
-                <View style={{
-                    width: 36, height: 36,
-                    borderRadius: 10,
-                    backgroundColor: accent ? 'rgba(255,255,255,0.1)' : Colors.canvas,
-                    alignItems: 'center', justifyContent: 'center',
-                    marginBottom: 14,
-                }}>
-                    <Ionicons name={icon as any} size={18} color={accent ? Colors.white : Colors.primary} />
+            <View className={`${
+                accent ? "bg-primary border-transparent" : "bg-surface border-card-border"
+            } rounded-sm p-[18px] border shadow-sm`}>
+                <View className={`w-9 h-9 rounded-[10px] items-center justify-center mb-3 ${
+                    accent ? "bg-white/10" : "bg-canvas"
+                }`}>
+                    <Ionicons 
+                        name={icon as any} 
+                        size={18} 
+                        className={accent ? "text-white" : "text-primary"} 
+                    />
                 </View>
-                <Text style={[Typography.data, {
-                    color: accent ? Colors.white : Colors.ink,
-                    fontSize: 22,
-                    marginBottom: 4,
-                }]}>
+                <Text className={`text-data text-[22px] mb-1 ${
+                    accent ? "text-white" : "text-ink"
+                }`}>
                     {value}
                 </Text>
-                <Text style={[Typography.label, {
-                    color: accent ? 'rgba(255,255,255,0.55)' : Colors.muted,
-                    fontSize: 9,
-                    letterSpacing: 0.8,
-                }]}>
+                <Text className={`text-label text-[9px] tracking-[0.8px] uppercase ${
+                    accent ? "text-white/55" : "text-muted"
+                }`}>
                     {label}
                 </Text>
             </View>
@@ -95,27 +84,12 @@ function OnlineToggle({ online, onToggle }: { online: boolean; onToggle: () => v
             <TouchableOpacity
                 onPress={handlePress}
                 activeOpacity={1}
-                style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 8,
-                    backgroundColor: online ? Colors.successLight : Colors.canvas,
-                    paddingHorizontal: 16,
-                    paddingVertical: 10,
-                    borderRadius: 24,
-                    borderWidth: 1.5,
-                    borderColor: online ? Colors.success + '60' : Colors.cardBorder,
-                }}
+                className={`flex-row items-center gap-2 px-4 py-[10px] rounded-[24px] border-[1.5px] ${
+                    online ? "bg-success/10 border-success/60" : "bg-canvas border-card-border"
+                }`}
             >
-                <View style={{
-                    width: 8, height: 8, borderRadius: 4,
-                    backgroundColor: online ? Colors.success : Colors.muted,
-                }} />
-                <Text style={{
-                    fontSize: 12,
-                    fontFamily: 'PlusJakartaSans-Bold',
-                    color: online ? Colors.success : Colors.muted,
-                }}>
+                <View className={`w-2 h-2 rounded-full ${online ? "bg-success" : "bg-muted"}`} />
+                <Text className={`text-[12px] font-jakarta-bold ${online ? "text-success" : "text-muted"}`}>
                     {online ? "AVAILABLE" : "OFFLINE"}
                 </Text>
             </TouchableOpacity>
@@ -162,13 +136,13 @@ export default function ArtisanDashboard() {
     useEffect(() => { load(); }, [load]);
     const onRefresh = useCallback(() => { setRefreshing(true); load(); }, [load]);
 
-    const newJobs = React.useMemo(() => jobs.filter(j => j.status === 'submitted'), [jobs]);
-    const activeJobs = React.useMemo(() => jobs.filter(j => ['matched', 'scheduled', 'in_progress'].includes(j.status)), [jobs]);
+    const newJobs = React.useMemo(() => jobs.filter(j => j.status === 'submitted' || j.status === 'matched'), [jobs]);
+    const activeJobs = React.useMemo(() => jobs.filter(j => ['accepted', 'on_the_way', 'in_progress'].includes(j.status)), [jobs]);
 
     const firstName = user?.name?.split(' ')[0] || 'Pro';
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.canvas }}>
+        <View className="flex-1 bg-canvas">
             <SubAppHeader
                 showLocation={false}
                 label="DASHBOARD"
@@ -179,98 +153,83 @@ export default function ArtisanDashboard() {
 
             <ScrollView
                 contentContainerStyle={{ padding: 24, paddingBottom: 130 }}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00120C" />}
                 showsVerticalScrollIndicator={false}
             >
                 {/* ─── Verification Banner ──────────────────────────────────── */}
                 {verificationStatus !== 'approved' && (
-                    <Animated.View entering={FadeInUp.springify()} style={{ marginBottom: 20 }}>
+                    <Animated.View entering={FadeInUp.springify()} className="mb-5">
                         <TouchableOpacity 
                             onPress={() => router.push('/verification')}
                             activeOpacity={0.9}
-                            style={{
-                                backgroundColor: verificationStatus === 'pending' ? Colors.warning + '10' : Colors.error + '10',
-                                borderRadius: Radius.sm,
-                                padding: 16,
-                                borderWidth: 1,
-                                borderColor: verificationStatus === 'pending' ? Colors.warning + '20' : Colors.error + '20',
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: 12
-                            }}
+                            className={`flex-row items-center gap-3 p-4 rounded-sm border ${
+                                verificationStatus === 'pending' ? 'bg-warning/10 border-warning/20' : 'bg-error/10 border-error/20'
+                            }`}
                         >
-                            <View style={{ 
-                                width: 36, height: 36, borderRadius: 18, 
-                                backgroundColor: verificationStatus === 'pending' ? Colors.warning : Colors.error,
-                                alignItems: 'center', justifyContent: 'center' 
-                            }}>
+                            <View className={`w-9 h-9 rounded-full items-center justify-center ${
+                                verificationStatus === 'pending' ? 'bg-warning' : 'bg-error'
+                            }`}>
                                 <Ionicons 
                                     name={verificationStatus === 'pending' ? "time-outline" : "alert-circle-outline"} 
                                     size={20} 
-                                    color={Colors.white} 
+                                    color="white" 
                                 />
                             </View>
-                            <View style={{ flex: 1 }}>
-                                <Text style={[Typography.label, { fontSize: 13, color: Colors.ink, fontFamily: 'PlusJakartaSans-Bold' }]}>
+                            <View className="flex-1">
+                                <Text className="text-label text-[13px] text-ink font-jakarta-bold">
                                     {verificationStatus === 'pending' ? "Verification in Progress" : "Complete Your Verification"}
                                 </Text>
-                                <Text style={[Typography.bodySmall, { color: Colors.muted, fontSize: 11, marginTop: 1 }]}>
+                                <Text className="text-body-sm text-muted text-[11px] mt-[1px]">
                                     {verificationStatus === 'pending' 
                                         ? "We're reviewing your documents. Hang tight!" 
                                         : "Verify your ID to unlock all features and start earning."}
                                 </Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={16} color={Colors.muted} />
+                            <Ionicons name="chevron-forward" size={16} className="text-muted" />
                         </TouchableOpacity>
                     </Animated.View>
                 )}
 
                 {/* ─── Status Row ───────────────────────────────────────────── */}
-                <View style={{ marginBottom: 32, flexDirection: 'row', justifyContent: 'flex-end' }}>
+                <View className="mb-8 flex-row justify-end">
                     <Animated.View entering={FadeInRight.delay(160).springify()}>
                         <OnlineToggle online={artisanOnline} onToggle={() => setArtisanOnline(!artisanOnline)} />
                     </Animated.View>
                 </View>
 
                 {/* ─── Earnings Hero Card ───────────────────────────────────── */}
-                <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginBottom: 20 }}>
-                    <View style={{
-                        backgroundColor: Colors.primary,
-                        borderRadius: Radius.sm,
-                        padding: 24,
-                        ...Shadows.brand,
-                        overflow: 'hidden',
-                    }}>
+                <Animated.View entering={FadeInDown.delay(200).springify()} className="mb-5">
+                    <View className="bg-primary rounded-sm p-6 shadow-brand overflow-hidden">
                         {/* Decorative */}
-                        <View style={{ position: 'absolute', right: -30, top: -30, opacity: 0.04 }}>
-                            <Ionicons name="wallet" size={200} color={Colors.white} />
+                        <View className="absolute -right-[30px] -top-[30px] opacity-[0.04]">
+                            <Ionicons name="wallet" size={200} color="white" />
                         </View>
 
-                        <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>
+                        <Text className="text-[10px] font-jakarta-bold text-white/50 tracking-[1px] uppercase mb-2">
                             Total Earnings
                         </Text>
-                        <Text style={{ fontSize: 38, fontFamily: 'Inter-Bold', color: Colors.white, letterSpacing: -1, marginBottom: 4 }}>
+                        <Text className="text-[38px] font-inter-bold text-white tracking-[-1px] mb-1">
                             ₦{Number(earnings?.totalEarnings ?? 0).toLocaleString()}
                         </Text>
-                        <Text style={{ fontSize: 12, fontFamily: 'Inter-Regular', color: 'rgba(255,255,255,0.45)', marginBottom: 24 }}>
+                        <Text className="text-[12px] font-inter text-white/45 mb-6">
                             All time · Updated just now
                         </Text>
 
-                        <View style={{ flexDirection: 'row', gap: 20 }}>
+                        <View className="flex-row gap-5">
                             <View>
-                                <Text style={{ fontSize: 9, fontFamily: 'PlusJakartaSans-Bold', color: 'rgba(255,255,255,0.4)', letterSpacing: 0.6, textTransform: 'uppercase' }}>
+                                <Text className="text-[9px] font-jakarta-bold text-white/40 tracking-[0.6px] uppercase">
                                     This week
                                 </Text>
-                                <Text style={{ fontSize: 17, fontFamily: 'Inter-Bold', color: Colors.white, marginTop: 2 }}>
+                                <Text className="text-[17px] font-inter-bold text-white mt-[2px]">
                                     ₦{Number(earnings?.thisWeek ?? 0).toLocaleString()}
                                 </Text>
                             </View>
-                            <View style={{ width: 1, backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                            <View className="w-[1px] bg-white/10" />
                             <View>
-                                <Text style={{ fontSize: 9, fontFamily: 'PlusJakartaSans-Bold', color: 'rgba(255,255,255,0.4)', letterSpacing: 0.6, textTransform: 'uppercase' }}>
+                                <Text className="text-[9px] font-jakarta-bold text-white/40 tracking-[0.6px] uppercase">
                                     Completed
                                 </Text>
-                                <Text style={{ fontSize: 17, fontFamily: 'Inter-Bold', color: Colors.white, marginTop: 2 }}>
+                                <Text className="text-[17px] font-inter-bold text-white mt-[2px]">
                                     {profile?.completedJobs ?? 0} jobs
                                 </Text>
                             </View>
@@ -279,7 +238,7 @@ export default function ArtisanDashboard() {
                 </Animated.View>
 
                 {/* ─── Stats Row ───────────────────────────────────────────── */}
-                <View style={{ flexDirection: 'row', gap: 12, marginBottom: 40 }}>
+                <View className="flex-row gap-3 mb-10">
                     <StatCard
                         label="New Jobs"
                         value={`${newJobs.length}`}
@@ -303,19 +262,16 @@ export default function ArtisanDashboard() {
 
                 {/* ─── New Gigs ─────────────────────────────────────────────── */}
                 <View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 20 }}>
+                    <View className="flex-row justify-between items-end mb-5">
                         <View>
-                            <Text style={[Typography.label, { color: Colors.muted, marginBottom: 4 }]}>Incoming</Text>
-                            <Text style={[Typography.h2, { fontSize: 20 }]}>New Job Requests</Text>
+                            <Text className="text-label text-muted mb-1">Incoming</Text>
+                            <Text className="text-h2 text-[20px]">New Job Requests</Text>
                         </View>
                         <TouchableOpacity
                             onPress={() => router.push('/(tabs)/jobs')}
-                            style={{
-                                backgroundColor: Colors.canvas,
-                                paddingVertical: 6,
-                            }}
+                            className="bg-canvas py-[6px]"
                         >
-                            <Text style={{ fontSize: 12, fontFamily: 'Inter-SemiBold', color: Colors.primary }}>
+                            <Text className="text-[12px] font-inter-semibold text-primary">
                                 All Jobs
                             </Text>
                         </TouchableOpacity>
@@ -326,32 +282,19 @@ export default function ArtisanDashboard() {
                     ) : error ? (
                         <ErrorState onRetry={load} />
                     ) : newJobs.length === 0 ? (
-                        <View style={{
-                            backgroundColor: Colors.surface,
-                            borderRadius: Radius.xl,
-                            padding: 48,
-                            alignItems: 'center',
-                            borderWidth: 1.5,
-                            borderStyle: 'dashed',
-                            borderColor: Colors.cardBorder,
-                        }}>
-                            <View style={{
-                                width: 60, height: 60, borderRadius: 20,
-                                backgroundColor: Colors.canvas,
-                                alignItems: 'center', justifyContent: 'center',
-                                marginBottom: 16,
-                            }}>
-                                <Ionicons name="notifications-off-outline" size={28} color={Colors.muted} />
+                        <View className="bg-surface rounded-xl p-12 items-center border-[1.5px] border-dashed border-card-border">
+                            <View className="w-[60px] h-[60px] rounded-[20px] bg-canvas items-center justify-center mb-4">
+                                <Ionicons name="notifications-off-outline" size={28} className="text-muted" />
                             </View>
-                            <Text style={[Typography.h3, { textAlign: 'center', marginBottom: 8 }]}>
+                            <Text className="text-h3 text-center mb-2">
                                 No jobs yet
                             </Text>
-                            <Text style={[Typography.body, { textAlign: 'center', fontSize: 14 }]}>
-                                Stay online and you&apo;ll be notified when a job comes in.
+                            <Text className="text-body text-center text-[14px]">
+                                Stay online and you&apos;ll be notified when a job comes in.
                             </Text>
                         </View>
                     ) : (
-                        <View style={{ gap: 12 }}>
+                        <View className="gap-3">
                             {newJobs.slice(0, 4).map((job, index) => (
                                 <Animated.View key={job.id} entering={FadeInDown.delay(500 + index * 80).springify()}>
                                     <RequestCard

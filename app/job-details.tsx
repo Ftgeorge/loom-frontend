@@ -7,7 +7,6 @@ import { ErrorState } from '@/components/ui/StateComponents';
 import { StatusTimeline, getArtisanJobSteps } from '@/components/ui/StatusTimeline';
 import { jobApi } from '@/services/api';
 import { mapJob } from '@/services/mappers';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { ArtisanJobStatus, JobRequest } from '@/types';
 import { formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,8 +29,15 @@ export default function JobDetailsScreen() {
             if (!id) return;
             const row = await jobApi.getById(id) as any;
             if (row) {
-                setJob(mapJob(row));
-                setArtisanStatus('new');
+                const mappedJob = mapJob(row);
+                setJob(mappedJob);
+                
+                // Derive artisan status from job status
+                if (mappedJob.status === 'completed') setArtisanStatus('completed');
+                else if (mappedJob.status === 'in_progress') setArtisanStatus('in_progress');
+                else if (mappedJob.status === 'on_the_way') setArtisanStatus('on_the_way');
+                else if (mappedJob.status === 'accepted') setArtisanStatus('accepted');
+                else setArtisanStatus('new');
             }
         } catch (err) {
             console.error('[JobDetails] Error:', err);
@@ -48,7 +54,7 @@ export default function JobDetailsScreen() {
         try {
             await jobApi.accept(id);
             setArtisanStatus('accepted');
-            setJob((j) => j ? { ...j, status: 'matched', artisanStatus: 'accepted' } : null);
+            setJob((j) => j ? { ...j, status: 'accepted', artisanStatus: 'accepted' } : null);
         } catch (err: any) {
             Alert.alert('System Error', err.message || 'Failed to accept job');
         }
@@ -62,15 +68,20 @@ export default function JobDetailsScreen() {
     };
 
     const handleStatusUpdate = async (newStatus: ArtisanJobStatus) => {
-        setArtisanStatus(newStatus);
-        setJob((j) => j ? { ...j, artisanStatus: newStatus } : null);
-
-        if (newStatus === 'completed' && id) {
-            try {
+        try {
+            if (!id) return;
+            
+            if (newStatus === 'completed') {
                 await jobApi.complete(id);
-            } catch (err: any) {
-                Alert.alert('System Error', err.message ?? 'Could not mark mission complete on server.');
+            } else {
+                await jobApi.updateStatus(id, newStatus);
             }
+            
+            setArtisanStatus(newStatus);
+            setJob((j) => j ? { ...j, status: newStatus as any, artisanStatus: newStatus } : null);
+        } catch (err: any) {
+            console.error('[JobDetails] Status Update Error:', err);
+            Alert.alert('System Error', err.message ?? 'Could not update mission status.');
         }
     };
 
@@ -81,22 +92,22 @@ export default function JobDetailsScreen() {
     };
 
     if (loading) return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.4} />
             <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
-            <View style={{ padding: 24 }}><SkeletonList count={3} type="request" /></View>
+            <View className="p-6"><SkeletonList count={3} type="request" /></View>
         </View>
     );
 
     if (error || !job) return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.2} animated />
             <AppHeader title="Job Details" showBack onBack={() => router.back()} showNotification={false} />
 
@@ -105,29 +116,22 @@ export default function JobDetailsScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Job Summary */}
-                <Animated.View entering={FadeInDown.springify()} style={{ marginBottom: 40 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>JOB TYPE</Text>
-                    <Text style={[Typography.h1, { fontSize: 32 }]}>{job.category.toUpperCase().replace('_', ' / ')}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16 }}>
-                        <View style={{
-                            backgroundColor: Colors.accent + '10',
-                            paddingHorizontal: 12,
-                            paddingVertical: 4,
-                            borderRadius: Radius.xs,
-                            borderWidth: 1,
-                            borderColor: Colors.accent
-                        }}>
-                            <Text style={[Typography.label, { color: Colors.accent, fontSize: 10, fontWeight: '900' }]}>{job.status.toUpperCase()}</Text>
+                <Animated.View entering={FadeInDown.springify()} className="mb-10">
+                    <Text className="text-label text-primary mb-2 tracking-[2px] uppercase">Job Type</Text>
+                    <Text className="text-h1 text-[32px] uppercase">{job.category.replace('_', ' / ')}</Text>
+                    <View className="flex-row items-center gap-3 mt-4">
+                        <View className="bg-accent/5 px-3 py-1 rounded-xs border border-accent">
+                            <Text className="text-label text-accent text-[10px] font-jakarta-extrabold uppercase">{job.status}</Text>
                         </View>
-                        <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>REF: {job.id.substring(0, 8).toUpperCase()}</Text>
+                        <Text className="text-label text-muted text-[10px] uppercase">REF: {job.id.substring(0, 8)}</Text>
                     </View>
                 </Animated.View>
 
                 {/* Protocol Progress */}
                 {artisanStatus !== 'new' && artisanStatus !== 'declined' && (
                     <Animated.View entering={FadeInDown.delay(100).springify()}>
-                        <Card style={{ marginBottom: 24, padding: 24, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.cardBorder, ...Shadows.sm }}>
-                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 20 }]}>STATUS</Text>
+                        <Card className="mb-6 p-6 bg-white border-[1.5px] border-card-border shadow-sm">
+                            <Text className="text-label text-primary mb-5 uppercase">Status</Text>
                             <StatusTimeline steps={getArtisanJobSteps(artisanStatus)} />
                         </Card>
                     </Animated.View>
@@ -135,8 +139,8 @@ export default function JobDetailsScreen() {
 
                 {/* Client Identity */}
                 <Animated.View entering={FadeInDown.delay(200).springify()}>
-                    <Card style={{ padding: 24, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.cardBorder, ...Shadows.sm }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 24 }]}>DETAILS</Text>
+                    <Card className="p-6 bg-white border-[1.5px] border-card-border shadow-sm">
+                        <Text className="text-label text-primary mb-6 uppercase">Details</Text>
 
                         <DetailItem label="CLIENT" value={job.clientName.toUpperCase()} />
                         <DetailItem label="SERVICE" value={job.category.toUpperCase()} />
@@ -151,57 +155,33 @@ export default function JobDetailsScreen() {
                 <Animated.View entering={FadeInDown.delay(300).springify()}>
                     <TouchableOpacity
                         activeOpacity={0.9}
-                        style={{
-                            marginTop: 24,
-                            backgroundColor: Colors.primary,
-                            borderRadius: Radius.md,
-                            padding: 32,
-                            alignItems: 'center',
-                            ...Shadows.md
-                        }}
+                        className="mt-6 bg-primary rounded-md p-8 items-center shadow-md"
                     >
-                        <View style={{
-                            width: 56,
-                            height: 56,
-                            borderRadius: Radius.xs,
-                            backgroundColor: 'rgba(255,255,255,0.1)',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            marginBottom: 16,
-                            borderWidth: 1,
-                            borderColor: 'rgba(255,255,255,0.2)'
-                        }}>
-                            <Ionicons name="location" size={24} color={Colors.white} />
+                        <View className="w-14 h-14 rounded-xs bg-white/10 items-center justify-center mb-4 border border-white/20">
+                            <Ionicons name="location" size={24} color="white" />
                         </View>
-                        <Text style={[Typography.h3, { color: Colors.white }]}>OPEN MAP</Text>
-                        <Text style={[Typography.label, { color: Colors.accent, marginTop: 8, fontSize: 8 }]}>
-                            AREA: {job.location.area.toUpperCase()}
+                        <Text className="text-h3 text-white uppercase">Open Map</Text>
+                        <Text className="text-label text-accent mt-2 text-[8px] uppercase">
+                            Area: {job.location.area}
                         </Text>
                     </TouchableOpacity>
                 </Animated.View>
 
                 {/* Actions */}
-                <Animated.View entering={FadeInDown.delay(400).springify()} style={{ marginTop: 48, gap: 16 }}>
-                    {artisanStatus === 'new' && (
-                        <View style={{ gap: 16 }}>
+                <Animated.View entering={FadeInDown.delay(400).springify()} className="mt-12 gap-4">
+                    {artisanStatus === 'new' && (job.status === 'submitted' || job.status === 'matched') && (
+                        <View className="gap-4">
                             <PrimaryButton
                                 title="ACCEPT JOB"
                                 onPress={handleAccept}
                                 variant="accent"
-                                style={{ height: 64, borderRadius: Radius.md }}
+                                className="h-16 rounded-md shadow-md"
                             />
                             <TouchableOpacity
-                                style={{
-                                    alignItems: 'center',
-                                    padding: 20,
-                                    borderRadius: Radius.md,
-                                    borderWidth: 1.5,
-                                    borderColor: Colors.error,
-                                    backgroundColor: Colors.white
-                                }}
+                                className="items-center p-5 rounded-md border-[1.5px] border-error bg-white shadow-sm"
                                 onPress={handleDecline}
                             >
-                                <Text style={[Typography.label, { color: Colors.error, fontWeight: '900' }]}>DECLINE</Text>
+                                <Text className="text-label text-error font-jakarta-extrabold uppercase">Decline</Text>
                             </TouchableOpacity>
                         </View>
                     )}
@@ -211,18 +191,17 @@ export default function JobDetailsScreen() {
                             title={statusActions[artisanStatus].label}
                             onPress={() => handleStatusUpdate(statusActions[artisanStatus].next)}
                             variant="accent"
-                            style={{ height: 64, borderRadius: Radius.md }}
+                            className="h-16 rounded-md shadow-md"
                         />
                     )}
 
-                    <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <View className="flex-row gap-3">
                         <SecondaryButton
                             title="MESSAGE"
                             onPress={async () => {
                                 try {
                                     const { threadApi } = await import('@/services/api');
                                     const res = await threadApi.create({ 
-                                        artisanProfileId: '', // Backend will infer from user id
                                         jobRequestId: job.id 
                                     });
                                     router.push({ pathname: '/chat', params: { threadId: res.id } });
@@ -231,15 +210,15 @@ export default function JobDetailsScreen() {
                                     Alert.alert('Error', 'Unable to start chat with client.');
                                 }
                             }}
-                            style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
-                            textStyle={[Typography.label, { color: Colors.primary }]}
+                            className="flex-1 h-16 rounded-md border-primary border-[1.5px] bg-white"
+                            textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 10, letterSpacing: 1.2 }}
                         />
                         <SecondaryButton
                             title="CALL"
                             onPress={() => { }}
-                            style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
-                            textStyle={[Typography.label, { color: Colors.primary }]}
-                            icon={<Ionicons name="call" size={18} color={Colors.primary} />}
+                            className="flex-1 h-16 rounded-md border-primary border-[1.5px] bg-white"
+                            textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 10, letterSpacing: 1.2 }}
+                            icon={<Ionicons name="call" size={18} color="#00120C" />}
                         />
                     </View>
                 </Animated.View>
@@ -250,14 +229,10 @@ export default function JobDetailsScreen() {
 
 function DetailItem({ label, value }: { label: string; value: string }) {
     return (
-        <View style={{ marginBottom: 24 }}>
-            <Text style={[Typography.label, { fontSize: 8, color: Colors.muted, marginBottom: 8 }]}>{label}</Text>
-            <Text style={[Typography.body, {
-                color: Colors.primary,
-                fontWeight: '700',
-                fontSize: 15,
-                lineHeight: 22
-            }]}>{value}</Text>
+        <View className="mb-6">
+            <Text className="text-label text-[8px] text-muted mb-2 uppercase">{label}</Text>
+            <Text className="text-body text-primary font-jakarta-bold text-[15px] leading-[22px]">{value}</Text>
         </View>
     );
 }
+

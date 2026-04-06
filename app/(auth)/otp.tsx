@@ -119,7 +119,7 @@ export default function OTPScreen() {
                         borderColor: Colors.cardBorder
                     }}>
                         <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted }]}>
-                            Don't see it? Check your spam. It expires in{' '}
+                            Don&apos;t see it? Check your spam. It expires in{' '}
                             <Text style={{ fontWeight: '600', color: Colors.text }}>10 minutes.</Text>
                         </Text>
                     </View>

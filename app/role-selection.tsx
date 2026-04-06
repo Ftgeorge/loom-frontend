@@ -1,7 +1,6 @@
 import { LoomThread } from "@/components/ui/LoomThread";
 import { t } from "@/i18n";
 import { useAppStore } from "@/store";
-import { Colors, Radius, Shadows, Typography } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -18,66 +17,49 @@ export default function RoleSelectionScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <View className="flex-1 bg-background">
       <View style={StyleSheet.absoluteFill}>
         <LoomThread variant="dense" animated scale={1.5} opacity={0.5} />
       </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 32, justifyContent: 'center' }}>
-        <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 48 }}>
-          <Text style={[Typography.label, { color: Colors.primary, marginBottom: 12 }]}>LOOM</Text>
-          <Text style={[Typography.h1, { fontSize: 36, lineHeight: 38 }]}>
+        <Animated.View entering={FadeInDown.delay(100).springify()} className="mb-12">
+          <Text className="text-label text-primary mb-3">LOOM</Text>
+          <Text className="text-h1 text-[36px] leading-[38px]">
             How can we{"\n"}help you?
           </Text>
         </Animated.View>
 
-        <View style={{ gap: 24 }}>
+        <View className="gap-6">
           {/* Client Role */}
           <Animated.View entering={FadeInUp.delay(200).springify()}>
             <TouchableOpacity
-              style={{
-                backgroundColor: Colors.white,
-                borderRadius: Radius.md,
-                height: 200,
-                overflow: 'hidden',
-                borderWidth: 1.5,
-                borderColor: Colors.cardBorder,
-                ...Shadows.md
-              }}
+              className="bg-white rounded-md h-[200px] overflow-hidden border-[1.5px] border-card-border shadow-md"
               onPress={() => handleSelect("client")}
               activeOpacity={0.9}
             >
               <ImageBackground
                 source={require("../assets/images/client.jpg")}
-                style={{ position: 'absolute', width: '100%', height: '100%' }}
+                className="absolute w-full h-full"
                 resizeMode="cover"
               />
-              <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(10,38,30,0.7)' }} />
+              <View className="absolute top-0 left-0 right-0 bottom-0 bg-[#0A261E]/70" />
 
-              <View style={{ flex: 1, padding: 24, justifyContent: 'space-between' }}>
-                <View style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: Radius.xs,
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: 'rgba(255,255,255,0.3)'
-                }}>
+              <View className="flex-1 p-6 justify-between">
+                <View className="w-12 h-12 rounded-xs bg-white/20 items-center justify-center border border-white/30">
                   <Ionicons name="search-outline" size={24} color="white" />
                 </View>
 
                 <View>
-                  <Text style={[Typography.label, { color: Colors.gray300, fontSize: 10, marginBottom: 4 }]}>CLIENT</Text>
-                  <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>
+                  <Text className="text-label text-gray-300 text-[10px] mb-1">CLIENT</Text>
+                  <Text className="text-[24px] font-jakarta-extrabold text-white">
                     {t("iNeedArtisan", language)}
                   </Text>
                 </View>
               </View>
 
-              <View style={{ position: 'absolute', top: 12, right: 12 }}>
-                <Ionicons name="chevron-forward-circle" size={24} color="rgba(255,255,255,0.5)" />
+              <View className="absolute top-3 right-3">
+                <Ionicons name="chevron-forward-circle" size={24} className="text-white/50" />
               </View>
             </TouchableOpacity>
           </Animated.View>
@@ -85,49 +67,32 @@ export default function RoleSelectionScreen() {
           {/* Artisan Role */}
           <Animated.View entering={FadeInUp.delay(300).springify()}>
             <TouchableOpacity
-              style={{
-                backgroundColor: Colors.white,
-                borderRadius: Radius.md,
-                height: 200,
-                overflow: 'hidden',
-                borderWidth: 1.5,
-                borderColor: Colors.cardBorder,
-                ...Shadows.md
-              }}
+              className="bg-white rounded-md h-[200px] overflow-hidden border-[1.5px] border-card-border shadow-md"
               onPress={() => handleSelect("artisan")}
               activeOpacity={0.9}
             >
               <ImageBackground
                 source={require("../assets/images/artisan.jpg")}
-                style={{ position: 'absolute', width: '100%', height: '100%' }}
+                className="absolute w-full h-full"
                 resizeMode="cover"
               />
-              <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(124,71,39,0.7)' }} />
+              <View className="absolute top-0 left-0 right-0 bottom-0 bg-[#7C4727]/70" />
 
-              <View style={{ flex: 1, padding: 24, justifyContent: 'space-between' }}>
-                <View style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: Radius.xs,
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderWidth: 1,
-                  borderColor: 'rgba(255,255,255,0.3)'
-                }}>
+              <View className="flex-1 p-6 justify-between">
+                <View className="w-12 h-12 rounded-xs bg-white/20 items-center justify-center border border-white/30">
                   <Ionicons name="hammer-outline" size={24} color="white" />
                 </View>
 
                 <View>
-                  <Text style={[Typography.label, { color: 'rgba(255,255,255,0.8)', fontSize: 10, marginBottom: 4 }]}>ARTISAN</Text>
-                  <Text style={{ fontSize: 24, fontWeight: '800', color: 'white' }}>
+                  <Text className="text-label text-white/80 text-[10px] mb-1 uppercase">Artisan</Text>
+                  <Text className="text-[24px] font-jakarta-extrabold text-white">
                     {t("iAmArtisan", language)}
                   </Text>
                 </View>
               </View>
 
-              <View style={{ position: 'absolute', top: 12, right: 12 }}>
-                <Ionicons name="chevron-forward-circle" size={24} color="rgba(255,255,255,0.5)" />
+              <View className="absolute top-3 right-3">
+                <Ionicons name="chevron-forward-circle" size={24} className="text-white/50" />
               </View>
             </TouchableOpacity>
           </Animated.View>
@@ -135,20 +100,12 @@ export default function RoleSelectionScreen() {
 
         <Animated.View entering={FadeInUp.delay(500).springify()}>
           <TouchableOpacity
-            style={{
-              alignItems: 'center',
-              marginTop: 56,
-              padding: 20,
-              backgroundColor: Colors.white,
-              borderRadius: Radius.xs,
-              borderWidth: 1,
-              borderColor: Colors.cardBorder
-            }}
+            className="items-center mt-14 p-5 bg-white rounded-xs border border-card-border"
             onPress={() => router.push("/(auth)/sign-in")}
           >
-            <Text style={[Typography.label, { color: Colors.muted, fontSize: 10, textTransform: 'none' }]}>
+            <Text className="text-label text-muted text-[10px] lowercase leading-none">
               Been here before?{" "}
-              <Text style={{ color: Colors.primary, fontWeight: '800' }}>Log In</Text>
+              <Text className="text-primary font-jakarta-extrabold">Log In</Text>
             </Text>
           </TouchableOpacity>
         </Animated.View>
@@ -156,3 +113,4 @@ export default function RoleSelectionScreen() {
     </View>
   );
 }
+

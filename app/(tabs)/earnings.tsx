@@ -6,7 +6,6 @@ import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
 import { artisanApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { formatDate, formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -16,7 +15,7 @@ import Animated, { FadeInDown, FadeInUp, StretchInY } from 'react-native-reanima
 
 export default function EarningsScreen() {
     const router = useRouter();
-    const { language, setEarnings, earnings } = useAppStore();
+    const { setEarnings, earnings } = useAppStore();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
@@ -61,21 +60,21 @@ export default function EarningsScreen() {
     const maxBar = React.useMemo(() => earnings ? Math.max(...earnings.weeklyData.map((d) => d.amount), 1) : 1, [earnings]);
 
     if (loading) return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <SubAppHeader label="FINANCIALS" title="Earnings" description="Loading your financial data..." onNotification={() => router.push('/notifications')} />
-            <View style={{ padding: 24 }}><SkeletonList count={4} /></View>
+            <View className="p-6"><SkeletonList count={4} /></View>
         </View>
     );
 
     if (error || !earnings) return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <SubAppHeader label="FINANCIALS" title="Earnings" description="Something went wrong." onNotification={() => router.push('/notifications')} />
             <ErrorState onRetry={load} />
         </View>
     );
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.2} animated />
             <SubAppHeader
                 label="FINANCIALS"
@@ -87,100 +86,76 @@ export default function EarningsScreen() {
             <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
                 {/* Balance Hub */}
                 <Animated.View entering={FadeInDown.delay(100).springify()}>
-                    <Card style={{
-                        backgroundColor: Colors.white,
-                        padding: 32,
-                        borderRadius: Radius.sm,
-                        borderWidth: 1.5,
-                        borderColor: Colors.cardBorder,
-                        ...Shadows.md
-                    }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <View style={{ flex: 1 }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                                    <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: Colors.primary }} />
-                                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 9, letterSpacing: 1.2 }]}>AVAILABLE BALANCE</Text>
+                    <Card className="bg-white p-8 rounded-sm border-[1.5px] border-card-border shadow-md">
+                        <View className="flex-row justify-between items-start">
+                            <View className="flex-1">
+                                <View className="flex-row items-center gap-[6px] mb-2">
+                                    <View className="w-1 h-1 rounded-full bg-primary" />
+                                    <Text className="text-label text-muted text-[9px] tracking-[1.2px]">AVAILABLE BALANCE</Text>
                                 </View>
                                 <Text 
-                                    style={[Typography.display, { color: Colors.primary, fontSize: 36, fontWeight: '800' }]}
+                                    className="text-display text-primary text-[36px] font-jakarta-extrabold"
                                     adjustsFontSizeToFit
                                     numberOfLines={1}
                                 >
                                     {formatNaira(earnings.totalEarnings)}
                                 </Text>
                             </View>
-                            <View style={{ 
-                                width: 52, 
-                                height: 52, 
-                                borderRadius: Radius.md, 
-                                backgroundColor: Colors.surface,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderWidth: 1,
-                                borderColor: Colors.cardBorder
-                            }}>
-                                <Ionicons name="wallet" size={26} color={Colors.primary} />
+                            <View className="w-[52px] h-[52px] rounded-md bg-surface items-center justify-center border border-card-border">
+                                <Ionicons name="wallet" size={26} color="#00120C" />
                             </View>
                         </View>
 
-                        <View style={{
-                            flexDirection: 'row',
-                            marginTop: 32,
-                            paddingTop: 24,
-                            borderTopWidth: 1,
-                            borderTopColor: Colors.divider,
-                            justifyContent: 'space-between'
-                        }}>
+                        <View className="flex-row mt-8 pt-6 border-t border-divider justify-between">
                             <View>
-                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 8 }]}>WEEKLY REVENUE</Text>
-                                <Text style={[Typography.h3, { color: Colors.primary, marginTop: 4, fontSize: 16 }]}>{formatNaira(earnings.thisWeek)}</Text>
+                                <Text className="text-label text-muted text-[8px]">WEEKLY REVENUE</Text>
+                                <Text className="text-h3 text-primary mt-1 text-base">{formatNaira(earnings.thisWeek)}</Text>
                             </View>
-                            <View style={{ alignItems: 'flex-end' }}>
-                                <Text style={[Typography.label, { color: Colors.muted, fontSize: 8 }]}>PENDING PAYOUT</Text>
-                                <Text style={[Typography.h3, { color: Colors.accent, marginTop: 4, fontSize: 16 }]}>{formatNaira(earnings.pendingPayments)}</Text>
+                            <View className="items-end">
+                                <Text className="text-label text-muted text-[8px]">PENDING PAYOUT</Text>
+                                <Text className="text-h3 text-accent mt-1 text-base">{formatNaira(earnings.pendingPayments)}</Text>
                             </View>
                         </View>
                     </Card>
                 </Animated.View>
 
                 {/* Balance Hub Actions */}
-                <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginTop: 24 }}>
+                <Animated.View entering={FadeInDown.delay(200).springify()} className="mt-6">
                     <PrimaryButton
                         title="WITHDRAW FUNDS"
                         onPress={() => { }}
                         variant="accent"
-                        style={{ height: 64, borderRadius: Radius.sm, ...Shadows.md }}
-                        icon={<Ionicons name="paper-plane" size={20} color={Colors.white} />}
+                        className="h-16 rounded-sm shadow-md"
+                        icon={<Ionicons name="paper-plane" size={20} color="white" />}
                     />
                 </Animated.View>
 
                 {/* Velocity Visualization */}
                 <Animated.View entering={FadeInUp.delay(300).springify()}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 48, marginBottom: 20 }}>
+                    <View className="flex-row justify-between items-end mt-12 mb-5">
                         <View>
-                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 4 }]}>EARNINGS OVERVIEW</Text>
-                            <Text style={[Typography.h3, { fontSize: 20 }]}>Performance</Text>
+                            <Text className="text-label text-primary mb-1 uppercase">Earnings Overview</Text>
+                            <Text className="text-h3 text-[20px]">Performance</Text>
                         </View>
-                        <View style={{ backgroundColor: Colors.primaryLight, paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.full }}>
-                            <Text style={[Typography.label, { color: Colors.primary, fontSize: 10 }]}>THIS WEEK</Text>
+                        <View className="bg-primary/5 px-3 py-[6px] rounded-full">
+                            <Text className="text-label text-primary text-[10px]">THIS WEEK</Text>
                         </View>
                     </View>
 
-                    <Card style={{ paddingVertical: 28, paddingHorizontal: 20, marginBottom: 24, borderRadius: Radius.sm, backgroundColor: Colors.white, borderColor: Colors.cardBorder }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 120, alignItems: 'flex-end' }}>
+                    <Card className="py-7 px-5 mb-6 rounded-sm bg-white border border-card-border">
+                        <View className="flex-row justify-between h-[120px] items-end">
                             {earnings.weeklyData.map((d, i) => (
-                                <View key={`${d.day}-${i}`} style={{ alignItems: 'center', flex: 1 }}>
+                                <View key={`${d.day}-${i}`} className="items-center flex-1">
                                     <Animated.View
                                         entering={StretchInY.delay(400 + i * 50)}
+                                        className={`rounded-[3px] w-[14px] ${
+                                            i === 4 ? 'bg-accent opacity-100' : 'bg-primary opacity-[0.12]'
+                                        }`}
                                         style={{
-                                            backgroundColor: i === 4 ? Colors.accent : Colors.primary,
-                                            borderRadius: 3,
-                                            width: 14,
                                             height: `${Math.max((d.amount / maxBar) * 100, 8)}%`,
-                                            opacity: i === 4 ? 1 : 0.12
                                         }}
                                     />
-                                    <Text style={[Typography.label, { fontSize: 8, color: Colors.muted, marginTop: 12 }]}>{d.day}</Text>
+                                    <Text className="text-label text-[8px] text-muted mt-3">{d.day}</Text>
                                 </View>
                             ))}
                         </View>
@@ -188,53 +163,34 @@ export default function EarningsScreen() {
                 </Animated.View>
 
                 {/* Activity Ledger */}
-                <View style={{ marginTop: 40 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 12 }]}>PAYMENT HISTORY</Text>
+                <View className="mt-10">
+                    <Text className="text-label text-primary mb-3">PAYMENT HISTORY</Text>
                     {earnings.transactions.length === 0 ? (
-                        <Card style={{ padding: 48, alignItems: 'center', backgroundColor: Colors.surface, borderStyle: 'dashed', borderColor: Colors.cardBorder, borderRadius: Radius.sm }}>
-                            <Ionicons name="receipt-outline" size={32} color={Colors.muted} />
-                            <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 16 }]}>NO TRANSACTIONS YET</Text>
+                        <Card className="p-12 items-center bg-surface border-dashed border-card-border rounded-sm">
+                            <Ionicons name="receipt-outline" size={32} color="#8F9B94" />
+                            <Text className="text-body-sm text-muted mt-4 uppercase">No transactions yet</Text>
                         </Card>
                     ) : (
-                        <View style={{ gap: 12 }}>
+                        <View className="gap-3">
                             {earnings.transactions.map((tx, index) => (
                                 <Animated.View key={tx.id} entering={FadeInUp.delay(500 + index * 100).springify()}>
                                     <TouchableOpacity
-                                        style={{
-                                            flexDirection: 'row',
-                                            alignItems: 'center',
-                                            gap: 16,
-                                            padding: 20,
-                                            backgroundColor: Colors.white,
-                                            borderRadius: Radius.sm,
-                                            borderWidth: 1.5,
-                                            borderColor: Colors.cardBorder,
-                                            ...Shadows.sm
-                                        }}
+                                        className="flex-row items-center gap-4 p-5 bg-white rounded-sm border-[1.5px] border-card-border shadow-sm"
                                     >
                                         <View
-                                            style={{
-                                                width: 36,
-                                                height: 36,
-                                                borderRadius: Radius.xs,
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                backgroundColor: tx.type === 'credit' ? Colors.surface : Colors.surface,
-                                                borderWidth: 1,
-                                                borderColor: Colors.cardBorder
-                                            }}
+                                            className="w-9 h-9 rounded-xs items-center justify-center bg-surface border border-card-border"
                                         >
                                             <Ionicons
                                                 name={tx.type === 'credit' ? 'arrow-down' : 'arrow-up'}
                                                 size={16}
-                                                color={tx.type === 'credit' ? Colors.primary : Colors.accent}
+                                                className={tx.type === 'credit' ? 'text-primary' : 'text-accent'}
                                             />
                                         </View>
-                                        <View style={{ flex: 1 }}>
-                                            <Text style={[Typography.body, { color: Colors.text, fontWeight: '700', fontSize: 14 }]} numberOfLines={1}>{tx.description}</Text>
-                                            <Text style={[Typography.label, { color: Colors.muted, fontSize: 9, marginTop: 4, textTransform: 'none' }]}>{formatDate(tx.date)}</Text>
+                                        <View className="flex-1">
+                                            <Text className="text-body text-ink font-jakarta-bold text-base" numberOfLines={1}>{tx.description}</Text>
+                                            <Text className="text-label text-muted text-[9px] mt-1 lowercase">{formatDate(tx.date)}</Text>
                                         </View>
-                                        <Text style={[Typography.h3, { color: tx.type === 'credit' ? Colors.primary : Colors.accent, fontSize: 16 }]}>
+                                        <Text className={`text-h3 text-base ${tx.type === 'credit' ? 'text-primary' : 'text-accent'}`}>
                                             {tx.type === 'credit' ? '+' : '-'}{formatNaira(tx.amount)}
                                         </Text>
                                     </TouchableOpacity>
@@ -247,3 +203,4 @@ export default function EarningsScreen() {
         </View>
     );
 }
+

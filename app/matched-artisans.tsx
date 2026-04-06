@@ -5,7 +5,6 @@ import { SkeletonList } from '@/components/ui/SkeletonLoader';
 import { ErrorState } from '@/components/ui/StateComponents';
 import { artisanApi } from '@/services/api';
 import { mapArtisan } from '@/services/mappers';
-import { Colors, Typography } from '@/theme';
 import type { Artisan } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -16,7 +15,6 @@ const SORT_OPTIONS = ['Best for you', 'Best ratings', 'Lowest cost'];
 
 export default function MatchedArtisansScreen() {
     const router = useRouter();
-    // skill param comes from post-job after a job is created
     const { skill } = useLocalSearchParams<{ skill?: string }>();
     const [artisans, setArtisans] = useState<Artisan[]>([]);
     const [loading, setLoading] = useState(true);
@@ -26,9 +24,8 @@ export default function MatchedArtisansScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
-            // GET /artisans/search?skill=<skill>
             const res = await artisanApi.search({
-                skill: skill || 'plumber', // fall back to a common skill
+                skill: skill || 'plumber',
                 limit: 20,
             });
             const results = (res.results as any[])
@@ -51,16 +48,16 @@ export default function MatchedArtisansScreen() {
     });
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <AppHeader title="Results" showBack onBack={() => router.back()} showNotification={false} />
 
             <FlatList
                 data={sorted}
                 ListHeaderComponent={
                     <View>
-                        <View style={{ padding: 24, paddingBottom: 0 }}>
-                            <Text style={Typography.h2}>Ready to help</Text>
-                            <Text style={[Typography.bodySmall, { color: Colors.textSecondary, marginTop: 4 }]}>
+                        <View className="px-6 pt-6">
+                            <Text className="text-h2 uppercase">Ready to help</Text>
+                            <Text className="text-body-sm text-muted mt-1 normal-case leading-5">
                                 {loading
                                     ? 'Searching...'
                                     : `${artisans.length} pros ready now.`}
@@ -74,9 +71,10 @@ export default function MatchedArtisansScreen() {
                             keyExtractor={(item) => item}
                             renderItem={({ item, index }) => (
                                 <Chip
-                                    label={item}
+                                    label={item.toUpperCase()}
                                     selected={sortIdx === index}
                                     onPress={() => setSortIdx(index)}
+                                    className="px-6 py-3 rounded-full"
                                 />
                             )}
                         />
@@ -91,7 +89,7 @@ export default function MatchedArtisansScreen() {
                 renderItem={({ item, index }) => (
                     <Animated.View
                         entering={FadeInDown.delay(index * 100)}
-                        style={{ paddingHorizontal: 24 }}
+                        className="px-6"
                     >
                         <ArtisanCard
                             artisan={item}
@@ -102,10 +100,10 @@ export default function MatchedArtisansScreen() {
                         />
                     </Animated.View>
                 )}
-                ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+                ItemSeparatorComponent={() => <View className="h-4" />}
                 ListEmptyComponent={
                     loading ? (
-                        <View style={{ paddingHorizontal: 24 }}>
+                        <View className="px-6">
                             <SkeletonList count={4} type="artisan" />
                         </View>
                     ) : error ? (
@@ -116,3 +114,4 @@ export default function MatchedArtisansScreen() {
         </View>
     );
 }
+

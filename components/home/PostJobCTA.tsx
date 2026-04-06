@@ -1,4 +1,3 @@
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
@@ -10,56 +9,39 @@ import Animated, {
 
 interface PostJobCTAProps {
     onPress: () => void;
+    className?: string;
 }
 
-export function PostJobCTA({ onPress }: PostJobCTAProps) {
+export function PostJobCTA({ onPress, className = '' }: PostJobCTAProps) {
     const scale = useSharedValue(1);
     const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
 
     return (
-        <Animated.View style={[animatedStyle, { marginBottom: 40 }]}>
+        <Animated.View style={animatedStyle} className={`mb-10 ${className}`}>
             <TouchableOpacity
-                style={{
-                    borderRadius: Radius.sm,
-                    borderWidth: 1.5,
-                    borderColor: Colors.primary + '40',
-                    borderStyle: 'dashed',
-                    padding: 24,
-                    backgroundColor: Colors.primaryLight,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: 16,
-                }}
+                className="bg-primary-light border-[1.5px] border-primary/40 border-dashed rounded-sm p-6 flex-row items-center gap-4"
                 onPress={onPress}
                 onPressIn={() => { scale.value = withSpring(0.98, { damping: 15 }); }}
                 onPressOut={() => { scale.value = withSpring(1, { damping: 15 }); }}
                 activeOpacity={1}
             >
-                <View style={{
-                    width: 52, height: 52, borderRadius: 16,
-                    backgroundColor: Colors.primary,
-                    alignItems: 'center', justifyContent: 'center',
-                    ...Shadows.violet,
-                }}>
-                    <Ionicons name="add" size={28} color={Colors.white} />
+                <View className="w-[52px] h-[52px] rounded-md bg-primary items-center justify-center shadow-violet">
+                    <Ionicons name="add" size={28} color="white" />
                 </View>
-                <View style={{ flex: 1 }}>
-                    <Text style={{
-                        fontSize: 10, fontFamily: 'PlusJakartaSans-Bold',
-                        color: Colors.primary, letterSpacing: 0.5,
-                        marginBottom: 4, textTransform: 'uppercase',
-                    }}>
+                <View className="flex-1">
+                    <Text className="text-[10px] font-jakarta-bold text-primary tracking-[0.5px] mb-1 uppercase">
                         Post a Job
                     </Text>
-                    <Text style={[Typography.h3, { fontSize: 18, color: Colors.ink }]}>
+                    <Text className="text-h3 text-[18px] text-ink">
                         What do you need done?
                     </Text>
-                    <Text style={[Typography.bodySmall, { fontSize: 12, marginTop: 4 }]}>
+                    <Text className="text-body-sm text-[12px] mt-1">
                         Post a request and let Loom find the right artisans
                     </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+                <Ionicons name="chevron-forward" size={20} className="text-primary" />
             </TouchableOpacity>
         </Animated.View>
     );
 }
+

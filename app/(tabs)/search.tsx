@@ -8,59 +8,17 @@ import { ErrorState } from '@/components/ui/StateComponents';
 import { AppTextInput } from '@/components/ui/TextInputs';
 import { artisanApi } from '@/services/api';
 import { mapArtisan } from '@/services/mappers';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { Artisan } from '@/types';
 import { CATEGORIES } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useAppStore } from '@/store';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, Text, View } from 'react-native';
-import Animated, { Easing, FadeInDown, interpolate, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-const ScanningBar = () => {
-    const progress = useSharedValue(0);
-
-    useEffect(() => {
-        progress.value = withRepeat(
-            withTiming(1, { duration: 2000, easing: Easing.linear }),
-            -1,
-            false
-        );
-    }, [progress]);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ translateY: interpolate(progress.value, [0, 1], [0, 600]) }],
-        opacity: interpolate(progress.value, [0, 0.1, 0.5, 0.9, 1], [0, 1, 1, 1, 0]),
-    }));
-
-    return (
-        <Animated.View
-            style={[
-                {
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 2,
-                    backgroundColor: Colors.accent,
-                    zIndex: 20,
-                    shadowColor: Colors.accent,
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: 0.8,
-                    shadowRadius: 10,
-                    elevation: 5,
-                },
-                animatedStyle,
-            ]}
-        />
-    );
-};
+import { FlatList, Platform, Text, View } from 'react-native';
+import Animated, { FadeInDown} from 'react-native-reanimated';
 
 export default function SearchScreen() {
     const router = useRouter();
-    const insets = useSafeAreaInsets();
     const params = useLocalSearchParams<{ category?: string }>();
     const [query, setQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -71,6 +29,7 @@ export default function SearchScreen() {
     const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     const [viewLayout, setViewLayout] = useState<'grid' | 'list'>('grid');
     const { user } = useAppStore();
+
     // Sync with params
     useEffect(() => {
         if (params.category) {
@@ -129,9 +88,8 @@ export default function SearchScreen() {
     }, [query, selectedCategory, search]);
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.2} animated />
-            {(loading || isSearching) && <ScanningBar />}
             
             <SubAppHeader
                 label="EXPLORE"
@@ -140,21 +98,25 @@ export default function SearchScreen() {
                 onNotification={() => router.push('/notifications')}
             />
 
-            <View style={{ paddingHorizontal: 24, paddingBottom: 16 }}>
+            <View className="px-6 pb-4">
                 <AppTextInput
                     placeholder="Search by name, skill, or location..."
                     value={query}
                     onChangeText={setQuery}
                     containerStyle={{
-                        borderRadius: Radius.lg,
-                        backgroundColor: Colors.white,
+                        borderRadius: 24,
+                        backgroundColor: 'white',
                         borderWidth: 1.5,
-                        borderColor: isSearching ? Colors.primary : Colors.cardBorder,
-                        ...Shadows.sm
+                        borderColor: isSearching ? '#00120C' : '#F0F0EE',
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.05,
+                        shadowRadius: 10,
+                        elevation: 2
                     }}
                     leftIcon={
-                        <View style={{ paddingLeft: 20 }}>
-                            <Ionicons name="search" size={22} color={Colors.muted} />
+                        <View className="pl-5">
+                            <Ionicons name="search" size={22} className="text-muted" />
                         </View>
                     }
                 />
@@ -171,14 +133,14 @@ export default function SearchScreen() {
                 initialNumToRender={10}
                 maxToRenderPerBatch={10}
                 windowSize={5}
-                removeClippedSubviews={true}
+                removeClippedSubviews={Platform.OS !== 'web'}
                 ListHeaderComponent={
-                    <View style={{ marginBottom: 24 }}>
+                    <View className="mb-6">
                         <FlatList
                             data={[{ id: 'all', label: 'ALL SERVICES' }, ...CATEGORIES]}
                             horizontal
                             showsHorizontalScrollIndicator={false}
-                            style={{ marginHorizontal: -24 }}
+                            className="-mx-6"
                             contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 12, gap: 10 }}
                             keyExtractor={(item) => item.id}
                             renderItem={({ item }) => (
@@ -194,40 +156,29 @@ export default function SearchScreen() {
                             )}
                         />
 
-                        {/* <LayoutSwitch/> */}
-
                         {loading ? (
-                            <View style={{ marginTop: 24 }}>
+                            <View className="mt-6">
                                 <SkeletonList count={4} type="artisan" />
                             </View>
                         ) : error ? (
-                            <View style={{ marginTop: 24 }}>
+                            <View className="mt-6">
                                 <ErrorState onRetry={() => search(selectedCategory, query)} />
                             </View>
                         ) : artisans.length === 0 ? (
-                            <View style={{
-                                marginTop: 64,
-                                padding: 48,
-                                alignItems: 'center',
-                                borderStyle: 'dashed',
-                                backgroundColor: Colors.white,
-                                borderColor: Colors.cardBorder,
-                                borderRadius: Radius.md,
-                                borderWidth: 1.5
-                            }}>
-                                <Ionicons name="search" size={48} color={Colors.cardBorder} />
-                                <Text style={[Typography.h3, { textAlign: 'center', color: Colors.primary, marginTop: 24 }]}>
+                            <View className="mt-16 p-12 items-center border-dashed bg-white border-card-border rounded-md border-[1.5px]">
+                                <Ionicons name="search" size={48} className="text-card-border" />
+                                <Text className="text-h3 text-center text-primary mt-6">
                                     NO RESULTS
                                 </Text>
-                                <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted, marginTop: 12, lineHeight: 20 }]}>
+                                <Text className="text-body-sm text-center text-muted mt-3 leading-5">
                                     We couldn&apos;t find any artisans matching your current search parameters.
                                 </Text>
                             </View>
                         ) : (
-                            <View style={{ marginTop: 24, marginBottom: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.accent }} />
-                                    <Text style={[Typography.label, { fontSize: 10, color: Colors.primary, letterSpacing: 1, fontWeight: '700' }]}>
+                            <View className="mt-6 mb-2 flex-row items-center justify-between">
+                                <View className="flex-row items-center gap-2">
+                                    <View className="w-[6px] h-[6px] rounded-full bg-accent" />
+                                    <Text className="text-label text-[10px] text-primary tracking-[1px] font-jakarta-bold uppercase">
                                         FOUND {artisans.length} ARTISANS
                                     </Text>
                                 </View>
@@ -242,11 +193,7 @@ export default function SearchScreen() {
                 renderItem={({ item, index }) => (
                         <Animated.View
                             entering={FadeInDown.delay(100 + index * 50).springify()}
-                            style={{
-                                marginBottom: 16,
-                                flex: viewLayout === 'grid' ? 0.5 : 1,
-                                paddingHorizontal: viewLayout === 'grid' ? 0 : 0 // handled by columnWrapperStyle or paddingHorizontal above
-                            }}
+                            className={`mb-4 ${viewLayout === 'grid' ? 'flex-[0.5]' : 'flex-1'}`}
                         >
                             <ArtisanCard
                                 artisan={item}
@@ -266,3 +213,4 @@ export default function SearchScreen() {
         </View>
     );
 }
+

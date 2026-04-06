@@ -4,7 +4,6 @@ import { PrimaryButton } from '@/components/ui/Buttons';
 import { Chip } from '@/components/ui/CardChipBadge';
 import { userApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { CategoryId, CATEGORIES } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -115,7 +114,7 @@ export default function ProfileCompletionScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <View style={StyleSheet.absoluteFill}>
                 <LoomThread variant="dense" scale={1.2} animated opacity={0.3} />
             </View>
@@ -127,19 +126,15 @@ export default function ProfileCompletionScreen() {
             />
 
             {/* Progress Indicator */}
-            <View style={{ flexDirection: 'row', paddingHorizontal: 24, paddingVertical: 16, gap: 8, marginHorizontal: 32 }}>
+            <View className="flex-row px-6 py-4 gap-2 mx-8">
                 {STEPS.filter((_, i) => user?.role !== 'artisan' || i === 0).map((s, i) => (
-                    <View key={s} style={{ flex: 1, gap: 4 }}>
-                        <View style={{
-                            height: 3,
-                            borderRadius: 2,
-                            backgroundColor: i <= activeStep ? Colors.primary : Colors.cardBorder
-                        }} />
-                        <Text style={[Typography.label, {
-                            fontSize: 9,
-                            color: i === activeStep ? Colors.primary : Colors.muted,
-                            fontWeight: i === activeStep ? '700' : '500'
-                        }]}>
+                    <View key={s} className="flex-1 gap-1">
+                        <View className={`h-[3px] rounded-full ${
+                            i <= activeStep ? 'bg-primary' : 'bg-card-border'
+                        }`} />
+                        <Text className={`text-label text-[9px] uppercase ${
+                            i === activeStep ? 'text-primary font-jakarta-bold' : 'text-muted font-jakarta-medium'
+                        }`}>
                             {s}
                         </Text>
                     </View>
@@ -148,69 +143,38 @@ export default function ProfileCompletionScreen() {
 
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }} keyboardShouldPersistTaps="handled">
                 {activeStep === 0 && (
-                    <Animated.View entering={FadeInUp.springify()} style={{ padding: 32 }}>
-                        <View style={{ alignItems: 'center', marginBottom: 40 }}>
+                    <Animated.View entering={FadeInUp.springify()} className="p-8">
+                        <View className="items-center mb-10">
                             <TouchableOpacity
                                 activeOpacity={0.8}
                                 onPress={pickImage}
-                                style={{
-                                    width: 140,
-                                    height: 140,
-                                    borderRadius: 70,
-                                    backgroundColor: Colors.white,
-                                    borderWidth: 1.5,
-                                    borderColor: Colors.primary,
-                                    borderStyle: profileImage ? 'solid' : 'dashed',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    padding: 4,
-                                    ...Shadows.md
-                                }}
+                                className={`w-[140px] h-[140px] rounded-full bg-white border-[1.5px] items-center justify-center p-1 shadow-md ${
+                                    profileImage ? 'border-primary border-solid' : 'border-primary border-dashed'
+                                }`}
                             >
-                                <View style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    borderRadius: 70,
-                                    backgroundColor: Colors.primaryLight,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    overflow: 'hidden'
-                                }}>
+                                <View className="w-full h-full rounded-full bg-primary/5 items-center justify-center overflow-hidden">
                                     {profileImage ? (
-                                        <Image source={{ uri: profileImage }} style={{ width: '100%', height: '100%' }} />
+                                        <Image source={{ uri: profileImage }} className="w-full h-full" />
                                     ) : (
-                                        <Ionicons name="person" size={60} color={Colors.primary} />
+                                        <Ionicons name="person" size={60} color="#00120C" />
                                     )}
                                 </View>
-                                <View style={{
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    right: 4,
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: 20,
-                                    backgroundColor: Colors.accent,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    borderWidth: 3,
-                                    borderColor: Colors.white,
-                                    ...Shadows.sm
-                                }}>
-                                    <Ionicons name={profileImage ? "create" : "camera"} size={20} color={Colors.white} />
+                                <View className="absolute bottom-0 right-1 w-10 h-10 rounded-full bg-accent items-center justify-center border-[3px] border-white shadow-sm">
+                                    <Ionicons name={profileImage ? "create" : "camera"} size={20} color="white" />
                                 </View>
                             </TouchableOpacity>
-                            <Text style={[Typography.h3, { marginTop: 20, fontSize: 20 }]}>
+                            <Text className="text-h3 mt-5 text-[20px]">
                                 {user?.role === 'artisan' ? 'Add Business Photo' : 'Add Profile Photo'}
                             </Text>
-                            <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 4 }]}>
+                            <Text className="text-body-sm text-muted mt-1">
                                 {user?.role === 'artisan' ? 'Show clients who you are' : 'Help people recognize you'}
                             </Text>
                         </View>
 
-                        <Text style={{ fontSize: 24, fontWeight: '800', color: Colors.text, marginBottom: 8 }}>
+                        <Text className="text-[24px] font-jakarta-extrabold text-ink mb-2">
                             {user?.role === 'artisan' ? 'Where are you based?' : 'Where are you based?'}
                         </Text>
-                        <Text style={{ fontSize: 16, color: Colors.textSecondary, lineHeight: 24, marginBottom: 32 }}>
+                        <Text className="text-base text-ink/70 leading-6 mb-8">
                             {user?.role === 'artisan'
                                 ? 'This helps clients in your area find and book your services.'
                                 : 'This helps us show you pros in your neighborhood.'}
@@ -259,23 +223,23 @@ export default function ProfileCompletionScreen() {
                         <PrimaryButton
                             title="Continue"
                             onPress={nextStep}
-                            style={{ marginTop: 24, height: 60, borderRadius: Radius.md }}
+                            className="mt-6 h-[60px] rounded-md"
                         />
                     </Animated.View>
                 )}
 
                 {activeStep === 1 && (
-                    <Animated.View entering={FadeInRight} style={{ padding: 32 }}>
-                        <Text style={{ fontSize: 24, fontWeight: '800', color: Colors.text, marginBottom: 8 }}>
+                    <Animated.View entering={FadeInRight} className="p-8">
+                        <Text className="text-[24px] font-jakarta-extrabold text-ink mb-2">
                             What services do you need?
                         </Text>
-                        <Text style={{ fontSize: 16, color: Colors.textSecondary, lineHeight: 24, marginBottom: 32 }}>
+                        <Text className="text-base text-ink/70 leading-6 mb-8">
                             We&apos;ll customize your home feed based on your interests.
                         </Text>
 
-                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                        <View className="flex-row flex-wrap gap-[10px]">
                             {CATEGORIES.map((cat) => (
-                                <View key={cat.id} style={{ marginBottom: 4 }}>
+                                <View key={cat.id} className="mb-1">
                                     <Chip
                                         label={cat.label}
                                         selected={selectedInterests.includes(cat.id)}
@@ -289,15 +253,15 @@ export default function ProfileCompletionScreen() {
                             title="Complete Setup"
                             onPress={nextStep}
                             loading={loading}
-                            style={{ marginTop: 40 }}
+                            className="mt-10"
                             disabled={selectedInterests.length === 0}
                         />
 
                         <TouchableOpacity
                             onPress={handleComplete}
-                            style={{ alignItems: 'center', marginTop: 16, padding: 8 }}
+                            className="items-center mt-4 p-2"
                         >
-                            <Text style={{ color: Colors.muted, fontWeight: '600' }}>Skip for now</Text>
+                            <Text className="text-muted font-jakarta-semibold">Skip for now</Text>
                         </TouchableOpacity>
                     </Animated.View>
                 )}
@@ -305,3 +269,4 @@ export default function ProfileCompletionScreen() {
         </View>
     );
 }
+

@@ -4,7 +4,7 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { AppTextInput, PasswordInput, PhoneInput } from '@/components/ui/TextInputs';
 import { authApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
+import { Colors, Radius, Typography } from '@/theme';
 import { SignUpSchema, mapZodErrors } from '@/utils/helpers';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -164,12 +164,12 @@ export default function SignUpScreen() {
                         borderColor: Colors.cardBorder
                     }}>
                         <Text style={[Typography.label, { color: Colors.muted, fontSize: 10, textTransform: 'none' }]}>
-                            Been here?{" "}
+                            Have an account?{" "}
                             <Text
                                 onPress={() => router.push('/(auth)/sign-in')}
                                 style={{ color: Colors.primary, fontWeight: '800' }}
                             >
-                                GET IN
+                                Log In
                             </Text>
                         </Text>
                     </View>

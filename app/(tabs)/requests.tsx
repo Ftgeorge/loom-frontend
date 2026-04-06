@@ -1,4 +1,3 @@
-import { AppHeader } from '@/components/AppHeader';
 import { SubAppHeader } from '@/components/AppSubHeader';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { RequestCard } from '@/components/ui/RequestCard';
@@ -8,7 +7,6 @@ import { ErrorState } from '@/components/ui/StateComponents';
 import { jobApi } from '@/services/api';
 import { mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Typography } from '@/theme';
 import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
@@ -18,10 +16,10 @@ const SEGMENTS = ['ACTIVE', 'COMPLETED', 'CANCELLED'];
 
 export default function RequestsScreen() {
     const router = useRouter();
-    const { jobs, setJobs, language } = useAppStore();
+    const { jobs, setJobs } = useAppStore();
     const [segIdx, setSegIdx] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false);
+    const [, setError] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
     const load = useCallback(async () => {
@@ -60,7 +58,7 @@ export default function RequestsScreen() {
     );
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.2} animated />
             <SubAppHeader
                 title="My Bookings"
@@ -68,7 +66,7 @@ export default function RequestsScreen() {
                 description="Keep track of your service requests and appointments."
                 onNotification={() => router.push('/notifications')}
             />
-            <View style={{ paddingHorizontal: 24 }}>
+            <View className="px-6">
                 <SegmentedControl
                     segments={SEGMENTS}
                     selected={segIdx}
@@ -77,24 +75,14 @@ export default function RequestsScreen() {
             </View>
 
             {loading ? (
-                <View style={{ padding: 24 }}><SkeletonList count={3} type="request" /></View>
-            ) : error ? (
-                <ErrorState onRetry={load} />
+                <View className="p-6"><SkeletonList count={3} type="request" /></View>
             ) : jobs.length === 0 ? (
-                <View style={{ flex: 1, justifyContent: 'center', padding: 24 }}>
-                    <View style={{
-                        padding: 48,
-                        alignItems: 'center',
-                        borderStyle: 'dashed',
-                        backgroundColor: Colors.white,
-                        borderColor: Colors.cardBorder,
-                        borderRadius: Radius.md,
-                        borderWidth: 1.5
-                    }}>
-                        <Text style={[Typography.h3, { textAlign: 'center', color: Colors.primary }]}>
+                <View className="flex-1 justify-center p-6">
+                    <View className="p-12 items-center border-dashed bg-white border-card-border rounded-md border-[1.5px]">
+                        <Text className="text-h3 text-center text-primary">
                             {segIdx === 0 ? 'NO ACTIVE REQUESTS' : segIdx === 1 ? 'NO COMPLETED REQUESTS' : 'NO CANCELLED REQUESTS'}
                         </Text>
-                        <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted, marginTop: 12, lineHeight: 20 }]}>
+                        <Text className="text-body-sm text-center text-muted mt-3 leading-5">
                             {segIdx === 0
                                 ? "You don't have any active service requests right now."
                                 : "Your past requests will appear here once you have them."}
@@ -110,8 +98,7 @@ export default function RequestsScreen() {
                     initialNumToRender={10}
                     maxToRenderPerBatch={10}
                     windowSize={5}
-                    removeClippedSubviews={true}
-                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={Colors.primary} />}
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor="#00120C" />}
                     renderItem={({ item, index }) => (
                         <Animated.View entering={FadeInDown.delay(index * 100).springify()}>
                             <RequestCard
@@ -120,9 +107,10 @@ export default function RequestsScreen() {
                             />
                         </Animated.View>
                     )}
-                    ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+                    ItemSeparatorComponent={() => <View className="h-4" />}
                 />
             )}
         </View>
     );
 }
+

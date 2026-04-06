@@ -1,12 +1,9 @@
 import { Avatar, RatingStars } from '@/components/ui/AvatarRating';
-import { Badge, Chip } from '@/components/ui/CardChipBadge';
-import { LoomThread } from '@/components/ui/LoomThread';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { Artisan } from '@/types';
 import { formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback } from 'react';
-import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ImageBackground, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
 interface ArtisanCardProps {
@@ -15,6 +12,7 @@ interface ArtisanCardProps {
     grid?: boolean;
     list?: boolean;
     featured?: boolean;
+    className?: string;
 }
 
 const ArtisanCardComponent: React.FC<ArtisanCardProps> = ({
@@ -23,6 +21,7 @@ const ArtisanCardComponent: React.FC<ArtisanCardProps> = ({
     grid = false,
     list = false,
     featured = false,
+    className = '',
 }) => {
     const scale = useSharedValue(1);
 
@@ -55,68 +54,76 @@ const ArtisanCardComponent: React.FC<ArtisanCardProps> = ({
     const craftImage = getCraftImage(artisan.skills);
 
     const renderList = () => (
-        <Animated.View style={[styles.card, styles.listCard, animatedStyle]}>
+        <Animated.View 
+            style={animatedStyle}
+            className={`bg-surface rounded-md shadow-sm border-[1px] border-card-border overflow-hidden flex-row mb-3 ${className}`}
+        >
             <TouchableOpacity
                 onPress={onPress}
                 onPressIn={onPressIn}
                 onPressOut={onPressOut}
                 activeOpacity={1}
-                style={[styles.touchable, { flexDirection: 'row' }]}
+                className="flex-1 flex-row"
             >
-                <View style={styles.imageContainer}>
-                    <ImageBackground source={craftImage} style={styles.fullImage}>
-                        <View style={styles.overlay} />
+                <View className="w-[100px] h-[100px]">
+                    <ImageBackground source={craftImage} className="w-full h-full">
+                        <View className="absolute inset-0 bg-black/10" />
                     </ImageBackground>
                 </View>
 
-                <View style={styles.content}>
-                    <View style={styles.headerRow}>
-                        <Text style={styles.name} numberOfLines={1}>{artisan.name}</Text>
-                        {artisan.verified && <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />}
+                <View className="flex-1 p-4 justify-center">
+                    <View className="flex-row items-center gap-1">
+                        <Text className="text-h3 text-[16px]" numberOfLines={1}>{artisan.name}</Text>
+                        {artisan.verified && <Ionicons name="checkmark-circle" size={16} className="text-primary" />}
                     </View>
-                    <Text style={styles.skills} numberOfLines={1}>{artisan.skills.join(' • ')}</Text>
+                    <Text className="text-body-sm text-muted mt-1" numberOfLines={1}>{artisan.skills.join(' • ')}</Text>
                     
-                    <View style={styles.footerRow}>
+                    <View className="flex-row items-center justify-between mt-3">
                         <RatingStars rating={artisan.rating} size={10} showValue={false} />
-                        <Text style={styles.price}>From {formatNaira(artisan.baseFee)}</Text>
+                        <Text className="text-label text-primary text-[10px] normal-case tracking-normal">
+                            From {formatNaira(artisan.baseFee)}
+                        </Text>
                     </View>
                 </View>
 
-                <View style={styles.viewBadge}>
-                    <Text style={styles.viewText}>VIEW</Text>
+                <View className="absolute top-3 right-3 bg-primary-light px-2 py-1 rounded-xs">
+                    <Text className="text-label text-[8px] text-primary">VIEW</Text>
                 </View>
             </TouchableOpacity>
         </Animated.View>
     );
 
     const renderGrid = () => (
-        <Animated.View style={[styles.card, styles.gridCard, animatedStyle]}>
+        <Animated.View 
+            style={animatedStyle}
+            className={`bg-surface rounded-md shadow-sm border-[1px] border-card-border overflow-hidden flex-1 m-[6px] ${className}`}
+        >
             <TouchableOpacity
                 onPress={onPress}
                 onPressIn={onPressIn}
                 onPressOut={onPressOut}
                 activeOpacity={1}
-                style={[styles.touchable, { flexDirection: 'column' }]}
+                className="flex-1 flex-col"
             >
-                <View style={styles.gridImageContainer}>
-                    <ImageBackground source={craftImage} style={styles.fullImage}>
-                        <View style={styles.overlay} />
+                <View className="h-[110px] w-full">
+                    <ImageBackground source={craftImage} className="w-full h-full">
+                        <View className="absolute inset-0 bg-black/10" />
                     </ImageBackground>
-                    <View style={styles.gridAvatar}>
+                    <View className="absolute -bottom-5 left-3 z-[10] border-[3px] border-white rounded-[25px]">
                         <Avatar name={artisan.name} size={40} />
                     </View>
                 </View>
 
-                <View style={styles.gridContent}>
-                    <Text style={styles.gridName} numberOfLines={1}>{artisan.name}</Text>
-                    <Text style={styles.gridSkills} numberOfLines={1}>{artisan.skills[0] || 'Artisan'}</Text>
+                <View className="p-3 pt-6">
+                    <Text className="text-h3 text-[14px]" numberOfLines={1}>{artisan.name}</Text>
+                    <Text className="text-body-sm text-muted text-[11px]" numberOfLines={1}>{artisan.skills[0] || 'Artisan'}</Text>
                     
-                    <View style={styles.gridFooter}>
-                        <View style={styles.gridStats}>
-                            <Ionicons name="star" size={10} color={Colors.warning} />
-                            <Text style={styles.gridRating}>{artisan.rating}</Text>
+                    <View className="flex-row justify-between items-center mt-[10px]">
+                        <View className="flex-row items-center gap-1">
+                            <Ionicons name="star" size={10} className="text-warning" />
+                            <Text className="text-label text-[10px] normal-case tracking-normal">{artisan.rating}</Text>
                         </View>
-                        <View style={styles.gridAction}>
+                        <View className="w-6 h-6 rounded-full bg-primary items-center justify-center">
                             <Ionicons name="arrow-forward" size={12} color="white" />
                         </View>
                     </View>
@@ -129,133 +136,6 @@ const ArtisanCardComponent: React.FC<ArtisanCardProps> = ({
     return renderList();
 };
 
-const styles = StyleSheet.create({
-    card: {
-        backgroundColor: Colors.white,
-        borderRadius: Radius.lg,
-        ...Shadows.sm,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: Colors.cardBorder,
-    },
-    listCard: {
-        flexDirection: 'row',
-        marginBottom: 12,
-    },
-    gridCard: {
-        flex: 1,
-        margin: 6,
-    },
-    touchable: {
-        flex: 1,
-    },
-    imageContainer: {
-        width: 100,
-        height: 100,
-    },
-    fullImage: {
-        width: '100%',
-        height: '100%',
-    },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.1)',
-    },
-    content: {
-        flex: 1,
-        padding: 16,
-        justifyContent: 'center',
-    },
-    headerRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-    },
-    name: {
-        ...Typography.h3,
-        fontSize: 16,
-    },
-    skills: {
-        ...Typography.bodySmall,
-        color: Colors.muted,
-        marginTop: 4,
-    },
-    footerRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: 12,
-    },
-    price: {
-        ...Typography.label,
-        color: Colors.primary,
-        fontSize: 10,
-    },
-    viewBadge: {
-        position: 'absolute',
-        top: 12,
-        right: 12,
-        backgroundColor: Colors.primaryLight,
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: Radius.xs,
-    },
-    viewText: {
-        ...Typography.label,
-        fontSize: 8,
-        color: Colors.primary,
-    },
-    // Grid styles
-    gridImageContainer: {
-        height: 110,
-        width: '100%',
-    },
-    gridAvatar: {
-        position: 'absolute',
-        bottom: -20,
-        left: 12,
-        zIndex: 10,
-        borderWidth: 3,
-        borderColor: Colors.white,
-        borderRadius: 25,
-    },
-    gridContent: {
-        padding: 12,
-        paddingTop: 24,
-    },
-    gridName: {
-        ...Typography.h3,
-        fontSize: 14,
-    },
-    gridSkills: {
-        ...Typography.bodySmall,
-        color: Colors.muted,
-        fontSize: 11,
-    },
-    gridFooter: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    gridStats: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-    },
-    gridRating: {
-        ...Typography.label,
-        fontSize: 10,
-    },
-    gridAction: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
-        backgroundColor: Colors.primary,
-        alignItems: 'center',
-        justifyContent: 'center',
-    }
-});
-
 export const ArtisanCard = React.memo(ArtisanCardComponent);
 ArtisanCard.displayName = 'ArtisanCard';
+

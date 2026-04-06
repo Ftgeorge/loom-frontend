@@ -1,9 +1,8 @@
 import { LoomThread } from '@/components/ui/LoomThread';
 import { PrimaryButton } from '@/components/ui/Buttons';
-import { languageNames, t } from '@/i18n';
+import { languageNames } from '@/i18n';
 import { useAppStore } from '@/store';
 import { Language } from '@/types';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
@@ -22,59 +21,43 @@ export default function LanguageSelectionScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" animated opacity={0.3} />
 
             <ScrollView
                 contentContainerStyle={{ padding: 32, paddingTop: 100, flexGrow: 1 }}
                 showsVerticalScrollIndicator={false}
             >
-                <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 48 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 12 }]}>LANGUAGE</Text>
-                    <Text style={[Typography.h1, { fontSize: 32, lineHeight: 38 }]}>
+                <Animated.View entering={FadeInDown.delay(100).springify()} className="mb-12">
+                    <Text className="text-label text-primary mb-3">LANGUAGE</Text>
+                    <Text className="text-h1 text-[32px] leading-[38px]">
                         Choose your language
                     </Text>
-                    <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 12, lineHeight: 22 }]}>
+                    <Text className="text-body text-ink/70 mt-3 leading-[22px]">
                         Pick the language you want to use.
                     </Text>
                 </Animated.View>
 
-                <View style={{ gap: 16, flex: 1 }}>
+                <View className="gap-4 flex-1">
                     {LANGUAGES.map((lang, index) => (
                         <Animated.View key={lang} entering={FadeInDown.delay(150 + index * 100).springify()}>
                             <TouchableOpacity
                                 activeOpacity={0.8}
                                 onPress={() => setSelected(lang)}
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    padding: 24,
-                                    borderRadius: Radius.md,
-                                    borderWidth: 1.5,
-                                    borderColor: selected === lang ? Colors.primary : Colors.cardBorder,
-                                    backgroundColor: selected === lang ? Colors.white : Colors.surface,
-                                    ...Shadows.sm
-                                }}
+                                className={`flex-row items-center justify-between p-6 rounded-md border-[1.5px] shadow-sm ${
+                                    selected === lang ? 'border-primary bg-white' : 'border-card-border bg-surface'
+                                }`}
                             >
-                                <Text style={[
-                                    Typography.h3,
-                                    { color: selected === lang ? Colors.primary : Colors.muted, fontSize: 18 }
-                                ]}>
+                                <Text className={`text-h3 text-[18px] ${
+                                    selected === lang ? 'text-primary' : 'text-muted'
+                                }`}>
                                     {languageNames[lang]}
                                 </Text>
-                                <View style={{
-                                    width: 24,
-                                    height: 24,
-                                    borderRadius: Radius.xs,
-                                    borderWidth: 2,
-                                    borderColor: selected === lang ? Colors.primary : Colors.gray200,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    backgroundColor: selected === lang ? Colors.primaryLight : 'transparent'
-                                }}>
+                                <View className={`w-6 h-6 rounded-xs border-2 items-center justify-center ${
+                                    selected === lang ? 'border-primary bg-primary/5' : 'border-gray-200'
+                                }`}>
                                     {selected === lang && (
-                                        <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: Colors.primary }} />
+                                        <View className="w-[10px] h-[10px] rounded-[2px] bg-primary" />
                                     )}
                                 </View>
                             </TouchableOpacity>
@@ -82,14 +65,15 @@ export default function LanguageSelectionScreen() {
                     ))}
                 </View>
 
-                <Animated.View entering={FadeInUp.delay(500).springify()} style={{ paddingBottom: 40, paddingTop: 24 }}>
+                <Animated.View entering={FadeInUp.delay(500).springify()} className="pb-10 pt-6">
                     <PrimaryButton
                         title="CONTINUE"
                         onPress={handleContinue}
-                        style={{ height: 64, borderRadius: Radius.md }}
+                        className="h-16 rounded-md"
                     />
                 </Animated.View>
             </ScrollView>
         </View >
     );
 }
+

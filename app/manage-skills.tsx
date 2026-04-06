@@ -1,8 +1,5 @@
 import { AppHeader } from '@/components/AppHeader';
-import { PrimaryButton } from '@/components/ui/Buttons';
-import { Card } from '@/components/ui/CardChipBadge';
 import { artisanApi, skillApi } from '@/services/api';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -25,11 +22,10 @@ export default function ManageSkillsScreen() {
                 artisanApi.meProfile()
             ]);
             setMySkills(me);
-            // Filter out skills I already have
             const meIds = new Set(me.map(s => s.skill_id));
             setAvailableSkills(all.filter(s => !meIds.has(s.id)));
             
-            if ((all as any).id) { // This is just to satisfy the Promise.all Destructuring if I returned profile as 3rd
+            if ((all as any).id) {
                  setArtisanProfileId((all as any).id);
             }
         } catch (err: any) {
@@ -92,13 +88,13 @@ export default function ManageSkillsScreen() {
     };
 
     if (loading) return (
-        <View style={{ flex: 1, backgroundColor: Colors.background, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator size="large" color={Colors.primary} />
+        <View className="flex-1 bg-background justify-center items-center">
+            <ActivityIndicator size="large" color="#078365" />
         </View>
     );
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <AppHeader
                 title="Manage Skills"
                 showBack
@@ -106,15 +102,15 @@ export default function ManageSkillsScreen() {
             />
 
             <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>
-                <View style={{ marginBottom: 32 }}>
-                    <Text style={[Typography.h3, { marginBottom: 8 }]}>Your Skills</Text>
-                    <Text style={[Typography.bodySmall, { color: Colors.muted, marginBottom: 16 }]}>
+                <View className="mb-10">
+                    <Text className="text-h3 mb-2 uppercase">Your Skills</Text>
+                    <Text className="text-body-sm text-muted mb-4 normal-case">
                         These skills are visible on your profile. Remove those you no longer offer.
                     </Text>
                     
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                    <View className="flex-row flex-wrap gap-3">
                         {mySkills.length === 0 ? (
-                            <Text style={[Typography.bodySmall, { fontStyle: 'italic', color: Colors.error }]}>You haven't added any skills yet.</Text>
+                            <Text className="text-label text-error italic text-[11px] normal-case">You haven&apos;t added any skills yet.</Text>
                         ) : (
                             mySkills.map((skill) => (
                                 <Animated.View 
@@ -122,20 +118,10 @@ export default function ManageSkillsScreen() {
                                     entering={FadeInUp} 
                                     layout={Layout.springify()}
                                 >
-                                    <View style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        backgroundColor: Colors.primary + '10',
-                                        paddingHorizontal: 12,
-                                        paddingVertical: 8,
-                                        borderRadius: Radius.full,
-                                        borderWidth: 1,
-                                        borderColor: Colors.primary + '30',
-                                        gap: 6
-                                    }}>
-                                        <Text style={[Typography.label, { color: Colors.primary, fontSize: 13 }]}>{skill.name}</Text>
+                                    <View className="flex-row items-center bg-primary/10 px-4 py-2 rounded-full border border-primary/20 gap-2">
+                                        <Text className="text-label text-primary text-[13px] uppercase font-jakarta-bold">{skill.name}</Text>
                                         <TouchableOpacity onPress={() => handleRemoveSkill(skill.skill_id)}>
-                                            <Ionicons name="close-circle" size={18} color={Colors.primary} />
+                                            <Ionicons name="close-circle" size={18} color="#078365" />
                                         </TouchableOpacity>
                                     </View>
                                 </Animated.View>
@@ -145,12 +131,12 @@ export default function ManageSkillsScreen() {
                 </View>
 
                 <View>
-                    <Text style={[Typography.h3, { marginBottom: 8 }]}>Available Skills</Text>
-                    <Text style={[Typography.bodySmall, { color: Colors.muted, marginBottom: 16 }]}>
+                    <Text className="text-h3 mb-2 uppercase">Available Skills</Text>
+                    <Text className="text-body-sm text-muted mb-4 normal-case">
                         Tap a skill to add it to your profile.
                     </Text>
 
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                    <View className="flex-row flex-wrap gap-3">
                         {availableSkills.map((skill) => (
                             <Animated.View 
                                 key={skill.id} 
@@ -160,21 +146,10 @@ export default function ManageSkillsScreen() {
                                 <TouchableOpacity 
                                     onPress={() => handleAddSkill(skill)}
                                     disabled={saving}
-                                    style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        backgroundColor: Colors.white,
-                                        paddingHorizontal: 16,
-                                        paddingVertical: 10,
-                                        borderRadius: Radius.full,
-                                        borderWidth: 1,
-                                        borderColor: Colors.cardBorder,
-                                        gap: 6,
-                                        ...Shadows.xs
-                                    }}
+                                    className="flex-row items-center bg-white px-4 py-[10px] rounded-full border border-card-border gap-2 shadow-xs"
                                 >
-                                    <Ionicons name="add" size={16} color={Colors.muted} />
-                                    <Text style={[Typography.label, { color: Colors.ink, fontSize: 13 }]}>{skill.name}</Text>
+                                    <Ionicons name="add" size={16} color="#64748B" />
+                                    <Text className="text-label text-ink text-[13px] uppercase font-jakarta-semibold">{skill.name}</Text>
                                 </TouchableOpacity>
                             </Animated.View>
                         ))}
@@ -183,16 +158,11 @@ export default function ManageSkillsScreen() {
             </ScrollView>
 
             {saving && (
-                <View style={{ 
-                    position: 'absolute', 
-                    top: 0, left: 0, right: 0, bottom: 0, 
-                    backgroundColor: 'rgba(255,255,255,0.7)', 
-                    justifyContent: 'center', 
-                    alignItems: 'center' 
-                }}>
-                    <ActivityIndicator size="large" color={Colors.primary} />
+                <View className="absolute inset-0 bg-white/70 justify-center items-center">
+                    <ActivityIndicator size="large" color="#078365" />
                 </View>
             )}
         </View>
     );
 }
+

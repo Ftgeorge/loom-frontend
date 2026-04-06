@@ -3,7 +3,6 @@ import { PrimaryButton } from '@/components/ui/Buttons';
 import { Chip } from '@/components/ui/CardChipBadge';
 import { Toast } from '@/components/ui/StateComponents';
 import { AppTextInput } from '@/components/ui/TextInputs';
-import { Colors, Typography } from '@/theme';
 import { jobApi } from '@/services/api';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -29,9 +28,6 @@ export default function RateReviewScreen() {
     };
 
     const handleSubmit = async () => {
-        if (!jobId) {
-            // No jobId in params — still allow review to be submitted locally
-        }
         setLoading(true);
         try {
             if (jobId) {
@@ -50,21 +46,22 @@ export default function RateReviewScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <AppHeader title="Rate Experience" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView
+                className="flex-1"
                 contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
                 showsVerticalScrollIndicator={false}
             >
-                <Animated.View entering={FadeInDown.delay(100)} style={{ alignItems: 'center', marginVertical: 32 }}>
-                    <Text style={[Typography.h1, { textAlign: 'center', fontSize: 24 }]}>How was your service?</Text>
-                    <Text style={[Typography.body, { color: Colors.muted, marginTop: 8 }]}>Your feedback helps our pros grow.</Text>
+                <Animated.View entering={FadeInDown.delay(100)} className="items-center my-8">
+                    <Text className="text-h1 text-center text-[24px] uppercase italic">How was your service?</Text>
+                    <Text className="text-body text-muted mt-2 normal-case">Your feedback helps our pros grow.</Text>
                 </Animated.View>
 
                 {/* Star Rating */}
-                <Animated.View entering={FadeInDown.delay(200)} style={{ marginBottom: 40 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12 }}>
+                <Animated.View entering={FadeInDown.delay(200)} className="mb-10">
+                    <View className="flex-row justify-center gap-3">
                         {[1, 2, 3, 4, 5].map((star) => (
                             <TouchableOpacity
                                 key={star}
@@ -75,27 +72,28 @@ export default function RateReviewScreen() {
                                     <Ionicons
                                         name={star <= rating ? "star" : "star-outline"}
                                         size={48}
-                                        color={star <= rating ? Colors.accent : Colors.cardBorder}
+                                        color={star <= rating ? "#F59E0B" : "#CBD5E1"}
                                     />
                                 </Animated.View>
                             </TouchableOpacity>
                         ))}
                     </View>
-                    <Text style={[Typography.h3, { textAlign: 'center', marginTop: 16, color: rating > 0 ? Colors.primary : Colors.muted }]}>
+                    <Text className={`text-h3 text-center mt-4 uppercase ${rating > 0 ? 'text-primary' : 'text-muted'}`}>
                         {rating === 0 ? 'Tap to rate' : rating <= 2 ? 'Could be better' : rating <= 4 ? 'Great experience' : 'Exceptional!'}
                     </Text>
                 </Animated.View>
 
                 {/* Tags */}
-                <Animated.View entering={FadeInDown.delay(300)} style={{ marginBottom: 40 }}>
-                    <Text style={[Typography.h3, { marginBottom: 16 }]}>What went well?</Text>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                <Animated.View entering={FadeInDown.delay(300)} className="mb-10">
+                    <Text className="text-h3 mb-4 uppercase">What went well?</Text>
+                    <View className="flex-row flex-wrap gap-[10px]">
                         {TAGS.map((tag) => (
                             <Chip
                                 key={tag}
-                                label={tag}
+                                label={tag.toUpperCase()}
                                 selected={selectedTags.includes(tag)}
                                 onPress={() => toggleTag(tag)}
+                                className="px-5 py-3 rounded-full"
                             />
                         ))}
                     </View>
@@ -104,21 +102,22 @@ export default function RateReviewScreen() {
                 {/* Comment */}
                 <Animated.View entering={FadeInDown.delay(400)}>
                     <AppTextInput
-                        label="Share more details (Optional)"
-                        placeholder="What else would you like to tell us?"
+                        label="SHARE MORE DETAILS (OPTIONAL)"
+                        placeholder="WHAT ELSE WOULD YOU LIKE TO TELL US?"
                         value={comment}
                         onChangeText={setComment}
                         multiline
                         numberOfLines={4}
-                        style={{ minHeight: 120, textAlignVertical: 'top', paddingTop: 16 }}
+                        className="min-h-[140px] pt-4 shadow-sm"
+                        style={{ textAlignVertical: 'top' }}
                     />
 
                     <PrimaryButton
-                        title="Submit Review"
+                        title="SUBMIT REVIEW"
                         onPress={handleSubmit}
                         loading={loading}
                         disabled={rating === 0}
-                        style={{ marginTop: 40 }}
+                        className="mt-10 h-16 rounded-md shadow-md"
                     />
                 </Animated.View>
             </ScrollView>
@@ -127,4 +126,5 @@ export default function RateReviewScreen() {
         </View>
     );
 }
+
 

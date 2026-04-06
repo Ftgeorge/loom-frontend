@@ -1,5 +1,4 @@
 import { useAppStore } from '@/store';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { Alert, FlatList, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
@@ -58,91 +57,50 @@ export function AppHeader({
     return (
         <>
             <View
-                style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    paddingHorizontal: 24,
-                    paddingBottom: 16,
-                    backgroundColor: Colors.canvas,
-                    paddingTop: insets.top + 12,
-                    borderBottomWidth: 1,
-                    borderBottomColor: Colors.divider,
-                }}
+                style={{ paddingTop: insets.top + 12 }}
+                className="flex-row items-center justify-between px-6 pb-4 bg-canvas border-b-[1px] border-divider"
             >
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 }}>
+                <View className="flex-row items-center gap-3 flex-1">
                     {showBack && (
                         <TouchableOpacity
                             onPress={onBack}
                             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                            style={{ padding: 4 }}
+                            className="p-1"
                         >
-                            <Ionicons name="arrow-back" size={24} color={Colors.primary} />
+                            <Ionicons name="arrow-back" size={24} className="text-primary" />
                         </TouchableOpacity>
                     )}
                     {showLocation && (
                         <TouchableOpacity
-                            style={{
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                backgroundColor: Colors.surface,
-                                paddingHorizontal: 12,
-                                paddingVertical: 8,
-                                borderRadius: Radius.full,
-                                gap: 6,
-                                borderWidth: 1,
-                                borderColor: Colors.cardBorder,
-                                ...Shadows.xs
-                            }}
+                            className="flex-row items-center bg-surface px-3 py-2 rounded-full gap-[6px] border-[1px] border-card-border shadow-xs"
                             activeOpacity={0.8}
                             onPress={() => setShowPicker(true)}
                         >
-                            <Ionicons name="location" size={12} color={Colors.primary} />
-                            <Text style={{ fontSize: 12, fontFamily: 'Inter-SemiBold', color: Colors.ink }}>
+                            <Ionicons name="location" size={12} className="text-primary" />
+                            <Text className="text-[12px] font-inter-semibold text-ink">
                                 {selectedState}
                             </Text>
-                            <Ionicons name="chevron-down" size={12} color={Colors.muted} />
+                            <Ionicons name="chevron-down" size={12} className="text-muted" />
                         </TouchableOpacity>
                     )}
                     {title && !showLocation && (
-                        <Text style={{ fontSize: 16, fontFamily: 'PlusJakartaSans-SemiBold', color: Colors.ink, flex: 1 }} numberOfLines={1}>
+                        <Text className="text-[16px] font-jakarta-semibold text-ink flex-1" numberOfLines={1}>
                             {title}
                         </Text>
                     )}
                 </View>
 
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <View className="flex-row items-center gap-3">
                     {rightAction}
                     {showNotification && (
                         <TouchableOpacity
                             onPress={onNotification}
                             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                            style={{
-                                width: 40,
-                                height: 40,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: Radius.sm,
-                                backgroundColor: Colors.surface,
-                                borderWidth: 1,
-                                borderColor: Colors.cardBorder,
-                                position: 'relative',
-                                ...Shadows.xs,
-                            }}
+                            className="w-10 h-10 items-center justify-center rounded-sm bg-surface border-[1px] border-card-border relative shadow-xs"
                         >
-                            <Ionicons name="notifications" size={18} color={Colors.ink} />
+                            <Ionicons name="notifications" size={18} className="text-ink" />
                             {unread > 0 && (
-                                <View style={{
-                                    position: 'absolute',
-                                    top: 6,
-                                    right: 6,
-                                    backgroundColor: Colors.violet,
-                                    width: 8,
-                                    height: 8,
-                                    borderRadius: 4,
-                                    borderWidth: 1.5,
-                                    borderColor: Colors.surface,
-                                }} />
+                                <View className="absolute top-[6px] right-[6px] bg-violet w-2 h-2 rounded-full border-[1.5px] border-surface" />
                             )}
                         </TouchableOpacity>
                     )}
@@ -156,33 +114,17 @@ export function AppHeader({
                 onRequestClose={() => setShowPicker(false)}
             >
                 <Pressable
-                    style={{ flex: 1, backgroundColor: 'rgba(0,18,12,0.8)', justifyContent: 'center', padding: 32 }}
+                    className="flex-1 bg-black/80 justify-center p-8"
                     onPress={() => setShowPicker(false)}
                 >
-                    <View style={{
-                        backgroundColor: Colors.white,
-                        borderRadius: Radius.lg,
-                        maxHeight: '70%',
-                        overflow: 'hidden',
-                        borderWidth: 2,
-                        borderColor: Colors.primary,
-                        ...Shadows.lg
-                    }}>
-                        <View style={{
-                            padding: 24,
-                            borderBottomWidth: 1.5,
-                            borderBottomColor: Colors.cardBorder,
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            backgroundColor: Colors.surface
-                        }}>
+                    <View className="bg-white rounded-lg max-h-[70%] overflow-hidden border-[2px] border-primary shadow-lg">
+                        <View className="p-6 border-b-[1.5px] border-card-border flex-row items-center justify-between bg-surface">
                             <View>
-                                <Text style={[Typography.label, { fontSize: 10, color: Colors.primary, marginBottom: 4 }]}>Your City</Text>
-                                <Text style={[Typography.h3, { fontSize: 20 }]}>Where are you?</Text>
+                                <Text className="text-label text-[10px] text-primary mb-1">Your City</Text>
+                                <Text className="text-h3 text-[20px]">Where are you?</Text>
                             </View>
-                            <TouchableOpacity onPress={() => setShowPicker(false)} style={{ padding: 8 }}>
-                                <Ionicons name="close" size={24} color={Colors.primary} />
+                            <TouchableOpacity onPress={() => setShowPicker(false)} className="p-2">
+                                <Ionicons name="close" size={24} className="text-primary" />
                             </TouchableOpacity>
                         </View>
                         <FlatList
@@ -191,25 +133,15 @@ export function AppHeader({
                             contentContainerStyle={{ paddingVertical: 12 }}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
-                                    style={{
-                                        padding: 18,
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        backgroundColor: selectedState === item ? Colors.surface : 'transparent'
-                                    }}
+                                    className={`p-[18px] flex-row items-center justify-between ${selectedState === item ? 'bg-surface' : 'bg-transparent'}`}
                                     onPress={() => handleStateSelect(item)}
                                 >
-                                    <Text style={[Typography.label, {
-                                        color: selectedState === item ? Colors.primary : Colors.muted,
-                                        fontSize: 12,
-                                        fontWeight: selectedState === item ? '800' : '500'
-                                    }]}>
+                                    <Text className={`text-label text-[12px] normal-case tracking-normal ${selectedState === item ? 'text-primary font-jakarta-bold' : 'text-muted font-jakarta-medium'}`}>
                                         {item.toUpperCase()}
                                     </Text>
                                     {selectedState === item && (
-                                        <View style={{ backgroundColor: Colors.primary, padding: 4, borderRadius: 10 }}>
-                                            <Ionicons name="checkmark" size={12} color={Colors.white} />
+                                        <View className="bg-primary p-1 rounded-sm">
+                                            <Ionicons name="checkmark" size={12} color="white" />
                                         </View>
                                     )}
                                 </TouchableOpacity>
@@ -221,3 +153,4 @@ export function AppHeader({
         </>
     );
 }
+

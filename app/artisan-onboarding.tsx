@@ -3,12 +3,12 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { Chip } from '@/components/ui/CardChipBadge';
 import { artisanApi } from '@/services/api';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { CATEGORIES } from '@/types';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
+import { areas, days } from '@/data/ArtisanOnboardingArray';
 
 const STEPS = ['Skills', 'Areas', 'Days', 'Prices'];
 
@@ -19,9 +19,6 @@ export default function ArtisanOnboardingScreen() {
     const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
     const [pricingStyle, setPricingStyle] = useState('estimate');
     const [loading, setLoading] = useState(false);
-
-    const areas = ['Wuse', 'Garki', 'Maitama', 'Gwarinpa', 'Jabi', 'Asokoro', 'Kubwa', 'Nyanya', 'Life Camp', 'Utako'];
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const [selectedDays, setSelectedDays] = useState(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
 
     const toggleSkill = (id: string) => {
@@ -57,7 +54,7 @@ export default function ArtisanOnboardingScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" animated opacity={0.2} />
             <AppHeader
                 title="Setup your profile"
@@ -66,35 +63,27 @@ export default function ArtisanOnboardingScreen() {
                 showNotification={false}
             />
 
-            <View style={{ flexDirection: 'row', paddingVertical: 16, gap: 4, paddingHorizontal: 20 }}>
+            <View className="flex-row py-4 gap-1 px-5">
                 {STEPS.map((s, i) => (
-                    <View key={s} style={{ flex: 1, gap: 4 }}>
-                        <View style={{
-                            height: 4,
-                            borderRadius: 2,
-                            backgroundColor: i <= step ? Colors.primary : Colors.gray100
-                        }} />
-                        <Text style={[
-                            Typography.label,
-                            {
-                                fontSize: 8,
-                                textAlign: 'center',
-                                color: i === step ? Colors.primary : Colors.muted,
-                                opacity: i === step ? 1 : 0.5
-                            }
-                        ]}>{s.toUpperCase()}</Text>
+                    <View key={s} className="flex-1 gap-1">
+                        <View className={`h-1 rounded-full ${
+                            i <= step ? 'bg-primary' : 'bg-gray-100'
+                        }`} />
+                        <Text className={`text-label text-[8px] text-center uppercase ${
+                            i === step ? 'text-primary' : 'text-muted opacity-50'
+                        }`}>{s}</Text>
                     </View>
                 ))}
             </View>
 
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }} keyboardShouldPersistTaps="handled">
                 {step === 0 && (
-                    <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 1</Text>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>What can you do?</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>What help do you provide?</Text>
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
+                        <Text className="text-label text-primary mb-2 uppercase">Step 1</Text>
+                        <Text className="text-h1 text-[28px] mb-3">What can you do?</Text>
+                        <Text className="text-body text-muted mb-8">What help do you provide?</Text>
 
-                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                        <View className="flex-row flex-wrap gap-[10px]">
                             {CATEGORIES.map((cat) => (
                                 <Chip
                                     key={cat.id}
@@ -104,8 +93,8 @@ export default function ArtisanOnboardingScreen() {
                                     containerStyle={{
                                         paddingHorizontal: 16,
                                         paddingVertical: 10,
-                                        borderRadius: Radius.xs,
-                                        borderColor: selectedSkills.includes(cat.id) ? Colors.primary : Colors.cardBorder
+                                        borderRadius: 8,
+                                        borderColor: selectedSkills.includes(cat.id) ? '#00120C' : '#E8ECEF'
                                     }}
                                 />
                             ))}
@@ -114,18 +103,18 @@ export default function ArtisanOnboardingScreen() {
                             title="NEXT"
                             onPress={() => setStep(1)}
                             disabled={selectedSkills.length === 0}
-                            style={{ marginTop: 48, height: 60, borderRadius: Radius.md }}
+                            className="mt-12 h-[60px] rounded-md"
                         />
                     </Animated.View>
                 )}
 
                 {step === 1 && (
-                    <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 2</Text>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>Where do you work?</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Pick the places where you can go for work.</Text>
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
+                        <Text className="text-label text-primary mb-2 uppercase">Step 2</Text>
+                        <Text className="text-h1 text-[28px] mb-3">Where do you work?</Text>
+                        <Text className="text-body text-muted mb-8">Pick the places where you can go for work.</Text>
 
-                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                        <View className="flex-row flex-wrap gap-[10px]">
                             {areas.map((area) => (
                                 <Chip
                                     key={area}
@@ -135,8 +124,8 @@ export default function ArtisanOnboardingScreen() {
                                     containerStyle={{
                                         paddingHorizontal: 16,
                                         paddingVertical: 10,
-                                        borderRadius: Radius.xs,
-                                        borderColor: selectedAreas.includes(area) ? Colors.primary : Colors.cardBorder
+                                        borderRadius: 8,
+                                        borderColor: selectedAreas.includes(area) ? '#00120C' : '#E8ECEF'
                                     }}
                                 />
                             ))}
@@ -145,54 +134,45 @@ export default function ArtisanOnboardingScreen() {
                             title="NEXT"
                             onPress={() => setStep(2)}
                             disabled={selectedAreas.length === 0}
-                            style={{ marginTop: 48, height: 60, borderRadius: Radius.md }}
+                            className="mt-12 h-[60px] rounded-md"
                         />
                     </Animated.View>
                 )}
 
                 {step === 2 && (
-                    <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 3</Text>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>When are you free?</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>Pick the days you can do work.</Text>
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
+                        <Text className="text-label text-primary mb-2 uppercase">Step 3</Text>
+                        <Text className="text-h1 text-[28px] mb-3">When are you free?</Text>
+                        <Text className="text-body text-muted mb-8">Pick the days you can do work.</Text>
 
-                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center' }}>
+                        <View className="flex-row flex-wrap gap-3 justify-center">
                             {days.map((d) => (
                                 <TouchableOpacity
                                     key={d}
-                                    style={{
-                                        width: 54,
-                                        height: 54,
-                                        borderRadius: Radius.xs,
-                                        borderWidth: 1.5,
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        backgroundColor: selectedDays.includes(d) ? Colors.primaryLight : Colors.white,
-                                        borderColor: selectedDays.includes(d) ? Colors.primary : Colors.cardBorder,
-                                        ...Shadows.sm
-                                    }}
+                                    className={`w-[54px] h-[54px] rounded-xs border-[1.5px] items-center justify-center shadow-sm ${
+                                        selectedDays.includes(d) ? 'bg-primary/5 border-primary' : 'bg-white border-card-border'
+                                    }`}
                                     onPress={() => toggleDay(d)}
                                 >
-                                    <Text style={[
-                                        Typography.label,
-                                        { color: selectedDays.includes(d) ? Colors.primary : Colors.muted, fontSize: 12 }
-                                    ]}>{d.toUpperCase()}</Text>
+                                    <Text className={`text-label text-[12px] uppercase ${
+                                        selectedDays.includes(d) ? 'text-primary' : 'text-muted'
+                                    }`}>{d}</Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
                         <PrimaryButton
                             title="NEXT"
                             onPress={() => setStep(3)}
-                            style={{ marginTop: 56, height: 60, borderRadius: Radius.md }}
+                            className="mt-14 h-[60px] rounded-md"
                         />
                     </Animated.View>
                 )}
 
                 {step === 3 && (
-                    <Animated.View entering={FadeInRight.springify()} style={{ padding: 32 }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>STEP 4</Text>
-                        <Text style={[Typography.h1, { fontSize: 28, marginBottom: 12 }]}>How much?</Text>
-                        <Text style={[Typography.body, { color: Colors.muted, marginBottom: 32 }]}>How do you want to charge?</Text>
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
+                        <Text className="text-label text-primary mb-2 uppercase">Step 4</Text>
+                        <Text className="text-h1 text-[28px] mb-3">How much?</Text>
+                        <Text className="text-body text-muted mb-8">How do you want to charge?</Text>
 
                         {[
                             { value: 'fixed', label: 'SAME PRICE', desc: 'A set cost for the job' },
@@ -201,37 +181,21 @@ export default function ArtisanOnboardingScreen() {
                         ].map((opt) => (
                             <TouchableOpacity
                                 key={opt.value}
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    gap: 16,
-                                    padding: 24,
-                                    borderRadius: Radius.md,
-                                    borderWidth: 1.5,
-                                    marginBottom: 16,
-                                    backgroundColor: Colors.white,
-                                    borderColor: pricingStyle === opt.value ? Colors.primary : Colors.cardBorder,
-                                    ...Shadows.sm
-                                }}
+                                className={`flex-row items-center gap-4 p-6 rounded-md border-[1.5px] mb-4 bg-white shadow-sm ${
+                                    pricingStyle === opt.value ? 'border-primary' : 'border-card-border'
+                                }`}
                                 onPress={() => setPricingStyle(opt.value)}
                             >
-                                <View style={{
-                                    width: 24,
-                                    height: 24,
-                                    borderRadius: Radius.xl,
-                                    borderWidth: 2,
-                                    borderColor: pricingStyle === opt.value ? Colors.primary : Colors.gray200,
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    backgroundColor: pricingStyle === opt.value ? Colors.primaryLight : 'transparent'
-                                }}>
+                                <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
+                                    pricingStyle === opt.value ? 'border-primary bg-primary/5' : 'border-gray-200'
+                                }`}>
                                     {pricingStyle === opt.value && (
-                                        <View style={{ width: 10, height: 10, borderRadius: 100, backgroundColor: Colors.primary }} />
+                                        <View className="w-[10px] h-[10px] rounded-full bg-primary" />
                                     )}
                                 </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={[Typography.h3, { color: Colors.primary, fontSize: 16 }]}>{opt.label}</Text>
-                                    <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 4, lineHeight: 18 }]}>{opt.desc}</Text>
+                                <View className="flex-1">
+                                    <Text className="text-h3 text-primary text-base uppercase">{opt.label}</Text>
+                                    <Text className="text-body-sm text-muted mt-1 leading-[18px]">{opt.desc}</Text>
                                 </View>
                             </TouchableOpacity>
                         ))}
@@ -240,7 +204,7 @@ export default function ArtisanOnboardingScreen() {
                             title="FINISH"
                             onPress={handleComplete}
                             loading={loading}
-                            style={{ marginTop: 48, height: 64, borderRadius: Radius.md }}
+                            className="mt-12 h-16 rounded-md"
                             variant="accent"
                         />
                     </Animated.View>
@@ -249,3 +213,4 @@ export default function ArtisanOnboardingScreen() {
         </View>
     );
 }
+

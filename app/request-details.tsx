@@ -8,7 +8,6 @@ import { StatusTimeline, getJobStatusSteps } from '@/components/ui/StatusTimelin
 import { jobApi } from '@/services/api';
 import { mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { JobRequest } from '@/types';
 import { formatDate, formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
@@ -65,15 +64,15 @@ export default function RequestDetailsScreen() {
     };
 
     if (loading) return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.4} />
             <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
-            <View style={{ padding: 24 }}><SkeletonList count={3} /></View>
+            <View className="p-6"><SkeletonList count={3} /></View>
         </View>
     );
 
     if (error || !job) return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
@@ -82,7 +81,7 @@ export default function RequestDetailsScreen() {
     const isTerminated = job.status === 'cancelled';
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View className="flex-1 bg-background">
             <LoomThread variant="minimal" opacity={0.2} animated />
             <AppHeader title="Mission Log" showBack onBack={() => router.back()} showNotification={false} />
 
@@ -91,31 +90,28 @@ export default function RequestDetailsScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Service Identity */}
-                <Animated.View entering={FadeInDown.springify()} style={{ marginBottom: 40 }}>
-                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>SERVICE TYPE</Text>
-                    <Text style={[Typography.h1, { fontSize: 32 }]}>{job.category.toUpperCase().replace('_', ' / ')}</Text>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16 }}>
-                        <View style={{
-                            backgroundColor: isTerminated ? Colors.error + '10' : Colors.success + '10',
-                            paddingHorizontal: 12,
-                            paddingVertical: 4,
-                            borderRadius: Radius.xs,
-                            borderWidth: 1,
-                            borderColor: isTerminated ? Colors.error : Colors.success
-                        }}>
-                            <Text style={[Typography.label, { color: isTerminated ? Colors.error : Colors.success, fontSize: 10, fontWeight: '900' }]}>
+                <Animated.View entering={FadeInDown.springify()} className="mb-10">
+                    <Text className="text-label text-primary mb-2 tracking-[2px] uppercase">Service Type</Text>
+                    <Text className="text-h1 text-[32px] uppercase">{job.category.replace('_', ' / ')}</Text>
+                    <View className="flex-row items-center gap-3 mt-4">
+                        <View className={`px-3 py-1 rounded-xs border shadow-sm ${
+                            isTerminated ? 'bg-error/5 border-error' : 'bg-success/5 border-success'
+                        }`}>
+                            <Text className={`text-label text-[10px] font-jakarta-extrabold uppercase ${
+                                isTerminated ? 'text-error' : 'text-success'
+                            }`}>
                                 {isTerminated ? 'CANCELLED' : 'ACTIVE'}
                             </Text>
                         </View>
-                        <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>REF: {job.id.substring(0, 8).toUpperCase()}</Text>
+                        <Text className="text-label text-muted text-[10px] uppercase">REF: {job.id.substring(0, 8)}</Text>
                     </View>
                 </Animated.View>
 
                 {/* Status Timeline */}
                 {!isTerminated && (
                     <Animated.View entering={FadeInDown.delay(100).springify()}>
-                        <Card style={{ marginBottom: 24, padding: 24, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.cardBorder, ...Shadows.sm }}>
-                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 20 }]}>PROGRESS TRACKER</Text>
+                        <Card className="mb-6 p-6 bg-white border-[1.5px] border-card-border shadow-sm">
+                            <Text className="text-label text-primary mb-5 uppercase">Progress Tracker</Text>
                             <StatusTimeline steps={getJobStatusSteps(job.status)} />
                         </Card>
                     </Animated.View>
@@ -123,8 +119,8 @@ export default function RequestDetailsScreen() {
 
                 {/* Operational Details */}
                 <Animated.View entering={FadeInDown.delay(200).springify()}>
-                    <Card style={{ padding: 24, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.cardBorder, ...Shadows.sm }}>
-                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 24 }]}>DETAILS</Text>
+                    <Card className="p-6 bg-white border-[1.5px] border-card-border shadow-sm">
+                        <Text className="text-label text-primary mb-6 uppercase">Details</Text>
 
                         <DetailItem label="AREA" value={job.location.area.toUpperCase()} />
                         <DetailItem label="DESCRIPTION" value={job.description} />
@@ -137,46 +133,30 @@ export default function RequestDetailsScreen() {
                 {/* Artisan assigned info */}
                 {job.artisanName && (
                     <Animated.View entering={FadeInDown.delay(300).springify()}>
-                        <Card style={{ marginTop: 24, padding: 24, backgroundColor: Colors.primary, ...Shadows.md }}>
-                            <Text style={[Typography.label, { color: Colors.white, marginBottom: 20, opacity: 0.6 }]}>ARTISAN ASSIGNED</Text>
+                        <Card className="mt-6 p-6 bg-primary shadow-md">
+                            <Text className="text-label text-white/60 mb-5 uppercase">Artisan Assigned</Text>
                             <TouchableOpacity
                                 activeOpacity={0.8}
-                                style={{
-                                    flexDirection: 'row',
-                                    alignItems: 'center',
-                                    gap: 16,
-                                    backgroundColor: 'rgba(255,255,255,0.1)',
-                                    padding: 16,
-                                    borderRadius: Radius.md,
-                                    borderWidth: 1,
-                                    borderColor: 'rgba(255,255,255,0.2)'
-                                }}
+                                className="flex-row items-center gap-4 bg-white/10 p-4 rounded-md border border-white/20"
                                 onPress={() => job.artisanId && router.push({ pathname: '/artisan-profile', params: { id: job.artisanId } })}
                             >
-                                <View style={{
-                                    width: 48,
-                                    height: 48,
-                                    borderRadius: Radius.xs,
-                                    backgroundColor: Colors.white,
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
-                                    <Text style={[Typography.h3, { color: Colors.primary }]}>{job.artisanName[0].toUpperCase()}</Text>
+                                <View className="w-12 h-12 rounded-xs bg-white items-center justify-center">
+                                    <Text className="text-h3 text-primary uppercase">{job.artisanName[0]}</Text>
                                 </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={[Typography.h3, { color: Colors.white }]}>{job.artisanName.toUpperCase()}</Text>
-                                    <Text style={[Typography.label, { color: Colors.accent, fontSize: 8, marginTop: 4 }]}>VIEW PROFILE</Text>
+                                <View className="flex-1">
+                                    <Text className="text-h3 text-white uppercase">{job.artisanName}</Text>
+                                    <Text className="text-label text-accent text-[8px] mt-1 uppercase">View Profile</Text>
                                 </View>
-                                <Ionicons name="chevron-forward" size={20} color={Colors.white} />
+                                <Ionicons name="chevron-forward" size={20} color="white" />
                             </TouchableOpacity>
                         </Card>
                     </Animated.View>
                 )}
 
                 {/* Actions */}
-                <Animated.View entering={FadeInDown.delay(400).springify()} style={{ marginTop: 48, gap: 16 }}>
+                <Animated.View entering={FadeInDown.delay(400).springify()} className="mt-12 gap-4">
                     {job.artisanName && (
-                        <View style={{ flexDirection: 'row', gap: 12 }}>
+                        <View className="flex-row gap-3">
                             <SecondaryButton
                                 title="MESSAGE"
                                 onPress={async () => {
@@ -193,15 +173,15 @@ export default function RequestDetailsScreen() {
                                         Alert.alert('Error', 'Unable to start chat at this time.');
                                     }
                                 }}
-                                style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
-                                textStyle={[Typography.label, { color: Colors.primary }]}
+                                className="flex-1 h-16 rounded-md border-primary border-[1.5px]"
+                                textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 10, letterSpacing: 1.2 }}
                             />
                             <SecondaryButton
                                 title="CALL"
                                 onPress={() => { }}
-                                style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
-                                textStyle={[Typography.label, { color: Colors.primary }]}
-                                icon={<Ionicons name="call" size={18} color={Colors.primary} />}
+                                className="flex-1 h-16 rounded-md border-primary border-[1.5px]"
+                                textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 10, letterSpacing: 1.2 }}
+                                icon={<Ionicons name="call" size={18} color="#00120C" />}
                             />
                         </View>
                     )}
@@ -211,24 +191,16 @@ export default function RequestDetailsScreen() {
                             title="RATE & REVIEW"
                             onPress={() => router.push({ pathname: '/rate-review', params: { jobId: job.id } })}
                             variant="accent"
-                            style={{ height: 64, borderRadius: Radius.md }}
+                            className="h-16 rounded-md shadow-md"
                         />
                     )}
 
                     {!['completed', 'cancelled'].includes(job.status) && (
                         <TouchableOpacity
-                            style={{
-                                alignItems: 'center',
-                                padding: 20,
-                                borderRadius: Radius.md,
-                                borderWidth: 1.5,
-                                borderColor: Colors.error,
-                                marginTop: 12,
-                                backgroundColor: Colors.white
-                            }}
+                            className="items-center p-5 rounded-md border-[1.5px] border-error mt-3 bg-white shadow-sm"
                             onPress={handleCancel}
                         >
-                            <Text style={[Typography.label, { color: Colors.error, fontWeight: '900', letterSpacing: 1 }]}>CANCEL REQUEST</Text>
+                            <Text className="text-label text-error font-jakarta-extrabold tracking-[1px] uppercase">Cancel Request</Text>
                         </TouchableOpacity>
                     )}
                 </Animated.View>
@@ -239,15 +211,11 @@ export default function RequestDetailsScreen() {
 
 function DetailItem({ label, value }: { label: string; value: string }) {
     return (
-        <View style={{ marginBottom: 24 }}>
-            <Text style={[Typography.label, { fontSize: 8, color: Colors.muted, marginBottom: 8 }]}>{label}</Text>
-            <Text style={[Typography.body, {
-                color: Colors.primary,
-                fontWeight: '700',
-                fontSize: 15,
-                lineHeight: 22
-            }]}>{value}</Text>
+        <View className="mb-6">
+            <Text className="text-label text-[8px] text-muted mb-2 uppercase">{label}</Text>
+            <Text className="text-body text-primary font-jakarta-bold text-[15px] leading-[22px]">{value}</Text>
         </View>
     );
 }
+
 

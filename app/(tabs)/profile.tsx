@@ -3,7 +3,6 @@ import { Avatar } from "@/components/ui/AvatarRating";
 import { LoomThread } from "@/components/ui/LoomThread";
 import { languageNames } from "@/i18n";
 import { useAppStore } from "@/store";
-import { Colors, Radius, Shadows, Typography } from "@/theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -144,7 +143,7 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <View className="flex-1 bg-background">
       <LoomThread variant="minimal" opacity={0.2} animated />
       <SubAppHeader
         label="IDENTITY"
@@ -158,29 +157,12 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Command Center */}
-        <Animated.View entering={FadeInDown.springify()} style={{ alignItems: "center", paddingVertical: 40 }}>
+        <Animated.View entering={FadeInDown.springify()} className="items-center py-10">
           {/* ─── Premium Avatar Complex ────────────────────────────────────────── */}
-          <View style={{ marginBottom: 24 }}>
-            <View style={{
-              padding: 12,
-              borderRadius: 80,
-              backgroundColor: Colors.white,
-              borderWidth: 1,
-              borderColor: Colors.cardBorder,
-              ...Shadows.md
-            }}>
-              <View style={{
-                padding: 6,
-                borderRadius: 70,
-                borderWidth: 2,
-                borderColor: Colors.primary + '10',
-                borderStyle: 'dashed'
-              }}>
-                <View style={{
-                  borderRadius: 60,
-                  overflow: 'hidden',
-                  ...Shadows.sm
-                }}>
+          <View className="mb-6 relative">
+            <View className="p-3 rounded-full bg-white border border-card-border shadow-md">
+              <View className="p-[6px] rounded-full border-2 border-primary/10 border-dashed">
+                <View className="rounded-full overflow-hidden shadow-sm">
                   <Avatar name={user?.name || "U"} size={110} />
                 </View>
               </View>
@@ -188,139 +170,70 @@ export default function ProfileScreen() {
               {/* Floating Camera Action */}
               <TouchableOpacity
                 activeOpacity={0.9}
-                style={{
-                  position: 'absolute',
-                  bottom: 12,
-                  right: 12,
-                  backgroundColor: Colors.ink,
-                  width: 38,
-                  height: 38,
-                  borderRadius: 19,
-                  borderWidth: 4,
-                  borderColor: Colors.white,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  ...Shadows.md
-                }}
+                className="absolute bottom-3 right-3 bg-ink w-[38px] h-[38px] rounded-full border-4 border-white items-center justify-center shadow-md"
               >
-                <Ionicons name="camera" size={16} color={Colors.white} />
+                <Ionicons name="camera" size={16} color="white" />
               </TouchableOpacity>
             </View>
 
             {/* Identity Halo (Subtle Glow) */}
-            <View style={{
-              position: 'absolute',
-              top: -20,
-              left: -20,
-              right: -20,
-              bottom: -20,
-              borderRadius: 100,
-              backgroundColor: Colors.primary,
-              opacity: 0.03,
-              zIndex: -1
-            }} />
+            <View className="absolute -top-5 -left-5 -right-5 -bottom-5 rounded-full bg-primary opacity-[0.03] -z-10" />
           </View>
 
           {/* ─── Profile Details ──────────────────────────────────────────────── */}
 
-          <Text style={[Typography.h1, {
-            marginTop: 8,
-            fontSize: 32,
-            color: Colors.ink,
-            fontFamily: 'PlusJakartaSans-ExtraBold'
-          }]}>
+          <Text className="text-h1 mt-2 text-[32px] text-ink font-jakarta-extrabold text-center">
             {user?.name?.toUpperCase()}
           </Text>
 
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16 }}>
-            <View style={{
-              backgroundColor: Colors.primary,
-              paddingHorizontal: 12,
-              paddingVertical: 6,
-              borderRadius: Radius.full,
-              borderWidth: 1,
-              borderColor: Colors.primary
-            }}>
-              <Text style={[Typography.label, {
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: '700',
-                letterSpacing: 0.5
-              }]}>
+          <View className="flex-row items-center gap-3 mt-4">
+            <View className="bg-primary px-3 py-[6px] rounded-full border border-primary">
+              <Text className="text-label text-white text-[10px] font-jakarta-bold tracking-[0.5px]">
                 {isArtisan ? "VERIFIED" : "CLIENT"}
               </Text>
             </View>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Ionicons name="location" size={14} color={Colors.muted} />
-              <Text style={[Typography.bodySmall, { color: Colors.muted, fontWeight: '600' }]}>
+            <View className="flex-row items-center gap-[6px]">
+              <Ionicons name="location" size={14} className="text-muted" />
+              <Text className="text-body-sm text-muted font-jakarta-semibold">
                 {user?.location?.city?.toUpperCase() || "LOCATION NOT SET"}
               </Text>
             </View>
           </View>
         </Animated.View>
 
-        <View style={{ gap: 32 }}>
+        <View className="gap-8">
           {menuSections.map((section, sectionIdx) => (
             <View key={section.title}>
-              <Text style={[Typography.label, {
-                color: Colors.muted,
-                fontSize: 10,
-                letterSpacing: 1.5,
-                marginBottom: 16,
-                paddingHorizontal: 4
-              }]}>
+              <Text className="text-label text-muted text-[10px] tracking-[1.5px] mb-4 px-1">
                 {section.title}
               </Text>
 
-              <View style={{ gap: 10 }}>
+              <View className="gap-[10px]">
                 {section.items.map((item, i) => (
                   <Animated.View
                     key={item.label}
                     entering={FadeInDown.delay(200 + (sectionIdx * 100) + (i * 50)).springify()}
                   >
                     <TouchableOpacity
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        padding: 16,
-                        backgroundColor: Colors.white,
-                        borderRadius: Radius.sm,
-                        gap: 16,
-                        borderWidth: 1,
-                        borderColor: Colors.cardBorder,
-                        ...Shadows.sm
-                      }}
+                      className="flex-row items-center p-4 bg-white rounded-sm gap-4 border border-card-border shadow-sm"
                       onPress={item.onPress}
                       activeOpacity={0.7}
                     >
-                      <View style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: Radius.xs,
-                        backgroundColor: item.danger ? Colors.error + '10' : Colors.surface,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderWidth: 1,
-                        borderColor: item.danger ? Colors.error + '25' : Colors.cardBorder
-                      }}>
+                      <View className={`w-10 h-10 rounded-xs items-center justify-center border ${
+                        item.danger ? 'bg-error/10 border-error/25' : 'bg-surface border-card-border'
+                      }`}>
                         <Ionicons
                           name={item.icon as any}
                           size={20}
-                          color={item.danger ? Colors.error : Colors.primary}
+                          className={item.danger ? 'text-error' : 'text-primary'}
                         />
                       </View>
 
                       <Text
-                        style={[
-                          Typography.body,
-                          {
-                            flex: 1,
-                            fontWeight: '600',
-                            color: item.danger ? Colors.error : Colors.ink,
-                            fontSize: 15
-                          }
-                        ]}
+                        className={`flex-1 font-jakarta-semibold text-[15px] ${
+                            item.danger ? 'text-error' : 'text-ink'
+                        }`}
                       >
                         {item.label}
                       </Text>
@@ -328,7 +241,7 @@ export default function ProfileScreen() {
                       <Ionicons
                         name="chevron-forward"
                         size={16}
-                        color={Colors.gray400}
+                        className="text-gray-400"
                       />
                     </TouchableOpacity>
                   </Animated.View>
@@ -338,9 +251,9 @@ export default function ProfileScreen() {
           ))}
         </View>
 
-        <View style={{ marginTop: 64, alignItems: 'center' }}>
-          <View style={{ height: 1, width: 40, backgroundColor: Colors.cardBorder, marginBottom: 16 }} />
-          <Text style={[Typography.label, { textAlign: 'center', opacity: 0.3, fontSize: 8, letterSpacing: 4 }]}>
+        <View className="mt-16 items-center">
+          <View className="h-[1px] w-10 bg-card-border mb-4" />
+          <Text className="text-label text-center opacity-30 text-[8px] tracking-[4px]">
             LOOM v4.0.0
           </Text>
         </View>
@@ -348,3 +261,4 @@ export default function ProfileScreen() {
     </View>
   );
 }
+
