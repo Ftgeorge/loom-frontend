@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { ErrorState } from '@/components/ui/StateComponents';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
-import Animated, {  FadeInLeft, FadeInRight } from 'react-native-reanimated';
+import Animated, {  FadeInLeft, FadeInRight, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const QUICK_REPLIES = [
@@ -25,7 +25,7 @@ const QUICK_REPLIES = [
     "How much will it cost?",
     "Okay, thank you!",
     "When can you come?",
-    "Send me your location",
+    "Send location",
 ];
 
 export default function ChatScreen() {
@@ -118,57 +118,67 @@ export default function ChatScreen() {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
         >
-            <LoomThread variant="minimal" opacity={0.3} animated />
+            <View className="absolute inset-0">
+                <LoomThread variant="minimal" opacity={0.3} animated scale={1.3} />
+            </View>
             <AppHeader
-                title={thread?.participantName || 'Chat'}
+                title={thread?.participantName?.toUpperCase() || 'ENCRYPTED CHANNEL'}
                 showBack
                 onBack={() => router.back()}
                 showNotification={false}
             />
 
             {loading && messages.length === 0 ? (
-                <View className="flex-1 p-6">
-                    <SkeletonList count={6} type="message" />
+                <View className="flex-1 px-8 pt-8">
+                    <SkeletonList count={8} type="message" />
                 </View>
             ) : loadError && messages.length === 0 ? (
-                <View className="flex-1">
-                    <ErrorState onRetry={() => loadMessages(true)} message="Failed to load your conversation." />
+                <View className="flex-1 justify-center">
+                    <ErrorState onRetry={() => loadMessages(true)} message="Failed to load secure conversation log." />
                 </View>
             ) : (
-                <>
+                <View className="flex-1">
                     <FlatList
                         ref={listRef}
                         data={messages}
                         keyExtractor={(item) => item.id}
-                        contentContainerStyle={{ padding: 24, paddingBottom: 24, flexGrow: 1, justifyContent: messages.length > 0 ? 'flex-end' : 'center' }}
+                        contentContainerStyle={{ paddingHorizontal: 32, paddingTop: 40, paddingBottom: 40, flexGrow: 1, justifyContent: messages.length > 0 ? 'flex-end' : 'center' }}
                         showsVerticalScrollIndicator={false}
                         initialNumToRender={20}
                         maxToRenderPerBatch={20}
                         windowSize={5}
                         removeClippedSubviews={Platform.OS === 'android'}
                         ListEmptyComponent={() => (
-                            <View className="items-center opacity-50">
-                                <Ionicons name="chatbubble-ellipses-outline" size={48} color="#94A3B8" />
-                                <Text className="text-body text-muted mt-4 normal-case">Say hello to start the chat!</Text>
-                            </View>
+                            <Animated.View entering={FadeInUp.springify()} className="items-center opacity-30 px-12">
+                                <View className="w-20 h-20 rounded-[32px] bg-white border border-card-border items-center justify-center mb-6 shadow-inner">
+                                    <Ionicons name="chatbubble-ellipses-outline" size={40} color="#94A3B8" />
+                                </View>
+                                <Text className="text-h3 text-muted text-center uppercase font-jakarta-extrabold italic tracking-tighter text-[16px]">Secure line established</Text>
+                                <Text className="text-body text-muted text-center mt-3 normal-case font-jakarta-medium italic">Commence mission coordination</Text>
+                            </Animated.View>
                         )}
                         renderItem={({ item }) => {
                             const mine = isMe(item);
                             return (
                                 <Animated.View
                                     entering={mine ? FadeInRight.delay(50).springify() : FadeInLeft.delay(50).springify()}
-                                    className={`max-w-[85%] px-4 py-3 rounded-md mb-3 border shadow-sm ${
-                                        mine ? 'bg-accent self-end border-accent rounded-tr-[2px]' : 'bg-white self-start border-card-border rounded-tl-[2px]'
+                                    className={`max-w-[82%] px-6 py-4 rounded-[28px] mb-4 border shadow-md ${
+                                        mine ? 'bg-primary self-end border-primary/20 rounded-tr-[4px] shadow-primary/20' : 'bg-white self-start border-card-border/50 rounded-tl-[4px] shadow-xl'
                                     }`}
                                 >
-                                    <Text className={`text-body text-[15px] leading-[22px] normal-case ${mine ? 'text-white' : 'text-body'}`}>
+                                    <Text className={`text-[15px] leading-6 font-jakarta-medium italic normal-case ${mine ? 'text-white' : 'text-ink'}`}>
                                         {item.text}
                                     </Text>
-                                    <Text className={`text-[9px] mt-2 uppercase tracking-tight ${
-                                        mine ? 'text-white/60 self-end' : 'text-muted self-start'
-                                    }`}>
-                                        {formatTime(item.timestamp)}
-                                    </Text>
+                                    <View className="mt-3 flex-row items-center justify-end gap-1.5 opacity-50">
+                                        <Text className={`text-[10px] uppercase font-jakarta-extrabold tracking-tighter ${
+                                            mine ? 'text-white' : 'text-muted'
+                                        }`}>
+                                            {formatTime(item.timestamp)}
+                                        </Text>
+                                        {mine && (
+                                            <Ionicons name="checkmark-done" size={12} color="white" opacity={item.read ? 1 : 0.5} />
+                                        )}
+                                    </View>
                                 </Animated.View>
                             );
                         }}
@@ -179,39 +189,41 @@ export default function ChatScreen() {
                         }}
                     />
 
-                    <View className="bg-transparent">
+                    {/* Quick Replies Terminal */}
+                    <View className="mb-4">
                         <FlatList
                             data={QUICK_REPLIES}
                             horizontal
                             showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 16, gap: 10 }}
+                            contentContainerStyle={{ paddingHorizontal: 32, paddingBottom: 16, gap: 12 }}
                             keyExtractor={(item) => item}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
+                                    activeOpacity={0.8}
                                     onPress={() => handleSend(item)}
-                                    className="px-4 py-[10px] rounded-xs bg-white/80 border border-card-border shadow-sm"
+                                    className="px-6 py-3 rounded-full bg-white/60 border border-card-border/50 shadow-sm backdrop-blur-md active:bg-white"
                                 >
-                                    <Text className="text-label text-primary text-[9px] normal-case tracking-normal">{item}</Text>
+                                    <Text className="text-label text-primary text-[10px] uppercase font-jakarta-extrabold italic tracking-tight">{item}</Text>
                                 </TouchableOpacity>
                             )}
                         />
                     </View>
-                </>
+                </View>
             )}
 
-            {/* Comm Input */}
+            {/* Comm Input Protocol */}
             <View 
-                className="flex-row items-center px-4 pt-4 bg-white border-t border-card-border gap-3 shadow-lg"
-                style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+                className="flex-row items-center px-6 pt-6 pb-4 bg-white border-t border-card-border/50 gap-4 shadow-3xl"
+                style={{ paddingBottom: Math.max(insets.bottom, 24) }}
             >
-                <TouchableOpacity className="p-1">
-                    <Ionicons name="attach-outline" size={26} color="#94A3B8" />
+                <TouchableOpacity className="w-12 h-12 rounded-2xl bg-background border border-card-border/50 items-center justify-center shadow-inner active:bg-gray-50">
+                    <Ionicons name="add-outline" size={28} color="#94A3B8" />
                 </TouchableOpacity>
 
-                <View className="flex-1 bg-background rounded-md border-[1.5px] border-card-border min-h-[48px] max-h-[120px] px-4 py-[10px] justify-center">
+                <View className="flex-1 bg-background rounded-[24px] border-[1.5px] border-card-border/50 min-h-[52px] max-h-[140px] px-6 py-3 justify-center shadow-inner">
                     <TextInput
-                        className="text-body text-ink text-[15px] p-0"
-                        placeholder="Type a message..."
+                        className="text-[15px] text-ink font-jakarta-medium italic p-0"
+                        placeholder="Encrypted message..."
                         placeholderTextColor="#94A3B8"
                         value={text}
                         onChangeText={setText}
@@ -222,14 +234,13 @@ export default function ChatScreen() {
                 <TouchableOpacity
                     onPress={() => handleSend()}
                     disabled={!text.trim()}
-                    className={`w-12 h-12 rounded-md items-center justify-center shadow-md ${
-                        text.trim() ? 'bg-primary' : 'bg-gray-200'
+                    className={`w-14 h-14 rounded-2xl items-center justify-center shadow-xl active:scale-[0.95] ${
+                        text.trim() ? 'bg-primary shadow-primary/30' : 'bg-gray-100 border border-card-border/30'
                     }`}
                 >
-                    <Ionicons name="send" size={20} color={text.trim() ? "white" : "#94A3B8"} />
+                    <Ionicons name="chevron-forward" size={24} color={text.trim() ? "white" : "#CBD5E1"} />
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
     );
 }
-

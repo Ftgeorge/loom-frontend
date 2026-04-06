@@ -11,6 +11,7 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 
 const SEGMENTS = ['INCOMING', 'ACTIVE', 'HISTORY'];
 
@@ -19,7 +20,7 @@ export default function JobsScreen() {
     const [segIdx, setSegIdx] = useState(0);
     const [jobs, setJobs] = useState<JobRequest[]>([]);
     const [loading, setLoading] = useState(true);
-    const [, setError] = useState(false);
+    const [error, setError] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
     const load = useCallback(async () => {
@@ -54,15 +55,17 @@ export default function JobsScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <LoomThread variant="minimal" opacity={0.2} animated />
+            <View className="absolute inset-0">
+                <LoomThread variant="minimal" opacity={0.2} animated />
+            </View>
             <SubAppHeader
-                label="JOB LIST"
-                title="Service Jobs"
-                description="Manage your incoming, active and past completed jobs."
+                label="OPERATIONAL LOG"
+                title="SERVICE JOBS"
+                description="Manage your incoming mission requests and active contracts."
                 onNotification={() => router.push('/notifications')}
             />
 
-            <View className="px-6 py-5">
+            <View className="px-6 py-6 border-b border-card-border/30 bg-white/50 backdrop-blur-xl">
                 <SegmentedControl
                     segments={SEGMENTS}
                     selected={segIdx}
@@ -71,19 +74,28 @@ export default function JobsScreen() {
             </View>
 
             {loading ? (
-                <View className="p-6"><SkeletonList count={3} type="request" /></View>
+                <View className="p-7"><SkeletonList count={3} type="request" /></View>
+            ) : error ? (
+                <ErrorState onRetry={load} />
             ) : filtered.length === 0 ? (
-                <View className="flex-1 justify-center p-6">
-                    <View className="p-12 items-center border-[1.5px] border-dashed bg-surface border-card-border rounded-md">
-                        <Text className="text-h3 text-center text-primary uppercase">
-                            {segIdx === 0 ? 'NO NEW REQUESTS' : segIdx === 1 ? 'NO ACTIVE JOBS' : 'NO JOB HISTORY'}
+                <View className="flex-1 justify-center p-7">
+                    <View className="p-16 items-center border-[2px] border-dashed bg-white border-card-border rounded-[32px] shadow-inner">
+                        <View className="w-20 h-20 bg-background rounded-3xl items-center justify-center mb-6 shadow-sm border border-card-border">
+                            <Ionicons 
+                                name={segIdx === 0 ? "radio-outline" : segIdx === 1 ? "flash-outline" : "archive-outline"} 
+                                size={42} 
+                                color="#94A3B8" 
+                            />
+                        </View>
+                        <Text className="text-h3 text-center text-ink uppercase font-jakarta-extrabold italic tracking-tight">
+                            {segIdx === 0 ? 'NO MISSION REQUESTS' : segIdx === 1 ? 'ZERO ACTIVE JOBS' : 'EMPTY HISTORY LOG'}
                         </Text>
-                        <Text className="text-body-sm text-center text-muted mt-3 leading-5">
+                        <Text className="text-body text-center text-ink/50 mt-4 leading-5 font-jakarta-medium max-w-[240px]">
                             {segIdx === 0
-                                ? 'You have no new job requests at the moment. We will notify you when a new job arrives.'
+                                ? 'Your transmission frequency is clear. We will alert you when a mission is available.'
                                 : segIdx === 1
-                                    ? 'You do not have any jobs currently in progress.'
-                                    : 'You have not completed any jobs yet.'}
+                                    ? 'You have no operations currently deployed in the field.'
+                                    : 'Your operational history is currently unpopulated.'}
                         </Text>
                     </View>
                 </View>
@@ -91,7 +103,8 @@ export default function JobsScreen() {
                 <FlatList
                     data={filtered}
                     keyExtractor={(item) => item.id}
-                    contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
+                    className="flex-1"
+                    contentContainerStyle={{ padding: 24, paddingBottom: 160 }}
                     showsVerticalScrollIndicator={false}
                     refreshControl={
                         <RefreshControl
@@ -115,7 +128,12 @@ export default function JobsScreen() {
                     ItemSeparatorComponent={() => <View className="h-4" />}
                 />
             )}
+            
+            <View className="absolute bottom-10 left-0 right-0 items-center pointer-events-none opacity-20">
+                <Text className="text-[9px] text-muted uppercase tracking-[5px] font-jakarta-bold italic">End of Log • Encrypted v4.2</Text>
+            </View>
         </View>
     );
 }
+
 

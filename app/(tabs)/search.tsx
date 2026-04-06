@@ -89,34 +89,30 @@ export default function SearchScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <LoomThread variant="minimal" opacity={0.2} animated />
+            <View className="absolute inset-0">
+                <LoomThread variant="minimal" opacity={0.2} animated />
+            </View>
             
             <SubAppHeader
-                label="EXPLORE"
-                title="Find an Artisan"
-                description="Discover skilled artisans in your area."
+                label="DISCOVERY ENGINE"
+                title="FIND ARTISANS"
+                description="Initialize localized search for certified professional operatives."
                 onNotification={() => router.push('/notifications')}
             />
 
-            <View className="px-6 pb-4">
+            <View className="px-6 pb-6 pt-2 bg-white/50 backdrop-blur-xl border-b border-card-border/30">
                 <AppTextInput
-                    placeholder="Search by name, skill, or location..."
+                    placeholder="Search by mission name, skill, or sector..."
                     value={query}
                     onChangeText={setQuery}
-                    containerStyle={{
-                        borderRadius: 24,
-                        backgroundColor: 'white',
-                        borderWidth: 1.5,
-                        borderColor: isSearching ? '#00120C' : '#F0F0EE',
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.05,
-                        shadowRadius: 10,
-                        elevation: 2
-                    }}
+                    className="h-14 bg-white border-[1.5px] border-card-border rounded-full shadow-2xl px-6"
                     leftIcon={
-                        <View className="pl-5">
-                            <Ionicons name="search" size={22} className="text-muted" />
+                        <View className="pl-6">
+                            <Ionicons 
+                                name={isSearching ? "sync-outline" : "search-outline"} 
+                                size={20} 
+                                color={isSearching ? "#1AB26C" : "#94A3B8"} 
+                            />
                         </View>
                     }
                 />
@@ -126,10 +122,11 @@ export default function SearchScreen() {
                 key={viewLayout}
                 data={artisans}
                 keyExtractor={(item) => item.id}
+                className="flex-1"
                 numColumns={viewLayout === 'grid' ? 2 : 1}
-                columnWrapperStyle={viewLayout === 'grid' ? { gap: 12, marginBottom: 16 } : undefined}
+                columnWrapperStyle={viewLayout === 'grid' ? { gap: 16, marginBottom: 16 } : undefined}
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: 150, paddingHorizontal: 24 }}
+                contentContainerStyle={{ paddingBottom: 160, paddingHorizontal: 24 }}
                 initialNumToRender={10}
                 maxToRenderPerBatch={10}
                 windowSize={5}
@@ -137,11 +134,11 @@ export default function SearchScreen() {
                 ListHeaderComponent={
                     <View className="mb-6">
                         <FlatList
-                            data={[{ id: 'all', label: 'ALL SERVICES' }, ...CATEGORIES]}
+                            data={[{ id: 'all', label: 'ALL SECTORS' }, ...CATEGORIES]}
                             horizontal
                             showsHorizontalScrollIndicator={false}
                             className="-mx-6"
-                            contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 12, gap: 10 }}
+                            contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 16, gap: 12 }}
                             keyExtractor={(item) => item.id}
                             renderItem={({ item }) => (
                                 <Chip
@@ -165,21 +162,23 @@ export default function SearchScreen() {
                                 <ErrorState onRetry={() => search(selectedCategory, query)} />
                             </View>
                         ) : artisans.length === 0 ? (
-                            <View className="mt-16 p-12 items-center border-dashed bg-white border-card-border rounded-md border-[1.5px]">
-                                <Ionicons name="search" size={48} className="text-card-border" />
-                                <Text className="text-h3 text-center text-primary mt-6">
-                                    NO RESULTS
+                            <View className="mt-16 p-16 items-center border-[2px] border-dashed bg-white border-card-border rounded-[32px] shadow-inner text-center">
+                                <View className="w-20 h-20 bg-background rounded-3xl items-center justify-center mb-6 shadow-sm border border-card-border">
+                                    <Ionicons name="search-outline" size={42} color="#94A3B8" />
+                                </View>
+                                <Text className="text-h3 text-center text-ink uppercase font-jakarta-extrabold italic tracking-tight">
+                                    ZERO RESULTS FOUND
                                 </Text>
-                                <Text className="text-body-sm text-center text-muted mt-3 leading-5">
-                                    We couldn&apos;t find any artisans matching your current search parameters.
+                                <Text className="text-body text-center text-ink/50 mt-4 leading-5 font-jakarta-medium max-w-[240px]">
+                                    We couldn&apos;t localize any artisans matching your current discovery encryption.
                                 </Text>
                             </View>
                         ) : (
-                            <View className="mt-6 mb-2 flex-row items-center justify-between">
+                            <View className="mt-6 mb-4 flex-row items-center justify-between px-1">
                                 <View className="flex-row items-center gap-2">
-                                    <View className="w-[6px] h-[6px] rounded-full bg-accent" />
-                                    <Text className="text-label text-[10px] text-primary tracking-[1px] font-jakarta-bold uppercase">
-                                        FOUND {artisans.length} ARTISANS
+                                    <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+                                    <Text className="text-label text-[10px] text-primary tracking-[2px] font-jakarta-extrabold italic uppercase">
+                                        FOUND {artisans.length} OPERATIVES
                                     </Text>
                                 </View>
                                 <LayoutSwitch
@@ -210,7 +209,15 @@ export default function SearchScreen() {
                     )
                 }
             />
+            
+            <View className="absolute bottom-10 left-0 right-0 items-center pointer-events-none opacity-20">
+                <View className="flex-row items-center gap-2">
+                    <Ionicons name="shield-checkmark" size={10} color="#64748B" />
+                    <Text className="text-[9px] text-muted uppercase tracking-[5px] font-jakarta-bold italic">Secure Discovery Logic Active • Loom v4.2</Text>
+                </View>
+            </View>
         </View>
     );
 }
+
 

@@ -40,24 +40,24 @@ function StatCard({ label, value, icon, delay, accent }: {
             className="flex-1"
         >
             <View className={`${
-                accent ? "bg-primary border-transparent" : "bg-surface border-card-border"
-            } rounded-sm p-[18px] border shadow-sm`}>
-                <View className={`w-9 h-9 rounded-[10px] items-center justify-center mb-3 ${
-                    accent ? "bg-white/10" : "bg-canvas"
+                accent ? "bg-primary border-transparent" : "bg-white border-card-border"
+            } rounded-2xl p-5 border shadow-sm`}>
+                <View className={`w-10 h-10 rounded-xl items-center justify-center mb-3.5 shadow-sm ${
+                    accent ? "bg-white/15" : "bg-background"
                 }`}>
                     <Ionicons 
                         name={icon as any} 
                         size={18} 
-                        className={accent ? "text-white" : "text-primary"} 
+                        color={accent ? "#FFFFFF" : "#00120C"} 
                     />
                 </View>
-                <Text className={`text-data text-[22px] mb-1 ${
+                <Text className={`text-h1 text-[24px] mb-0.5 font-jakarta-extrabold italic ${
                     accent ? "text-white" : "text-ink"
                 }`}>
                     {value}
                 </Text>
-                <Text className={`text-label text-[9px] tracking-[0.8px] uppercase ${
-                    accent ? "text-white/55" : "text-muted"
+                <Text className={`text-label text-[9px] tracking-[1.5px] uppercase font-jakarta-bold italic ${
+                    accent ? "text-white/60" : "text-muted"
                 }`}>
                     {label}
                 </Text>
@@ -84,13 +84,13 @@ function OnlineToggle({ online, onToggle }: { online: boolean; onToggle: () => v
             <TouchableOpacity
                 onPress={handlePress}
                 activeOpacity={1}
-                className={`flex-row items-center gap-2 px-4 py-[10px] rounded-[24px] border-[1.5px] ${
-                    online ? "bg-success/10 border-success/60" : "bg-canvas border-card-border"
+                className={`flex-row items-center gap-2.5 px-5 py-3 rounded-full border-[1.5px] shadow-sm ${
+                    online ? "bg-success/10 border-success/30" : "bg-white border-card-border"
                 }`}
             >
-                <View className={`w-2 h-2 rounded-full ${online ? "bg-success" : "bg-muted"}`} />
-                <Text className={`text-[12px] font-jakarta-bold ${online ? "text-success" : "text-muted"}`}>
-                    {online ? "AVAILABLE" : "OFFLINE"}
+                <View className={`w-2.5 h-2.5 rounded-full ${online ? "bg-success shadow-[0_0_8px_rgba(26,178,108,0.6)]" : "bg-muted"}`} />
+                <Text className={`text-[12px] font-jakarta-extrabold italic tracking-tight ${online ? "text-success" : "text-muted"}`}>
+                    {online ? "CONNECTED" : "OFFLINE"}
                 </Text>
             </TouchableOpacity>
         </Animated.View>
@@ -139,140 +139,151 @@ export default function ArtisanDashboard() {
     const newJobs = React.useMemo(() => jobs.filter(j => j.status === 'submitted' || j.status === 'matched'), [jobs]);
     const activeJobs = React.useMemo(() => jobs.filter(j => ['accepted', 'on_the_way', 'in_progress'].includes(j.status)), [jobs]);
 
-    const firstName = user?.name?.split(' ')[0] || 'Pro';
+    const firstName = user?.name?.split(' ')[0] || 'TRIAL OPERATIVE';
 
     return (
-        <View className="flex-1 bg-canvas">
+        <View className="flex-1 bg-background">
             <SubAppHeader
                 showLocation={false}
-                label="DASHBOARD"
-                title={firstName}
-                description="Manage your business and track incoming job requests."
+                label="COMMAND CENTER"
+                title={`MASTER ${firstName.toUpperCase()}`}
+                description="Monitor your operational yield and mission queue."
                 onNotification={() => router.push('/notifications')}
             />
 
             <ScrollView
-                contentContainerStyle={{ padding: 24, paddingBottom: 130 }}
+                className="flex-1"
+                contentContainerStyle={{ padding: 24, paddingBottom: 140 }}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00120C" />}
                 showsVerticalScrollIndicator={false}
             >
-                {/* ─── Verification Banner ──────────────────────────────────── */}
+                {/* ─── Verification Protocol Banner ──────────────────────────────────── */}
                 {verificationStatus !== 'approved' && (
-                    <Animated.View entering={FadeInUp.springify()} className="mb-5">
+                    <Animated.View entering={FadeInUp.springify()} className="mb-6">
                         <TouchableOpacity 
                             onPress={() => router.push('/verification')}
                             activeOpacity={0.9}
-                            className={`flex-row items-center gap-3 p-4 rounded-sm border ${
-                                verificationStatus === 'pending' ? 'bg-warning/10 border-warning/20' : 'bg-error/10 border-error/20'
+                            className={`flex-row items-center gap-4 p-5 rounded-2xl border-[1.5px] shadow-sm ${
+                                verificationStatus === 'pending' ? 'bg-warning/10 border-warning/30' : 'bg-destructive/10 border-destructive/30'
                             }`}
                         >
-                            <View className={`w-9 h-9 rounded-full items-center justify-center ${
-                                verificationStatus === 'pending' ? 'bg-warning' : 'bg-error'
+                            <View className={`w-11 h-11 rounded-2xl items-center justify-center shadow-sm ${
+                                verificationStatus === 'pending' ? 'bg-warning' : 'bg-destructive'
                             }`}>
                                 <Ionicons 
-                                    name={verificationStatus === 'pending' ? "time-outline" : "alert-circle-outline"} 
-                                    size={20} 
+                                    name={verificationStatus === 'pending' ? "radio-outline" : "alert-circle-outline"} 
+                                    size={24} 
                                     color="white" 
                                 />
                             </View>
                             <View className="flex-1">
-                                <Text className="text-label text-[13px] text-ink font-jakarta-bold">
-                                    {verificationStatus === 'pending' ? "Verification in Progress" : "Complete Your Verification"}
+                                <Text className="text-h3 text-ink text-[15px] font-jakarta-extrabold italic uppercase">
+                                    {verificationStatus === 'pending' ? "Verification Pending" : "Identity Incomplete"}
                                 </Text>
-                                <Text className="text-body-sm text-muted text-[11px] mt-[1px]">
+                                <Text className="text-body-sm text-ink/60 text-[12px] mt-1 font-jakarta-medium leading-4">
                                     {verificationStatus === 'pending' 
-                                        ? "We're reviewing your documents. Hang tight!" 
-                                        : "Verify your ID to unlock all features and start earning."}
+                                        ? "Reviewing your credentials. Operational capacity limited." 
+                                        : "Complete your identity profile to unlock tactical features."}
                                 </Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={16} className="text-muted" />
+                            <Ionicons name="chevron-forward" size={18} color="#64748B" />
                         </TouchableOpacity>
                     </Animated.View>
                 )}
 
-                {/* ─── Status Row ───────────────────────────────────────────── */}
-                <View className="mb-8 flex-row justify-end">
+                {/* ─── Status Control ───────────────────────────────────────────── */}
+                <View className="mb-6 flex-row justify-end">
                     <Animated.View entering={FadeInRight.delay(160).springify()}>
                         <OnlineToggle online={artisanOnline} onToggle={() => setArtisanOnline(!artisanOnline)} />
                     </Animated.View>
                 </View>
 
-                {/* ─── Earnings Hero Card ───────────────────────────────────── */}
-                <Animated.View entering={FadeInDown.delay(200).springify()} className="mb-5">
-                    <View className="bg-primary rounded-sm p-6 shadow-brand overflow-hidden">
-                        {/* Decorative */}
-                        <View className="absolute -right-[30px] -top-[30px] opacity-[0.04]">
-                            <Ionicons name="wallet" size={200} color="white" />
+                {/* ─── Financial Yield Hero Card ───────────────────────────────────── */}
+                <Animated.View entering={FadeInDown.delay(200).springify()} className="mb-6">
+                    <View className="bg-primary rounded-[28px] p-7 shadow-2xl overflow-hidden border border-primary/20">
+                        {/* High-Impact Decorative Overlay */}
+                        <View className="absolute -right-12 -top-12 opacity-10">
+                            <Ionicons name="stats-chart" size={240} color="white" />
                         </View>
 
-                        <Text className="text-[10px] font-jakarta-bold text-white/50 tracking-[1px] uppercase mb-2">
-                            Total Earnings
-                        </Text>
-                        <Text className="text-[38px] font-inter-bold text-white tracking-[-1px] mb-1">
+                        <View className="flex-row items-center gap-2 mb-3">
+                            <Ionicons name="cash-outline" size={12} color="white" className="opacity-60" />
+                            <Text className="text-label text-[10px] font-jakarta-extrabold text-white/60 tracking-[2.5px] uppercase italic">
+                                CUMULATIVE YIELD
+                            </Text>
+                        </View>
+                        <Text className="text-h1 text-[44px] font-jakarta-extrabold italic text-white tracking-[-1.5px] mb-1">
                             ₦{Number(earnings?.totalEarnings ?? 0).toLocaleString()}
                         </Text>
-                        <Text className="text-[12px] font-inter text-white/45 mb-6">
-                            All time · Updated just now
+                        <Text className="text-body-sm font-jakarta-bold text-white/40 mb-8 uppercase tracking-widest text-[10px]">
+                            REAL-TIME AUDITED • SYNCED NOW
                         </Text>
 
-                        <View className="flex-row gap-5">
+                        <View className="flex-row gap-8 items-center">
                             <View>
-                                <Text className="text-[9px] font-jakarta-bold text-white/40 tracking-[0.6px] uppercase">
-                                    This week
+                                <Text className="text-label text-[9px] font-jakarta-extrabold text-white/40 tracking-[1px] uppercase italic mb-1">
+                                    WEEKLY CYCLE
                                 </Text>
-                                <Text className="text-[17px] font-inter-bold text-white mt-[2px]">
+                                <Text className="text-h2 text-[20px] font-jakarta-extrabold italic text-white">
                                     ₦{Number(earnings?.thisWeek ?? 0).toLocaleString()}
                                 </Text>
                             </View>
-                            <View className="w-[1px] bg-white/10" />
+                            <View className="w-[1px] h-10 bg-white/10" />
                             <View>
-                                <Text className="text-[9px] font-jakarta-bold text-white/40 tracking-[0.6px] uppercase">
-                                    Completed
+                                <Text className="text-label text-[9px] font-jakarta-extrabold text-white/40 tracking-[1px] uppercase italic mb-1">
+                                    MISSIONS
                                 </Text>
-                                <Text className="text-[17px] font-inter-bold text-white mt-[2px]">
-                                    {profile?.completedJobs ?? 0} jobs
+                                <Text className="text-h2 text-[20px] font-jakarta-extrabold italic text-white">
+                                    {profile?.completedJobs ?? 0} SUCCESS
                                 </Text>
                             </View>
                         </View>
                     </View>
                 </Animated.View>
 
-                {/* ─── Stats Row ───────────────────────────────────────────── */}
-                <View className="flex-row gap-3 mb-10">
+                {/* ─── Operational Metrics ───────────────────────────────────────────── */}
+                <View className="flex-row gap-4 mb-12 px-1">
                     <StatCard
-                        label="New Jobs"
+                        label="INCOMING"
                         value={`${newJobs.length}`}
-                        icon="flash-outline"
+                        icon="flash"
                         delay={280}
                         accent
                     />
                     <StatCard
-                        label="Active Jobs"
+                        label="ACTIVE"
                         value={`${activeJobs.length}`}
-                        icon="briefcase-outline"
+                        icon="cog"
                         delay={360}
                     />
                     <StatCard
-                        label="Rating"
+                        label="VERDICT"
                         value={profile?.rating && profile.rating > 0 ? profile.rating.toFixed(1) : '5.0'}
-                        icon="star-outline"
+                        icon="ribbon"
                         delay={440}
                     />
                 </View>
 
-                {/* ─── New Gigs ─────────────────────────────────────────────── */}
+                {/* ─── Mission Queue ─────────────────────────────────────────────── */}
                 <View>
-                    <View className="flex-row justify-between items-end mb-5">
-                        <View>
-                            <Text className="text-label text-muted mb-1">Incoming</Text>
-                            <Text className="text-h2 text-[20px]">New Job Requests</Text>
+                    <View className="flex-row justify-between items-end mb-6 px-1">
+                        <View className="flex-1">
+                            <View className="flex-row items-center gap-1.5 mb-1.5">
+                                <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+                                <Text className="text-label text-[10px] text-primary tracking-[2px] uppercase font-jakarta-extrabold italic">
+                                    REQUEST TERMINAL
+                                </Text>
+                            </View>
+                            <Text className="text-[26px] uppercase italic font-jakarta-extrabold text-ink tracking-tighter">
+                                MISSION QUEUE
+                            </Text>
                         </View>
                         <TouchableOpacity
                             onPress={() => router.push('/(tabs)/jobs')}
-                            className="bg-canvas py-[6px]"
+                            className="bg-white px-4 py-2 rounded-xl border border-card-border shadow-sm active:bg-gray-50"
                         >
-                            <Text className="text-[12px] font-inter-semibold text-primary">
-                                All Jobs
+                            <Text className="text-[11px] font-jakarta-extrabold text-primary italic uppercase tracking-tighter">
+                                FULL LOGS
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -282,19 +293,19 @@ export default function ArtisanDashboard() {
                     ) : error ? (
                         <ErrorState onRetry={load} />
                     ) : newJobs.length === 0 ? (
-                        <View className="bg-surface rounded-xl p-12 items-center border-[1.5px] border-dashed border-card-border">
-                            <View className="w-[60px] h-[60px] rounded-[20px] bg-canvas items-center justify-center mb-4">
-                                <Ionicons name="notifications-off-outline" size={28} className="text-muted" />
+                        <View className="bg-white rounded-[28px] p-12 items-center border-[2px] border-dashed border-card-border shadow-inner">
+                            <View className="w-20 h-20 rounded-[30px] bg-background items-center justify-center mb-6 shadow-sm border border-card-border">
+                                <Ionicons name="radio-outline" size={42} color="#94A3B8" />
                             </View>
-                            <Text className="text-h3 text-center mb-2">
-                                No jobs yet
+                            <Text className="text-h3 text-center mb-2 uppercase font-jakarta-extrabold italic text-ink/80">
+                                NO FREQUENCIES DETECTED
                             </Text>
-                            <Text className="text-body text-center text-[14px]">
-                                Stay online and you&apos;ll be notified when a job comes in.
+                            <Text className="text-body text-center text-[14px] text-ink/50 max-w-[260px] font-jakarta-medium">
+                                Maintain active status to capture localized job transmissions.
                             </Text>
                         </View>
                     ) : (
-                        <View className="gap-3">
+                        <View className="gap-4">
                             {newJobs.slice(0, 4).map((job, index) => (
                                 <Animated.View key={job.id} entering={FadeInDown.delay(500 + index * 80).springify()}>
                                     <RequestCard
@@ -307,7 +318,13 @@ export default function ArtisanDashboard() {
                         </View>
                     )}
                 </View>
+                
+                <View className="mt-16 items-center flex-row justify-center gap-2 opacity-20">
+                    <Ionicons name="shield-checkmark" size={14} color="#64748B" />
+                    <Text className="text-[9px] text-muted uppercase tracking-[3px] font-jakarta-bold italic">Command Interface Encrypted • Auth v3.2</Text>
+                </View>
             </ScrollView>
         </View>
     );
 }
+

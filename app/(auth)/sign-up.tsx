@@ -4,12 +4,12 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { AppTextInput, PasswordInput, PhoneInput } from '@/components/ui/TextInputs';
 import { authApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Typography } from '@/theme';
 import { SignUpSchema, mapZodErrors } from '@/utils/helpers';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function SignUpScreen() {
     const router = useRouter();
@@ -61,127 +61,132 @@ export default function SignUpScreen() {
         }
     };
 
+    const isArtisan = user?.role === 'artisan';
+
     return (
         <KeyboardAvoidingView
-            style={{ flex: 1, backgroundColor: Colors.background }}
+            className="flex-1 bg-background"
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-            <LoomThread variant="dense" scale={1.2} animated opacity={0.2} />
+            <View className="absolute inset-0">
+                <LoomThread variant="dense" scale={1.2} animated opacity={0.2} />
+            </View>
 
             <ScrollView
+                className="flex-1"
                 contentContainerStyle={{ padding: 32, paddingTop: 80 }}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
             >
                 <BackButton onPress={() => router.back()} />
 
-                <Animated.View entering={FadeInDown.delay(100).springify()} style={{ marginBottom: 40, marginTop: 32 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Animated.View entering={FadeInDown.delay(100).springify()} className="mb-12 mt-10 px-1">
+                    <View className="flex-row justify-between items-start">
                         <View>
-                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8 }]}>JOIN US</Text>
-                            <Text style={[Typography.h1, { fontSize: 32 }]}>Log in</Text>
+                            <Text className="text-label text-primary mb-3 tracking-[2px] uppercase font-jakarta-extrabold italic">JOIN THE ECOSYSTEM</Text>
+                            <Text className="text-h1 text-[42px] leading-[44px] uppercase italic font-jakarta-extrabold tracking-tighter">
+                                CREATE{"\n"}IDENTITY
+                            </Text>
                         </View>
                         <TouchableOpacity
                             onPress={() => router.push('/role-selection')}
-                            style={{
-                                backgroundColor: user?.role === 'artisan' ? '#7C472720' : Colors.primaryLight,
-                                paddingHorizontal: 12,
-                                paddingVertical: 8,
-                                borderRadius: Radius.xs,
-                                borderWidth: 1,
-                                borderColor: user?.role === 'artisan' ? '#7C4727' : Colors.primary,
-                                alignItems: 'center'
-                            }}
+                            className={`px-4 py-2.5 rounded-xl border-[1.5px] items-center shadow-sm ${
+                                isArtisan ? 'bg-accent/10 border-accent' : 'bg-primary/10 border-primary'
+                            }`}
                         >
-                            <Text style={[Typography.label, { color: user?.role === 'artisan' ? '#7C4727' : Colors.primary, fontSize: 8 }]}>
-                                {user?.role === 'artisan' ? 'AS ARTISAN' : 'AS CLIENT'}
+                            <Text className={`text-label text-[9px] uppercase font-jakarta-extrabold italic ${
+                                isArtisan ? 'text-accent' : 'text-primary'
+                            }`}>
+                                {isArtisan ? 'AS ARTISAN' : 'AS CLIENT'}
                             </Text>
-                            <Text style={{ fontSize: 8, color: Colors.muted, marginTop: 2, fontWeight: '700' }}>CHANGE</Text>
+                            <View className="flex-row items-center gap-1 mt-0.5">
+                                <Ionicons name="swap-horizontal" size={10} color="#64748B" />
+                                <Text className="text-[8px] color-muted font-jakarta-bold uppercase tracking-tighter">SWITCH</Text>
+                            </View>
                         </TouchableOpacity>
                     </View>
-                    <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 12, lineHeight: 22 }]}>
-                        {user?.role === 'artisan'
-                            ? 'Join the artisans and start earning.'
-                            : 'Get your profile set to find artisan.'}
+                    <Text className="text-body text-ink/70 mt-6 leading-[24px] font-jakarta-medium max-w-[280px]">
+                        {isArtisan
+                            ? 'Initiate your professional profile and begin operational deployment.'
+                            : 'Set up your client terminal to discover top-tier artisans.'}
                     </Text>
                 </Animated.View>
 
                 <Animated.View entering={FadeInDown.delay(200).springify()}>
-                    <AppTextInput
-                        label="NAME"
-                        placeholder="e.g. Chinedu Okafor"
-                        value={form.name}
-                        onChangeText={(name) => setForm({ ...form, name })}
-                        error={errors.name}
-                        autoCapitalize="words"
-                        containerStyle={{ borderRadius: Radius.xs }}
-                    />
-                    <PhoneInput
-                        label="PHONE"
-                        placeholder="8012345678"
-                        value={form.phone}
-                        onChangeText={(phone) => setForm({ ...form, phone })}
-                        error={errors.phone}
-                        containerStyle={{ borderRadius: Radius.xs }}
-                    />
-                    <AppTextInput
-                        label="EMAIL"
-                        placeholder="chinedu@email.com"
-                        value={form.email}
-                        onChangeText={(email) => setForm({ ...form, email })}
-                        error={errors.email}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        containerStyle={{ borderRadius: Radius.xs }}
-                    />
-                    <PasswordInput
-                        label="Password"
-                        placeholder="Enter your password"
-                        value={form.password}
-                        onChangeText={(password) => setForm({ ...form, password })}
-                        error={errors.password}
-                        containerStyle={{ borderRadius: Radius.xs }}
-                    />
+                    <View className="gap-5">
+                        <AppTextInput
+                            label="FULL OPERATIVE NAME"
+                            placeholder="e.g. Chinedu Okafor"
+                            value={form.name}
+                            onChangeText={(name) => setForm({ ...form, name })}
+                            error={errors.name}
+                            autoCapitalize="words"
+                            className="h-16 rounded-[20px]"
+                        />
+                        <PhoneInput
+                            label="MISSION PHONE"
+                            placeholder="8012345678"
+                            value={form.phone}
+                            onChangeText={(phone) => setForm({ ...form, phone })}
+                            error={errors.phone}
+                            className="h-16 rounded-[20px]"
+                        />
+                        <AppTextInput
+                            label="EMAIL FREQUENCY"
+                            placeholder="chinedu@loom.network"
+                            value={form.email}
+                            onChangeText={(email) => setForm({ ...form, email })}
+                            error={errors.email}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            className="h-16 rounded-[20px]"
+                        />
+                        <PasswordInput
+                            label="SECRET KEY"
+                            placeholder="••••••••••••"
+                            value={form.password}
+                            onChangeText={(password) => setForm({ ...form, password })}
+                            error={errors.password}
+                            className="h-16 rounded-[20px]"
+                        />
+                    </View>
 
                     <PrimaryButton
-                        title="GO"
+                        title="INITIALIZE PROFILE"
                         onPress={handleSignUp}
                         loading={loading}
-                        style={{ marginTop: 32, height: 60 }}
+                        className="mt-10 h-16 rounded-xl shadow-2xl border border-primary/20"
                     />
                 </Animated.View>
 
                 <Animated.View entering={FadeInDown.delay(300).springify()}>
-                    <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginTop: 48,
-                        padding: 16,
-                        backgroundColor: Colors.white,
-                        borderRadius: Radius.xs,
-                        borderWidth: 1,
-                        borderColor: Colors.cardBorder
-                    }}>
-                        <Text style={[Typography.label, { color: Colors.muted, fontSize: 10, textTransform: 'none' }]}>
-                            Have an account?{" "}
+                    <View className="mt-12 p-6 bg-white rounded-[28px] border-[1.5px] border-card-border shadow-md flex-row items-center justify-center gap-3">
+                        <Ionicons name="log-in-outline" size={18} color="#64748B" />
+                        <Text className="text-label text-muted text-[11px] uppercase font-jakarta-bold tracking-tight">
+                            Identity verified?{" "}
                             <Text
                                 onPress={() => router.push('/(auth)/sign-in')}
-                                style={{ color: Colors.primary, fontWeight: '800' }}
+                                className="text-primary font-jakarta-extrabold italic"
                             >
-                                Log In
+                                ACCESS TERMINAL
                             </Text>
                         </Text>
                     </View>
 
-                    <View style={{ marginTop: 32, paddingBottom: 40 }}>
-                        <Text style={[Typography.bodySmall, { textAlign: 'center', fontSize: 10, lineHeight: 18, color: Colors.muted }]}>
-                            BY JOINING, YOU ACCEPT THE{"\n"}
-                            <Text style={{ color: Colors.primary, fontWeight: '700' }}>THE RULES</Text> AND <Text style={{ color: Colors.primary, fontWeight: '700' }}>YOUR DATA</Text>
+                    <View className="mt-10 pb-10 items-center">
+                        <Text className="text-[9px] text-muted text-center uppercase tracking-widest leading-4 font-jakarta-bold opacity-60">
+                            BY INITIALIZING, YOU ACCEDE TO OUR{"\n"}
+                            <Text className="text-primary font-jakarta-extrabold italic">SECURITY PROTOCOLS</Text> AND <Text className="text-primary font-jakarta-extrabold italic">DATA DIRECTIVES</Text>
                         </Text>
+                        
+                        <View className="mt-8 items-center flex-row justify-center gap-2 opacity-30">
+                            <Ionicons name="shield-checkmark" size={12} color="#64748B" />
+                            <Text className="text-[8px] text-muted uppercase tracking-[2px] font-jakarta-bold">Encryption Active • Stable v1.0</Text>
+                        </View>
                     </View>
                 </Animated.View>
             </ScrollView>
         </KeyboardAvoidingView>
     );
 }
+

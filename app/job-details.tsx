@@ -92,96 +92,103 @@ export default function JobDetailsScreen() {
 
     if (loading) return (
         <View className="flex-1 bg-background">
-            <LoomThread variant="minimal" opacity={0.4} />
-            <AppHeader title="JOB DETAILS" showBack onBack={() => router.back()} showNotification={false} />
+            <View className="absolute inset-0">
+                <LoomThread variant="minimal" opacity={0.4} scale={1.3} />
+            </View>
+            <AppHeader title="MISSION DETAILS" showBack onBack={() => router.back()} showNotification={false} />
             <View className="p-6"><SkeletonList count={3} type="request" /></View>
         </View>
     );
 
     if (error || !job) return (
         <View className="flex-1 bg-background">
-            <AppHeader title="JOB DETAILS" showBack onBack={() => router.back()} showNotification={false} />
+            <AppHeader title="MISSION DETAILS" showBack onBack={() => router.back()} showNotification={false} />
             <ErrorState onRetry={load} />
         </View>
     );
 
     return (
         <View className="flex-1 bg-background">
-            <LoomThread variant="minimal" opacity={0.2} animated />
-            <AppHeader title="JOB DETAILS" showBack onBack={() => router.back()} showNotification={false} />
+            <View className="absolute inset-0">
+                <LoomThread variant="minimal" opacity={0.2} animated scale={1.3} />
+            </View>
+            <AppHeader title="MISSION DETAILS" showBack onBack={() => router.back()} showNotification={false} />
 
             <ScrollView
                 className="flex-1"
-                contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
+                contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 24, paddingBottom: 160 }}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Job Summary */}
+                {/* ─── Mission Identity ────────────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.springify()} className="mb-10 px-1">
-                    <Text className="text-label text-primary mb-2 tracking-[2px] uppercase font-jakarta-bold">Job Type</Text>
-                    <Text className="text-h1 text-[32px] uppercase italic font-jakarta-extrabold tracking-tight">{job.category.replace('_', ' / ')}</Text>
-                    <View className="flex-row items-center gap-3 mt-4">
-                        <View className="bg-accent/10 px-3 py-1.5 rounded-xs border border-accent">
-                            <Text className="text-label text-accent text-[10px] font-jakarta-extrabold uppercase tracking-widest">{job.status}</Text>
+                    <View className="flex-row items-center gap-2 mb-3">
+                        <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+                        <Text className="text-label text-primary tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">MISSION PARAMETERS</Text>
+                    </View>
+                    <Text className="text-h1 text-[40px] leading-[44px] uppercase italic font-jakarta-extrabold tracking-tighter text-ink">{job.category.replace('_', ' / ')}</Text>
+                    <View className="flex-row items-center gap-4 mt-6">
+                        <View className="bg-accent/10 px-4 py-2 rounded-xl border border-accent/20 shadow-sm">
+                            <Text className="text-label text-accent text-[11px] font-jakarta-extrabold uppercase tracking-widest italic">{job.status.replace('_', ' ')}</Text>
                         </View>
-                        <Text className="text-label text-muted text-[10px] uppercase font-jakarta-bold">REF: {job.id.substring(0, 8)}</Text>
+                        <Text className="text-label text-ink/30 text-[10px] uppercase font-jakarta-extrabold italic tracking-[2px]">REF: {job.id.substring(0, 8)}</Text>
                     </View>
                 </Animated.View>
 
-                {/* Protocol Progress */}
+                {/* ─── Protocol Status ───────────────────────────────────────────── */}
                 {artisanStatus !== 'new' && artisanStatus !== 'declined' && (
                     <Animated.View entering={FadeInDown.delay(100).springify()}>
-                        <Card className="mb-8 p-6 bg-white border-[1.5px] border-card-border shadow-md rounded-[20px]">
-                            <Text className="text-label text-primary mb-6 uppercase tracking-widest text-[10px] font-jakarta-bold">Mission Status</Text>
+                        <View className="mb-10 p-8 bg-white border-[1.5px] border-card-border shadow-2xl rounded-[38px]">
+                            <Text className="text-label text-ink/40 mb-8 uppercase tracking-[5px] text-[10px] font-jakarta-extrabold italic">OPERATIONAL PROGRESS</Text>
                             <StatusTimeline steps={getArtisanJobSteps(artisanStatus)} />
-                        </Card>
+                        </View>
                     </Animated.View>
                 )}
 
-                {/* Client Identity */}
+                {/* ─── Tactical Intel ────────────────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(200).springify()}>
-                    <Card className="p-8 bg-white border-[1.5px] border-card-border shadow-md rounded-[24px]">
-                        <Text className="text-label text-primary mb-8 uppercase tracking-widest text-[10px] font-jakarta-bold">Mission Details</Text>
+                    <View className="p-10 bg-white border-[1.5px] border-card-border shadow-2xl rounded-[42px]">
+                        <Text className="text-label text-primary mb-10 uppercase tracking-[6px] text-[11px] font-jakarta-extrabold italic">CORE INTEL</Text>
 
-                        <DetailItem label="CLIENT" value={job.clientName.toUpperCase()} />
-                        <DetailItem label="SERVICE" value={job.category.toUpperCase().replace('_', ' ')} />
-                        <DetailItem label="DESCRIPTION" value={job.description} />
-                        <DetailItem label="LOCATION" value={`${job.location.area.toUpperCase()}, ${job.location.city.toUpperCase() || 'ABUJA'}`} />
-                        <DetailItem label="BUDGET预期" value={formatNaira(job.budget)} />
-                        <DetailItem label="URGENCY" value={job.urgency.toUpperCase().replace('_', ' ')} />
-                    </Card>
+                        <DetailItem label="CLIENT IDENTITY" value={job.clientName.toUpperCase()} />
+                        <DetailItem label="SERVICE PROTOCOL" value={job.category.toUpperCase().replace('_', ' ')} />
+                        <DetailItem label="OPERATION DEBRIEF" value={job.description} isDescription />
+                        <DetailItem label="TARGET LOCATION" value={`${job.location.area.toUpperCase()}, ${job.location.city.toUpperCase() || 'ABUJA'}`} />
+                        <DetailItem label="MISSION CREDITS" value={formatNaira(job.budget)} isPrice />
+                        <DetailItem label="URGENCY LEVEL" value={job.urgency.toUpperCase().replace('_', ' ')} isUrgency />
+                    </View>
                 </Animated.View>
 
-                {/* Map Action */}
+                {/* ─── Extraction Assistance ──────────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(300).springify()}>
                     <TouchableOpacity
                         activeOpacity={0.9}
-                        className="mt-8 bg-primary rounded-[24px] p-8 items-center shadow-lg border-[1.5px] border-primary"
+                        className="mt-10 bg-ink rounded-[42px] p-10 items-center shadow-3xl border border-white/10 active:scale-[0.98]"
                     >
-                        <View className="w-14 h-14 rounded-xl bg-white/10 items-center justify-center mb-4 border border-white/20">
-                            <Ionicons name="map-outline" size={24} color="white" />
+                        <View className="w-16 h-16 rounded-3xl bg-white/10 items-center justify-center mb-5 border border-white/20 shadow-inner">
+                            <Ionicons name="map-outline" size={28} color="white" />
                         </View>
-                        <Text className="text-h3 text-white uppercase font-jakarta-extrabold italic tracking-tight">Open Map Guidance</Text>
-                        <Text className="text-label text-accent mt-2 text-[9px] uppercase font-jakarta-bold tracking-widest">
+                        <Text className="text-[22px] text-white uppercase font-jakarta-extrabold italic tracking-tighter">OPEN TARGET NAVIGATOR</Text>
+                        <Text className="text-label text-primary/60 mt-3 text-[11px] uppercase font-jakarta-extrabold tracking-[4px] italic">
                             {job.location.area}
                         </Text>
                     </TouchableOpacity>
                 </Animated.View>
 
-                {/* Actions Suite */}
-                <Animated.View entering={FadeInDown.delay(400).springify()} className="mt-12 gap-5 px-1">
+                {/* ─── Authorization Actions ─────────────────────────────────────── */}
+                <Animated.View entering={FadeInDown.delay(400).springify()} className="mt-12 gap-6 px-1">
                     {artisanStatus === 'new' && (job.status === 'submitted' || job.status === 'matched') && (
-                        <View className="gap-4">
+                        <View className="gap-5">
                             <PrimaryButton
                                 title="ACCEPT MISSION"
                                 onPress={handleAccept}
                                 variant="accent"
-                                className="h-16 rounded-xl shadow-xl"
+                                className="h-18 rounded-[24px] shadow-2xl border border-white/10"
                             />
                             <TouchableOpacity
-                                className="items-center p-5 rounded-xl border-[1.5px] border-error bg-white shadow-sm"
+                                className="items-center justify-center h-18 rounded-[24px] border-[2px] border-error/30 bg-white/50 shadow-sm active:bg-error/10"
                                 onPress={handleDecline}
                             >
-                                <Text className="text-label text-error font-jakarta-extrabold uppercase tracking-widest text-[11px]">Decline Protocol</Text>
+                                <Text className="text-[12px] text-error font-jakarta-extrabold uppercase tracking-[4px] italic">DECLINE PROTOCOL</Text>
                             </TouchableOpacity>
                         </View>
                     )}
@@ -191,13 +198,12 @@ export default function JobDetailsScreen() {
                             title={statusActions[artisanStatus].label}
                             onPress={() => handleStatusUpdate(statusActions[artisanStatus].next)}
                             variant="accent"
-                            className="h-16 rounded-xl shadow-xl"
+                            className="h-18 rounded-[24px] shadow-2xl border border-white/10"
                         />
                     )}
 
-                    <View className="flex-row gap-4">
-                        <SecondaryButton
-                            title="MESSAGE"
+                    <View className="flex-row gap-5">
+                        <TouchableOpacity
                             onPress={async () => {
                                 try {
                                     const { threadApi } = await import('@/services/api');
@@ -210,30 +216,42 @@ export default function JobDetailsScreen() {
                                     Alert.alert('Error', 'Unable to start chat with client.');
                                 }
                             }}
-                            className="flex-1 h-16 rounded-xl border-primary border-[1.5px] bg-white shadow-sm"
-                            textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 10, letterSpacing: 1.2 }}
-                        />
-                        <SecondaryButton
-                            title="CALL"
-                            onPress={() => { }}
-                            className="flex-1 h-16 rounded-xl border-primary border-[1.5px] bg-white shadow-sm"
-                            textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 10, letterSpacing: 1.2 }}
-                            icon={<Ionicons name="call" size={18} color="#00120C" style={{ marginRight: 8 }} />}
-                        />
+                            className="flex-1 h-18 rounded-[24px] border-[2.5px] border-primary bg-white items-center justify-center flex-row gap-3 shadow-lg active:bg-gray-50"
+                        >
+                            <Ionicons name="chatbubble-ellipses-outline" size={20} color="#00120C" />
+                            <Text className="text-primary font-jakarta-extrabold uppercase italic tracking-tighter text-[13px]">MESSAGE</Text>
+                        </TouchableOpacity>
+                        
+                        <TouchableOpacity
+                            onPress={() => Alert.alert("Voice Link", "Initializing secure encrypted line...")}
+                            className="flex-1 h-18 rounded-[24px] border-[2.5px] border-primary bg-white items-center justify-center flex-row gap-3 shadow-lg active:bg-gray-50"
+                        >
+                            <Ionicons name="call-outline" size={20} color="#00120C" />
+                            <Text className="text-primary font-jakarta-extrabold uppercase italic tracking-tighter text-[13px]">CALL</Text>
+                        </TouchableOpacity>
                     </View>
                 </Animated.View>
+                
+                <View className="mt-16 items-center opacity-20 pointer-events-none">
+                    <Text className="text-[9px] text-muted uppercase tracking-[5px] font-jakarta-bold italic">Field Operation Report • Secure v4.2</Text>
+                </View>
             </ScrollView>
         </View>
     );
 }
 
-function DetailItem({ label, value }: { label: string; value: string }) {
+function DetailItem({ label, value, isDescription, isPrice, isUrgency }: { label: string; value: string; isDescription?: boolean; isPrice?: boolean; isUrgency?: boolean }) {
     return (
-        <View className="mb-8">
-            <Text className="text-label text-[9px] text-muted mb-2 uppercase tracking-[1.5px] font-jakarta-extrabold">{label}</Text>
-            <Text className="text-body text-primary font-jakarta-bold text-[16px] leading-[22px] normal-case">{value}</Text>
+        <View className="mb-10">
+            <Text className="text-label text-[10px] text-muted mb-3 uppercase tracking-[3px] font-jakarta-extrabold italic">{label}</Text>
+            <Text className={`text-ink ${
+                isPrice ? 'text-[22px] font-jakarta-extrabold italic tracking-tight text-primary' : 
+                isUrgency ? 'text-[18px] font-jakarta-extrabold italic tracking-tighter text-accent' :
+                isDescription ? 'text-[15px] font-jakarta-medium italic leading-6' :
+                'text-[18px] font-jakarta-extrabold italic tracking-tighter'
+            } uppercase`}>
+                {value}
+            </Text>
         </View>
     );
 }
-
-

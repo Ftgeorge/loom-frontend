@@ -24,58 +24,61 @@ export default function LanguageSelectionScreen() {
     return (
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
-                <LoomThread variant="minimal" animated opacity={0.3} />
+                <LoomThread variant="dense" animated opacity={0.4} scale={1.5} />
             </View>
 
             <ScrollView
                 className="flex-1"
-                contentContainerStyle={{ padding: 32, paddingTop: 120, flexGrow: 1 }}
+                contentContainerStyle={{ paddingHorizontal: 32, paddingTop: 100, paddingBottom: 150, flexGrow: 1 }}
                 showsVerticalScrollIndicator={false}
             >
                 <Animated.View entering={FadeInDown.delay(100).springify()} className="mb-14 px-1">
-                    <Text className="text-label text-primary mb-3 tracking-[2px] uppercase font-jakarta-extrabold italic">LOCALIZATION</Text>
-                    <Text className="text-h1 text-[42px] leading-[44px] uppercase italic font-jakarta-extrabold tracking-tighter">
+                    <View className="flex-row items-center gap-2 mb-4">
+                        <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+                        <Text className="text-label text-primary tracking-[6px] font-jakarta-extrabold italic uppercase">LOCALIZATION</Text>
+                    </View>
+                    <Text className="text-h1 text-[46px] leading-[50px] uppercase italic font-jakarta-extrabold tracking-tighter text-ink">
                         CHOOSE YOUR{"\n"}LANGUAGE
                     </Text>
-                    <Text className="text-body text-ink/70 mt-5 leading-[24px] font-jakarta-medium max-w-[280px]">
-                        Select your preferred mode of communication within the ecosystem.
+                    <Text className="text-[15px] text-ink/60 mt-6 leading-6 font-jakarta-medium max-w-[280px] italic">
+                        Select your preferred mode of communication within the ecosystem terminal.
                     </Text>
                 </Animated.View>
 
-                <View className="gap-6 flex-1">
+                <View className="gap-6 mb-12">
                     {LANGUAGES.map((lang, index) => {
                         const isSelected = selected === lang;
                         return (
                             <Animated.View key={lang} entering={FadeInDown.delay(150 + index * 100).springify()}>
                                 <TouchableOpacity
-                                    activeOpacity={0.9}
+                                    activeOpacity={0.8}
                                     onPress={() => setSelected(lang)}
-                                    className={`flex-row items-center justify-between p-7 rounded-[28px] border-[1.5px] shadow-sm ${
-                                        isSelected ? 'border-primary bg-white shadow-xl translate-y-[-2px]' : 'border-card-border bg-surface'
+                                    className={`flex-row items-center justify-between p-7 rounded-[32px] border-[1.5px] shadow-lg transition-transform ${
+                                        isSelected ? 'border-primary bg-white shadow-2xl -translate-y-1' : 'border-card-border/50 bg-white/40'
                                     }`}
                                 >
-                                    <View className="flex-row items-center gap-4">
-                                        <View className={`w-10 h-10 rounded-xl items-center justify-center border ${
-                                            isSelected ? 'bg-primary border-primary/20 shadow-md' : 'bg-white border-card-border'
+                                    <View className="flex-row items-center gap-5">
+                                        <View className={`w-12 h-12 rounded-2xl items-center justify-center border shadow-sm ${
+                                            isSelected ? 'bg-primary border-primary/20 shadow-primary/30' : 'bg-background border-card-border'
                                         }`}>
                                             <Ionicons 
-                                                name="language" 
-                                                size={20} 
+                                                name="language-outline" 
+                                                size={22} 
                                                 color={isSelected ? 'white' : '#94A3B8'} 
                                             />
                                         </View>
-                                        <Text className={`text-h3 text-[20px] uppercase italic font-jakarta-extrabold tracking-tight ${
-                                            isSelected ? 'text-primary' : 'text-muted'
+                                        <Text className={`text-[22px] uppercase italic font-jakarta-extrabold tracking-tight ${
+                                            isSelected ? 'text-ink' : 'text-ink/30'
                                         }`}>
-                                            {languageNames[lang]}
+                                            {languageNames[lang].toUpperCase()}
                                         </Text>
                                     </View>
                                     
-                                    <View className={`w-8 h-8 rounded-full border-[1.5px] items-center justify-center ${
-                                        isSelected ? 'border-primary bg-primary/5' : 'border-gray-200'
+                                    <View className={`w-7 h-7 rounded-full border-[1.5px] items-center justify-center ${
+                                        isSelected ? 'border-primary bg-primary/10' : 'border-card-border'
                                     }`}>
                                         {isSelected && (
-                                            <View className="w-4 h-4 rounded-full bg-primary shadow-sm" />
+                                            <View className="w-3.5 h-3.5 rounded-full bg-primary shadow-sm shadow-primary" />
                                         )}
                                     </View>
                                 </TouchableOpacity>
@@ -84,21 +87,22 @@ export default function LanguageSelectionScreen() {
                     })}
                 </View>
 
-                <Animated.View entering={FadeInUp.delay(500).springify()} className="pb-12 pt-8">
+                <Animated.View entering={FadeInUp.delay(500).springify()} className="pb-16 pt-10">
                     <PrimaryButton
                         title="INITIALIZE PROFILE"
                         onPress={handleContinue}
-                        className="h-16 rounded-[20px] shadow-2xl border border-primary/10"
+                        className="h-18 rounded-2xl shadow-2xl border border-white/10"
                     />
                     
-                    <View className="mt-8 items-center flex-row justify-center gap-2 opacity-40">
-                        <Ionicons name="lock-closed" size={12} color="#64748B" />
-                        <Text className="text-[8px] text-muted uppercase tracking-[2px] font-jakarta-bold">Encryption Active • Stable v1.0</Text>
+                    <View className="mt-10 items-center flex-row justify-center gap-2.5 opacity-30">
+                        <Ionicons name="shield-checkmark" size={12} color="#64748B" />
+                        <Text className="text-[9px] text-muted uppercase tracking-[4px] font-jakarta-bold italic">Encryption Active • Secure v4.2</Text>
                     </View>
                 </Animated.View>
             </ScrollView>
         </View >
     );
 }
+
 
 

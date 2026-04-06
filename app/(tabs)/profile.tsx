@@ -27,7 +27,7 @@ export default function ProfileScreen() {
   }, [isArtisan]);
 
   const handleLogout = () => {
-    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+    Alert.alert("Sign Out", "Are you sure you want to sign out of your operative terminal?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Sign Out",
@@ -45,6 +45,7 @@ export default function ProfileScreen() {
     label: string;
     onPress: () => void;
     danger?: boolean;
+    badge?: string;
   }
 
   interface MenuSection {
@@ -54,43 +55,44 @@ export default function ProfileScreen() {
 
   const menuSections: MenuSection[] = [
     {
-      title: "ACTIVITY",
+      title: "OPERATIONAL ACTIVITY",
       items: isArtisan
         ? [
           {
-            icon: "person-outline",
-            label: "View Public Profile",
+            icon: "person",
+            label: "VIEW PUBLIC PROFILE",
             onPress: () => artisanId && router.push({ pathname: '/artisan-profile', params: { id: artisanId } }),
           },
           {
-            icon: "shield-checkmark-outline",
-            label: "Verification Status",
+            icon: "shield-checkmark",
+            label: "VERIFICATION STATUS",
             onPress: () => router.push("/verification"),
           },
           {
-            icon: "construct-outline",
-            label: "Professional Skills",
+            icon: "construct",
+            label: "PROFESSIONAL SKILLS",
             onPress: () => router.push("/manage-skills"),
           },
         ]
         : [
           {
-            icon: "bookmark-outline",
-            label: `Saved Professionals (${savedArtisans.length})`,
+            icon: "bookmark",
+            label: "SAVED PROFESSIONALS",
+            badge: `${savedArtisans.length}`,
             onPress: () => { },
           },
-          { icon: "receipt-outline", label: "Payment History", onPress: () => { } },
+          { icon: "receipt", label: "PAYMENT HISTORY", onPress: () => { } },
           {
-            icon: "hammer-outline",
-            label: "Switch to Artisan Account",
+            icon: "swap-horizontal",
+            label: "SWITCH TO ARTISAN MODE",
             onPress: () => {
               Alert.alert(
-                "Become an Artisan",
-                "Do you want to start offering your services on Loom?",
+                "Initialize Artisan Protocol",
+                "Start deploying your professional services on the Loom ecosystem?",
                 [
                   { text: "Later", style: "cancel" },
                   {
-                    text: "Let's Go",
+                    text: "Initialize",
                     onPress: () => {
                       import('@/store').then(({ useAppStore }) => {
                         useAppStore.getState().switchRole('artisan');
@@ -105,36 +107,36 @@ export default function ProfileScreen() {
         ],
     },
     {
-      title: "PREFERENCES",
+      title: "SYSTEM PREFERENCES",
       items: [
         {
-          icon: "settings-outline",
-          label: "General Settings",
+          icon: "settings-sharp",
+          label: "GENERAL CONFIGURATION",
           onPress: () => router.push("/settings"),
         },
         {
-          icon: "language-outline",
-          label: `Language: ${languageNames[language]}`,
+          icon: "language",
+          label: `LANGUAGE: ${languageNames[language].toUpperCase()}`,
           onPress: () => router.push("/settings"),
         },
       ],
     },
     {
-      title: "SUPPORT",
+      title: "INTELLIGENCE SUPPORT",
       items: [
         {
-          icon: "help-circle-outline",
-          label: "Help & Support Center",
+          icon: "help-buoy",
+          label: "SUPPORT CENTER",
           onPress: () => router.push("/help"),
         },
       ],
     },
     {
-      title: "ACCOUNT",
+      title: "TERMINAL ACCESS",
       items: [
         {
-          icon: "log-out-outline",
-          label: "Sign Out",
+          icon: "power",
+          label: "SIGN OUT",
           onPress: handleLogout,
           danger: true,
         },
@@ -144,104 +146,120 @@ export default function ProfileScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <LoomThread variant="minimal" opacity={0.2} animated />
+      <View className="absolute inset-0">
+        <LoomThread variant="minimal" opacity={0.2} animated />
+      </View>
       <SubAppHeader
-        label="IDENTITY"
-        title="My Profile"
-        description="Manage your personal information and preferences."
+        label="IDENTITY PORTAL"
+        title="MY PROFILE"
+        description="Manage your operative profile and system preferences."
         onNotification={() => router.push('/notifications')}
       />
 
       <ScrollView
-        contentContainerStyle={{ padding: 24, paddingBottom: 150 }}
+        className="flex-1"
+        contentContainerStyle={{ padding: 28, paddingBottom: 150 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Profile Command Center */}
-        <Animated.View entering={FadeInDown.springify()} className="items-center py-10">
-          {/* ─── Premium Avatar Complex ────────────────────────────────────────── */}
-          <View className="mb-6 relative">
-            <View className="p-3 rounded-full bg-white border border-card-border shadow-md">
-              <View className="p-[6px] rounded-full border-2 border-primary/10 border-dashed">
-                <View className="rounded-full overflow-hidden shadow-sm">
+        {/* ─── Profile Command Center ────────────────────────────────────────── */}
+        <Animated.View entering={FadeInDown.springify()} className="items-center py-12">
+          <View className="mb-8 relative">
+            {/* Identity Halo */}
+            <View className="absolute -top-6 -left-6 -right-6 -bottom-6 rounded-full bg-primary/5 -z-10" />
+            <View className="absolute -top-12 -left-12 -right-12 -bottom-12 rounded-full bg-primary/[0.02] -z-20" />
+            
+            <View className="p-4 rounded-full bg-white border border-card-border shadow-2xl">
+              <View className="p-1.5 rounded-full border-[1.5px] border-primary/20 border-dashed">
+                <View className="rounded-full overflow-hidden shadow-sm border border-card-border">
                   <Avatar name={user?.name || "U"} size={110} />
                 </View>
               </View>
 
-              {/* Floating Camera Action */}
+              {/* Tactical Camera Action */}
               <TouchableOpacity
                 activeOpacity={0.9}
-                className="absolute bottom-3 right-3 bg-ink w-[38px] h-[38px] rounded-full border-4 border-white items-center justify-center shadow-md"
+                className="absolute bottom-4 right-4 bg-ink w-11 h-11 rounded-full border-4 border-white items-center justify-center shadow-2xl"
               >
-                <Ionicons name="camera" size={16} color="white" />
+                <Ionicons name="camera-reverse" size={20} color="white" />
               </TouchableOpacity>
             </View>
-
-            {/* Identity Halo (Subtle Glow) */}
-            <View className="absolute -top-5 -left-5 -right-5 -bottom-5 rounded-full bg-primary opacity-[0.03] -z-10" />
           </View>
 
-          {/* ─── Profile Details ──────────────────────────────────────────────── */}
-
-          <Text className="text-h1 mt-2 text-[32px] text-ink font-jakarta-extrabold text-center">
-            {user?.name?.toUpperCase()}
+          {/* ─── Profile Identification ──────────────────────────────────────────────── */}
+          <Text className="text-h1 mt-3 text-[38px] leading-[40px] text-ink font-jakarta-extrabold italic tracking-tighter text-center uppercase">
+            {user?.name || "Trial Operative"}
           </Text>
 
-          <View className="flex-row items-center gap-3 mt-4">
-            <View className="bg-primary px-3 py-[6px] rounded-full border border-primary">
-              <Text className="text-label text-white text-[10px] font-jakarta-bold tracking-[0.5px]">
-                {isArtisan ? "VERIFIED" : "CLIENT"}
+          <View className="flex-row items-center gap-4 mt-6">
+            <View className={`px-4 py-2 rounded-xl border items-center shadow-sm ${
+              isArtisan ? 'bg-primary/10 border-primary' : 'bg-accent/10 border-accent'
+            }`}>
+              <Text className={`text-label text-[10px] font-jakarta-extrabold italic tracking-[1.5px] uppercase ${
+                isArtisan ? 'text-primary' : 'text-accent'
+              }`}>
+                {isArtisan ? "VERIFIED PRO" : "ACTIVE CLIENT"}
               </Text>
             </View>
 
-            <View className="flex-row items-center gap-[6px]">
-              <Ionicons name="location" size={14} className="text-muted" />
-              <Text className="text-body-sm text-muted font-jakarta-semibold">
-                {user?.location?.city?.toUpperCase() || "LOCATION NOT SET"}
+            <View className="flex-row items-center gap-2 px-3 py-2 bg-background rounded-xl border border-card-border">
+              <Ionicons name="location-sharp" size={14} color="#64748B" />
+              <Text className="text-body-sm text-ink/60 font-jakarta-extrabold italic uppercase text-[10px] tracking-tight">
+                {user?.location?.city?.toUpperCase() || "LOCALIZING..."}
               </Text>
             </View>
           </View>
         </Animated.View>
 
-        <View className="gap-8">
+        <View className="gap-10">
           {menuSections.map((section, sectionIdx) => (
             <View key={section.title}>
-              <Text className="text-label text-muted text-[10px] tracking-[1.5px] mb-4 px-1">
-                {section.title}
-              </Text>
+              <View className="flex-row items-center gap-2 mb-5 px-1">
+                <View className="w-1 h-1 rounded-full bg-primary" />
+                <Text className="text-label text-primary text-[10px] tracking-[2.5px] font-jakarta-extrabold italic uppercase">
+                  {section.title}
+                </Text>
+              </View>
 
-              <View className="gap-[10px]">
+              <View className="gap-3">
                 {section.items.map((item, i) => (
                   <Animated.View
                     key={item.label}
                     entering={FadeInDown.delay(200 + (sectionIdx * 100) + (i * 50)).springify()}
                   >
                     <TouchableOpacity
-                      className="flex-row items-center p-4 bg-white rounded-sm gap-4 border border-card-border shadow-sm"
+                      className="flex-row items-center p-5 bg-white rounded-2xl gap-5 border-[1.5px] border-card-border shadow-sm active:bg-gray-50"
                       onPress={item.onPress}
                       activeOpacity={0.7}
                     >
-                      <View className={`w-10 h-10 rounded-xs items-center justify-center border ${
-                        item.danger ? 'bg-error/10 border-error/25' : 'bg-surface border-card-border'
+                      <View className={`w-12 h-12 rounded-xl items-center justify-center border shadow-sm ${
+                        item.danger ? 'bg-destructive/10 border-destructive/20' : 'bg-background border-card-border'
                       }`}>
                         <Ionicons
                           name={item.icon as any}
-                          size={20}
-                          className={item.danger ? 'text-error' : 'text-primary'}
+                          size={22}
+                          color={item.danger ? '#EF4444' : '#00120C'}
                         />
                       </View>
 
-                      <Text
-                        className={`flex-1 font-jakarta-semibold text-[15px] ${
-                            item.danger ? 'text-error' : 'text-ink'
-                        }`}
-                      >
-                        {item.label}
-                      </Text>
+                      <View className="flex-1">
+                        <Text
+                          className={`font-jakarta-extrabold italic text-[14px] uppercase tracking-tighter ${
+                              item.danger ? 'text-destructive' : 'text-ink'
+                          }`}
+                        >
+                          {item.label}
+                        </Text>
+                        {item.badge && (
+                          <Text className="text-[10px] text-muted font-jakarta-bold uppercase italic tracking-widest mt-0.5">
+                            {item.badge} ITEMS DETECTED
+                          </Text>
+                        )}
+                      </View>
 
                       <Ionicons
                         name="chevron-forward"
-                        size={16}
-                        className="text-gray-400"
+                        size={18}
+                        color="#CBD5E1"
                       />
                     </TouchableOpacity>
                   </Animated.View>
@@ -251,14 +269,15 @@ export default function ProfileScreen() {
           ))}
         </View>
 
-        <View className="mt-16 items-center">
-          <View className="h-[1px] w-10 bg-card-border mb-4" />
-          <Text className="text-label text-center opacity-30 text-[8px] tracking-[4px]">
-            LOOM v4.0.0
-          </Text>
+        <View className="mt-20 items-center">
+            <View className="flex-row items-center gap-2 opacity-20">
+                <Ionicons name="id-card-outline" size={14} color="#64748B" />
+                <Text className="text-[9px] text-muted uppercase tracking-[4px] font-jakarta-bold italic">LOOM TERMINAL v4.2.0 • STABLE</Text>
+            </View>
         </View>
       </ScrollView>
     </View>
   );
 }
+
 

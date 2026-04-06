@@ -39,15 +39,15 @@ function AnimatedLetter({
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: interpolate(progress.value, [0, 0.5, 1], [0, 0.7, 1]),
     transform: [
-      { translateY: interpolate(progress.value, [0, 1], [30, 0]) },
-      { scale: interpolate(progress.value, [0, 1], [0.85, 1]) },
+      { translateY: interpolate(progress.value, [0, 1], [40, 0]) },
+      { scale: interpolate(progress.value, [0, 1], [0.8, 1]) },
     ],
   }));
 
   return (
     <Animated.Text
       style={animatedStyle}
-      className="font-jakarta-extrabold text-[84px] text-white tracking-[-6px]"
+      className={`font-jakarta-extrabold italic text-[88px] text-white tracking-[-5px] ${index === 0 ? 'text-white' : 'text-white/90'}`}
     >
       {letter}
     </Animated.Text>
@@ -64,17 +64,17 @@ export default function SplashScreen() {
   useEffect(() => {
     taglineOpacity.value = withDelay(
       TAGLINE_DELAY,
-      withTiming(1, { duration: 1000, easing: Easing.out(Easing.quad) }),
+      withTiming(1, { duration: 1200, easing: Easing.out(Easing.quad) }),
     );
 
     indicatorOpacity.value = withDelay(
       INDICATOR_DELAY,
-      withTiming(1, { duration: 800, easing: Easing.out(Easing.quad) }),
+      withTiming(1, { duration: 900, easing: Easing.out(Easing.quad) }),
     );
 
     const timer = setTimeout(() => {
       handleContinue();
-    }, 3500);
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -94,7 +94,7 @@ export default function SplashScreen() {
   const taglineStyle = useAnimatedStyle(() => ({
     opacity: taglineOpacity.value,
     transform: [
-      { translateY: interpolate(taglineOpacity.value, [0, 1], [20, 0]) },
+      { translateY: interpolate(taglineOpacity.value, [0, 1], [30, 0]) },
     ],
   }));
 
@@ -107,35 +107,44 @@ export default function SplashScreen() {
       <View className="absolute inset-0">
         <LoomThread
           variant="complex"
-          color="#CCFF00" 
-          opacity={0.15}
+          color="#FFFFFF" 
+          opacity={0.18}
           animated
         />
       </View>
 
-      <View className="items-center z-10">
-        <View className="flex-row items-center">
+      <View className="items-center z-20">
+        <View className="flex-row items-center mb-4">
           {LETTERS.map((letter, i) => (
             <AnimatedLetter key={i} letter={letter} index={i} />
           ))}
         </View>
 
-        <Animated.View style={taglineStyle} className="flex-row items-center gap-3 mt-3">
-          <View className="h-[1px] w-5 bg-white/20" />
-          <Text className="text-[9px] text-white/50 font-jakarta-bold tracking-[3px] uppercase">
-            SERVICES. SIMPLIFIED.
-          </Text>
-          <View className="h-[1px] w-5 bg-white/20" />
+        <Animated.View style={taglineStyle}>
+          <View className="flex-row items-center gap-4">
+            <View className="h-[1.5px] w-6 bg-white/30 rounded-full" />
+            <Text className="text-[10px] text-white font-jakarta-extrabold tracking-[6px] uppercase italic text-center">
+              SERVICES SIMPLIFIED
+            </Text>
+            <View className="h-[1.5px] w-6 bg-white/30 rounded-full" />
+          </View>
         </Animated.View>
       </View>
 
-      <Animated.View style={indicatorStyle} className="absolute bottom-16 w-full px-10 items-center">
-        <ActivityIndicator color="white" size="small" className="mb-5" />
-        <Text className="mt-2 text-[8px] text-white/30 font-inter-medium tracking-[2px] uppercase">Loading Content</Text>
+      <Animated.View style={indicatorStyle} className="absolute bottom-24 w-full px-12 items-center flex-row justify-center gap-4 z-10">
+        <ActivityIndicator color="white" size="small" />
+        <Text className="text-[9px] text-white/40 font-jakarta-extrabold italic tracking-[4px] uppercase">
+          Initializing Frequency
+        </Text>
       </Animated.View>
+      
+      <View className="absolute bottom-12 items-center opacity-10">
+          <Text className="text-[8px] text-white tracking-[2px] font-jakarta-bold italic">LOOM ECOSYSTEM v4.2 PROTOTYPE</Text>
+      </View>
     </View>
   );
 }
+
 
 
 

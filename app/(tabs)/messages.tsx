@@ -9,18 +9,21 @@ import { useAppStore } from '@/store';
 import { timeAgo } from '@/utils/helpers';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View, RefreshControl } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function MessagesScreen() {
     const router = useRouter();
     const { threads, setThreads, language } = useAppStore();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
 
     const load = useCallback(async () => {
         try {
             setError(false);
-            // GET /threads — list threads for the logged-in user
+            if (!refreshing) setLoading(true);
             const res = await threadApi.list();
             const mapped = (res.results as any[]).map((row: any) => ({
                 id: row.id,
@@ -29,7 +32,7 @@ export default function MessagesScreen() {
                     row.other_user_first_name,
                     row.other_user_last_name,
                 ].filter(Boolean).join(' ') || row.other_user_email || 'Unknown',
-                lastMessage: row.last_message ?? 'Check in with them',
+                lastMessage: row.last_message ?? 'OPEN CHANNEL',
                 lastMessageTime: row.last_message_at ?? row.created_at,
                 unreadCount: Number(row.unread_count ?? 0),
                 participantRole: 'artisan' as const,
@@ -40,8 +43,9 @@ export default function MessagesScreen() {
             setError(true);
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
-    }, []);
+    }, [refreshing]);
 
     useFocusEffect(
         useCallback(() => {
@@ -49,54 +53,97 @@ export default function MessagesScreen() {
         }, [load])
     );
 
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        load();
+    }, [load]);
+
     return (
         <View className="flex-1 bg-background">
             <SubAppHeader
-                label="CONVERSATIONS"
-                title={t('messages', language)}
-                description="Continue your conversations with your service providers."
+                label="ENCRYPTED CHANNEL"
+                title="CONVERSATIONS"
+                description="Secure communication gateway with your assigned artisans."
                 onNotification={() => router.push('/notifications')}
             />
 
             {loading ? (
-                <View><SkeletonList count={5} type="message" /></View>
+                <View className="p-6"><SkeletonList count={5} type="message" /></View>
             ) : error ? (
                 <ErrorState onRetry={load} />
             ) : threads.length === 0 ? (
-                <EmptyState icon="chatbubbles-outline" title={t('noMessages', language)} message="Start a conversation by booking an artisan" />
+                <View className="flex-1 justify-center p-8">
+                    <View className="bg-white p-16 rounded-[32px] border-[2px] border-dashed border-card-border items-center shadow-inner">
+                        <View className="w-20 h-20 bg-background rounded-3xl items-center justify-center mb-6 shadow-sm border border-card-border">
+                            <Ionicons name="chatbubbles-outline" size={42} color="#94A3B8" />
+                        </View>
+                        <Text className="text-h3 text-center text-ink uppercase font-jakarta-extrabold italic tracking-tight">
+                            NO ACTIVE TRANSMISSIONS
+                        </Text>
+                        <Text className="text-body text-center text-ink/50 mt-4 leading-5 font-jakarta-medium max-w-[240px]">
+                            Initialize a contract to establish secure communication frequencies.
+                        </Text>
+                    </View>
+                </View>
             ) : (
                 <FlatList
                     data={threads}
                     keyExtractor={(item) => item.id}
-                    contentContainerStyle={{ paddingBottom: 100 }}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity
-                            className="flex-row items-center px-6 py-4 gap-4"
-                            onPress={() => router.push({ pathname: '/chat', params: { threadId: item.id } })}
-                            activeOpacity={0.8}
-                        >
-                            <Avatar name={item.participantName} size={50} />
-                            <View className="flex-1">
-                                <View className="flex-row justify-between items-center mb-0.5">
-                                    <Text className="text-base font-bold text-graphite tracking-tight flex-1" numberOfLines={1}>
-                                        {item.participantName}
-                                    </Text>
-                                    <Text className="text-xs font-medium text-gray-400">{timeAgo(item.lastMessageTime)}</Text>
+                    className="flex-1"
+                    contentContainerStyle={{ paddingBottom: 150 }}
+                    showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00120C" />
+                    }
+                    renderItem={({ item, index }) => (
+                        <Animated.View entering={FadeInDown.delay(index * 80).springify()}>
+                            <TouchableOpacity
+                                className="flex-row items-center px-6 py-5 gap-4 active:bg-white/50"
+                                onPress={() => router.push({ pathname: '/chat', params: { threadId: item.id } })}
+                                activeOpacity={0.7}
+                            >
+                                <View className="relative">
+                                    <Avatar name={item.participantName} size={56} />
+                                    <View className="absolute -bottom-1 -right-1 w-4 h-4 bg-background rounded-full items-center justify-center border-2 border-white">
+                                        <View className="w-2 h-2 bg-success rounded-full shadow-[0_0_8px_rgba(26,178,108,0.6)]" />
+                                    </View>
                                 </View>
-                                <Text
-                                    className={`text-sm ${item.unreadCount > 0 ? 'text-graphite font-semibold' : 'text-muted font-normal'}`}
-                                    numberOfLines={1}
-                                    style={{ lineHeight: 20 }}
-                                >
-                                    {item.lastMessage}
-                                </Text>
-                            </View>
-                            {item.unreadCount > 0 && <Badge count={item.unreadCount} />}
-                        </TouchableOpacity>
+                                
+                                <View className="flex-1">
+                                    <View className="flex-row justify-between items-center mb-1">
+                                        <Text className="text-[17px] font-jakarta-extrabold text-ink italic tracking-tighter uppercase flex-1" numberOfLines={1}>
+                                            {item.participantName}
+                                        </Text>
+                                        <Text className="text-[10px] font-jakarta-bold text-muted uppercase italic tracking-widest">{timeAgo(item.lastMessageTime)}</Text>
+                                    </View>
+                                    <View className="flex-row items-center gap-2">
+                                        <Text
+                                            className={`text-[13px] font-jakarta-medium flex-1 ${item.unreadCount > 0 ? 'text-ink font-jakarta-bold' : 'text-ink/40'}`}
+                                            numberOfLines={1}
+                                        >
+                                            {item.lastMessage}
+                                        </Text>
+                                        {item.unreadCount > 0 && (
+                                            <View className="bg-primary px-2.5 py-1 rounded-full shadow-sm">
+                                                <Text className="text-[10px] font-jakarta-extrabold text-white">{item.unreadCount}</Text>
+                                            </View>
+                                        )}
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        </Animated.View>
                     )}
-                    ItemSeparatorComponent={() => <View className="h-[1px] bg-gray-50 ml-[88px]" />}
+                    ItemSeparatorComponent={() => <View className="h-[1.5px] bg-card-border/30 ml-20 mr-6" />}
                 />
             )}
+            
+            <View className="absolute bottom-10 left-0 right-0 items-center pointer-events-none opacity-20">
+                <View className="flex-row items-center gap-2">
+                    <Ionicons name="lock-closed" size={10} color="#64748B" />
+                    <Text className="text-[9px] text-muted uppercase tracking-[5px] font-jakarta-bold italic">End-to-End Encrypted Communication</Text>
+                </View>
+            </View>
         </View>
     );
 }
+

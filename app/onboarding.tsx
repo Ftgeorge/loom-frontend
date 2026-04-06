@@ -82,13 +82,20 @@ export default function OnboardingScreen() {
     return (
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
-                <LoomThread variant="dense" scale={1.5} opacity={0.4} animated />
+                <LoomThread variant="dense" scale={1.2} opacity={0.3} animated />
             </View>
 
+            {/* ─── Tactical Header Control ────────────────────────────────────────── */}
             <View className="absolute top-16 w-full px-8 z-10 flex-row justify-between items-center">
-                <Text className="text-label text-primary text-[8px] uppercase tracking-widest font-jakarta-extrabold italic">MISSION STEP {currentPage + 1}</Text>
-                <TouchableOpacity onPress={handleSkip} className="bg-gray-100/80 px-4 py-2 rounded-xs border border-card-border shadow-xs">
-                    <Text className="text-label text-muted text-[8px] uppercase font-jakarta-bold tracking-tight">SKIP PROTOCOL</Text>
+                <View className="flex-row items-center gap-2">
+                    <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+                    <Text className="text-label text-primary text-[10px] uppercase tracking-[2px] font-jakarta-extrabold italic">MISSION STEP {currentPage + 1}</Text>
+                </View>
+                <TouchableOpacity 
+                    onPress={handleSkip} 
+                    className="bg-white/90 px-5 py-2.5 rounded-xl border border-card-border shadow-sm active:bg-gray-100"
+                >
+                    <Text className="text-label text-ink text-[9px] uppercase font-jakarta-extrabold tracking-tight italic">SKIP PROTOCOL</Text>
                 </TouchableOpacity>
             </View>
 
@@ -101,31 +108,34 @@ export default function OnboardingScreen() {
                 onMomentumScrollEnd={onMomentumScrollEnd}
                 keyExtractor={(_, i) => `${i}`}
                 renderItem={({ item }) => (
-                    <View className="flex-1 px-10" style={{ paddingTop: height * 0.12, width }}>
+                    <View className="flex-1 px-10" style={{ paddingTop: height * 0.14, width }}>
                         <View className="items-center mb-16">
                             <Animated.View
                                 entering={FadeInDown.delay(200).springify()}
-                                className="w-[260px] h-[260px] rounded-2xl bg-white items-center justify-center shadow-2xl border-[1.5px] border-card-border"
+                                className="w-[280px] h-[280px] rounded-[48px] bg-white items-center justify-center shadow-2xl border-[1.5px] border-card-border overflow-hidden"
                             >
-                                <View className={`absolute w-[190px] h-[190px] rounded-lg border rotate-45 ${item.borderAccent}`} />
-                                <Ionicons name={item.icon} size={88} color={item.accent} />
+                                {/* Decorative Identity Shroud */}
+                                <View className={`absolute w-[200px] h-[200px] rounded-[32px] border-2 rotate-[35deg] ${item.borderAccent}`} />
+                                <View className={`absolute w-[180px] h-[180px] rounded-[24px] border border-dashed rotate-[-15deg] opacity-40 ${item.borderAccent}`} />
+                                
+                                <Ionicons name={item.icon} size={94} color={item.accent} />
 
-                                <View className={`absolute -bottom-4 px-5 py-2 rounded-lg shadow-md ${item.bgAccent}`}>
-                                    <Text className="text-label text-white text-[9px] uppercase tracking-widest font-jakarta-extrabold">{item.mission}</Text>
+                                <View className={`absolute -bottom-6 px-7 py-3 rounded-2xl shadow-xl border border-white/20 ${item.bgAccent}`}>
+                                    <Text className="text-label text-white text-[10px] uppercase tracking-[3px] font-jakarta-extrabold italic">{item.mission}</Text>
                                 </View>
                             </Animated.View>
                         </View>
 
                         <Animated.Text
                             entering={FadeInDown.delay(400).springify()}
-                            className="text-h1 text-center text-[32px] mb-6 uppercase italic font-jakarta-extrabold tracking-tight"
+                            className="text-h1 text-center text-[38px] leading-[42px] mb-8 uppercase italic font-jakarta-extrabold tracking-tighter text-ink"
                         >
-                            {t(item.titleKey, language)}
+                            {t(item.titleKey, language).toUpperCase()}
                         </Animated.Text>
 
                         <Animated.Text
                             entering={FadeInDown.delay(500).springify()}
-                            className="text-body text-center text-muted leading-7 normal-case font-jakarta-medium px-4"
+                            className="text-body text-center text-ink/60 leading-7 normal-case font-jakarta-medium px-2 italic"
                         >
                             {t(item.descKey, language)}
                         </Animated.Text>
@@ -133,13 +143,13 @@ export default function OnboardingScreen() {
                 )}
             />
 
-            <View className="px-8 pb-16">
-                <View className="flex-row justify-center gap-2 mb-12">
+            <View className="px-10 pb-16">
+                <View className="flex-row justify-center gap-3 mb-14">
                     {pages.map((_, i) => (
                         <View
                             key={i}
-                            className={`h-1 rounded-full shadow-sm ${
-                                i === currentPage ? 'bg-primary w-10' : 'bg-gray-200 w-3'
+                            className={`h-[5px] rounded-full shadow-sm ${
+                                i === currentPage ? 'bg-primary w-12' : 'bg-card-border w-4'
                             }`}
                         />
                     ))}
@@ -148,17 +158,18 @@ export default function OnboardingScreen() {
                 <PrimaryButton
                     title={currentPage === pages.length - 1 ? "INITIALIZE" : "NEXT PHASE"}
                     onPress={handleNext}
-                    className="h-16 rounded-xl shadow-xl"
+                    className="h-18 rounded-2xl shadow-2xl border border-white/10"
                     variant={currentPage === pages.length - 1 ? 'accent' : 'primary'}
                 />
                 
-                <Text className="mt-8 text-center text-[8px] text-muted uppercase tracking-widest opacity-40 font-jakarta-bold">
-                    System Version 2.0.4 • Loom Marketplace
+                <Text className="mt-10 text-center text-[8px] text-ink/30 uppercase tracking-[6px] font-jakarta-extrabold italic">
+                    SYSTEM OPERATIONAL • TERMINAL v4.2.0
                 </Text>
             </View>
         </View>
     );
 }
+
 
 
 

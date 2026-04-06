@@ -4,11 +4,11 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { OTPInput } from '@/components/ui/OTPInput';
 import { authApi } from '@/services/api';
 import { useAppStore } from '@/store';
-import { Colors, Radius, Typography } from '@/theme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function OTPScreen() {
     const router = useRouter();
@@ -68,63 +68,77 @@ export default function OTPScreen() {
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
-            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.4 }}>
+        <View className="flex-1 bg-background">
+            <View className="absolute inset-0 opacity-40">
                 <LoomThread variant="minimal" scale={1.2} animated />
             </View>
 
             <ScrollView
+                className="flex-1"
                 contentContainerStyle={{ padding: 32, paddingTop: 80 }}
                 showsVerticalScrollIndicator={false}
             >
                 <BackButton onPress={() => router.back()} />
 
-                <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 48, marginTop: 24, alignItems: 'center' }}>
-                    <Text style={Typography.h1}>Check your mail</Text>
-                    <Text style={[Typography.body, { textAlign: 'center', marginTop: 12, color: Colors.textSecondary }]}>
-                        We sent a code to{'\n'}
-                        <Text style={{ color: Colors.text, fontWeight: '600' }}>{maskedEmail}</Text>
+                <Animated.View entering={FadeInDown.delay(100).springify()} className="mb-14 mt-10 items-center px-4">
+                    <View className="w-20 h-20 bg-primary/10 rounded-full items-center justify-center mb-6 border border-primary/20 shadow-sm">
+                        <Ionicons name="mail-open-outline" size={38} color="#00120C" />
+                    </View>
+                    <Text className="text-h1 text-[42px] leading-[44px] uppercase italic font-jakarta-extrabold tracking-tighter text-center">
+                        VERIFY MAIL
+                    </Text>
+                    <Text className="text-body text-ink/70 mt-5 leading-[24px] font-jakarta-medium text-center">
+                        Code transmitted to{'\n'}
+                        <Text className="text-primary font-jakarta-extrabold italic">{maskedEmail}</Text>
                     </Text>
                 </Animated.View>
 
-                <Animated.View entering={FadeInDown.delay(200)} style={{ width: '100%' }}>
+                <Animated.View entering={FadeInDown.delay(200).springify()} className="w-full">
                     <OTPInput onComplete={setCode} error={error} />
                 </Animated.View>
 
-                <Animated.View entering={FadeInDown.delay(300)} style={{ width: '100%', marginTop: 48 }}>
+                <Animated.View entering={FadeInDown.delay(300).springify()} className="w-full mt-14">
                     <PrimaryButton
-                        title="Verify"
+                        title="VERIFY IDENTITY"
                         onPress={handleVerify}
                         loading={loading}
+                        className="h-16 rounded-xl shadow-2xl border border-primary/20"
                     />
 
                     <SecondaryButton
-                        title={resendLoading ? 'Sending...' : 'Send again'}
+                        title={resendLoading ? 'TRANSMITTING...' : 'RESEND PROTOCOL'}
                         onPress={handleResend}
-                        style={{ marginTop: 16 }}
+                        className="mt-5 h-15 rounded-xl border-card-border"
+                        textStyle={{ color: '#00120C', fontFamily: 'PlusJakartaSans-Bold', fontSize: 11, letterSpacing: 1 }}
                     />
 
                     {resendSuccess && (
-                        <Text style={[Typography.bodySmall, { textAlign: 'center', marginTop: 12, color: Colors.success }]}>
-                            ✓ Sent a new one to {maskedEmail}
-                        </Text>
+                        <View className="flex-row items-center justify-center gap-1.5 mt-4">
+                            <Ionicons name="checkmark-circle" size={14} color="#1AB26C" />
+                            <Text className="text-body-sm text-success text-[11px] font-jakarta-bold uppercase italic">
+                                Transmission successful to {maskedEmail}
+                            </Text>
+                        </View>
                     )}
 
-                    <View style={{
-                        marginTop: 48,
-                        padding: 20,
-                        backgroundColor: Colors.surface,
-                        borderRadius: Radius.md,
-                        borderWidth: 1,
-                        borderColor: Colors.cardBorder
-                    }}>
-                        <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted }]}>
-                            Don&apos;t see it? Check your spam. It expires in{' '}
-                            <Text style={{ fontWeight: '600', color: Colors.text }}>10 minutes.</Text>
+                    <View className="mt-16 p-7 bg-white rounded-[28px] border-[1.5px] border-card-border shadow-md">
+                        <View className="flex-row items-center gap-3 mb-2">
+                            <Ionicons name="alert-circle-outline" size={18} color="#64748B" />
+                            <Text className="text-label text-muted text-[11px] uppercase font-jakarta-bold tracking-tight">RESILIENCE PROTOCOL</Text>
+                        </View>
+                        <Text className="text-body-sm text-muted leading-5 font-jakarta-medium normal-case">
+                            Check repository spam if missing. Authentication key neutralizes in{' '}
+                            <Text className="text-primary font-jakarta-extrabold italic">10 MINUTES.</Text>
                         </Text>
+                    </View>
+                    
+                    <View className="mt-12 items-center flex-row justify-center gap-2 opacity-30">
+                        <Ionicons name="shield-checkmark" size={12} color="#64748B" />
+                        <Text className="text-[8px] text-muted uppercase tracking-[2px] font-jakarta-bold">Encryption Active • Stable v1.0</Text>
                     </View>
                 </Animated.View>
             </ScrollView>
         </View>
     );
 }
+

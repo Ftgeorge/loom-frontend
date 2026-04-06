@@ -24,6 +24,7 @@ import Animated, {
 import LayoutSwitch from '@/components/ui/LayoutSwitch';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { EmptyState } from '@/components/ui/StateComponents';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ClientHomeScreen() {
     const router = useRouter();
@@ -72,26 +73,29 @@ export default function ClientHomeScreen() {
         [jobs]
     );
 
-    const firstName = user?.name?.split(' ')[0] || 'there';
+    const firstName = user?.name?.split(' ')[0] || 'TRIAL OPERATIVE';
 
     return (
-        <View className="flex-1 bg-canvas">
-            <LoomThread variant="minimal" opacity={0.3} animated />
+        <View className="flex-1 bg-background">
+            <View className="absolute inset-0">
+                <LoomThread variant="minimal" opacity={0.3} animated />
+            </View>
             <SubAppHeader
                 showLocation
-                label="WELCOME BACK"
-                title={`Hello, ${firstName}`}
-                description="What can we help you with today?"
+                label="OPERATIONAL STATUS: ACTIVE"
+                title={`GREETINGS, ${firstName.toUpperCase()}`}
+                description="Initialize your service requirements for today's mission."
                 onNotification={() => router.push('/notifications')}
                 notifPlacement="top"
             />
 
             <ScrollView
-                contentContainerStyle={{ padding: 24, paddingBottom: 130 }}
+                className="flex-1"
+                contentContainerStyle={{ padding: 24, paddingBottom: 140 }}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00120C" />}
                 showsVerticalScrollIndicator={false}
             >
-                {/* ─── Active Job Banner ─────────────────────────────────────── */}
+                {/* ─── Active Protocol Banner ─────────────────────────────────────── */}
                 {activeJobs.length > 0 && (
                     <ActiveJobBanner
                         job={activeJobs[0]}
@@ -99,24 +103,24 @@ export default function ClientHomeScreen() {
                     />
                 )}
 
-                {/* ─── Post a Job CTA ────────────────────────────────────────── */}
+                {/* ─── Strategic Deployment CTA ────────────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(380).springify()}>
                     <PostJobCTA onPress={() => router.push('/post-job')} />
                 </Animated.View>
 
-                {/* ─── Categories ────────────────────────────────────────────── */}
-                <Animated.View entering={FadeInDown.delay(220).springify()} className="mb-12">
+                {/* ─── Operational Classifications ────────────────────────────────────────────── */}
+                <Animated.View entering={FadeInDown.delay(220).springify()} className="mb-14">
                     <SectionHeader
-                        overline="Categories"
-                        title="What type of service?"
-                        action="See all"
+                        overline="MISSION CLASSES"
+                        title="SPECIFY CATEGORY?"
+                        action="EXPAND ALL"
                         onAction={() => router.push('/search')}
                     />
                     <ScrollView
                         horizontal
                         showsHorizontalScrollIndicator={false}
-                        className="-mx-6"
-                        contentContainerStyle={{ paddingHorizontal: 24, gap: 12, paddingBottom: 4 }}
+                        className="-mx-8 mt-2"
+                        contentContainerStyle={{ paddingHorizontal: 32, gap: 14, paddingBottom: 6 }}
                     >
                         {CATEGORIES.map((cat) => (
                             <CategoryPill
@@ -128,19 +132,22 @@ export default function ClientHomeScreen() {
                     </ScrollView>
                 </Animated.View>
 
-                {/* ─── Nearby Artisans ──────────────────────────────────── */}
+                {/* ─── Local Professional Matrix ──────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(440).springify()}>
-                    <View className="flex-row justify-between items-center mb-5">
-                        <View>
-                            <Text className="text-[10px] font-inter-semibold text-muted tracking-[0.8px] uppercase mb-1">
-                                NEARBY
-                            </Text>
-                            <Text className="text-[20px] font-jakarta-bold text-ink">
-                                Available Artisans
+                    <View className="flex-row justify-between items-end mb-6 px-1">
+                        <View className="flex-1">
+                            <View className="flex-row items-center gap-1.5 mb-1.5">
+                                <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
+                                <Text className="text-label text-[10px] text-primary tracking-[2px] uppercase font-jakarta-extrabold italic">
+                                    PROXIMITY RADAR
+                                </Text>
+                            </View>
+                            <Text className="text-[26px] uppercase italic font-jakarta-extrabold text-ink tracking-tighter">
+                                AVAILABLE PROS
                             </Text>
                         </View>
 
-                        {/* Layout Switch */}
+                        {/* Tactical Layout Toggle */}
                         <LayoutSwitch
                             viewLayout={viewLayout}
                             setViewLayout={setViewLayout}
@@ -152,18 +159,18 @@ export default function ClientHomeScreen() {
                     ) : artisans.length === 0 ? (
                         <EmptyState 
                             icon="location-outline"
-                            title="No professionals nearby"
-                            message={`We couldn't find any artisans in ${selectedCity}, ${selectedState}. Try switching your location to see more results.`}
-                            actionLabel="Update Location"
+                            title="ZERO OPERATIVES DETECTED"
+                            message={`No active professionals localized in ${selectedCity}, ${selectedState}. Calibrate your coordinates to expand the search field.`}
+                            actionLabel="RECALIBRATE COORDINATES"
                             onAction={() => router.push('/profile-completion')}
                         />
                     ) : (
-                        <View className={viewLayout === 'grid' ? "flex-row flex-wrap gap-3" : "gap-4"}>
+                        <View className={viewLayout === 'grid' ? "flex-row flex-wrap gap-4" : "gap-5"}>
                             {artisans.slice(0, 10).map((art, index) => (
                                 <Animated.View
                                     key={art.id}
                                     entering={FadeInDown.delay(480 + index * 80).springify()}
-                                    className={viewLayout === 'grid' ? "w-[48.2%]" : "w-full"}
+                                    className={viewLayout === 'grid' ? "w-[47.6%]" : "w-full"}
                                 >
                                     <ArtisanCard
                                         artisan={art}
@@ -176,8 +183,14 @@ export default function ClientHomeScreen() {
                         </View>
                     )}
                 </Animated.View>
+
+                <View className="mt-16 items-center flex-row justify-center gap-2 opacity-20">
+                    <Ionicons name="infinite" size={14} color="#64748B" />
+                    <Text className="text-[9px] text-muted uppercase tracking-[3px] font-jakarta-bold italic">Loom Tactical Interface • Stable Branch</Text>
+                </View>
             </ScrollView>
         </View>
     );
 }
+
 
