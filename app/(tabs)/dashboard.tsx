@@ -26,8 +26,76 @@ import Animated, {
     withSequence,
 } from 'react-native-reanimated';
 
-import { StatCard } from '@/components/dashboard/StatCard';
-import { OnlineToggle } from '@/components/dashboard/OnlineToggle';
+// ─── Stat Card ─────────────────────────────────────────────────────────────────
+function StatCard({ label, value, icon, delay, accent }: {
+    label: string;
+    value: string;
+    icon: string;
+    delay: number;
+    accent?: boolean;
+}) {
+    return (
+        <Animated.View
+            entering={FadeInUp.delay(delay).springify()}
+            className="flex-1"
+        >
+            <View className={`${
+                accent ? "bg-primary border-transparent" : "bg-white border-card-border"
+            } rounded-2xl p-5 border shadow-sm`}>
+                <View className={`w-10 h-10 rounded-xl items-center justify-center mb-3.5 shadow-sm ${
+                    accent ? "bg-white/15" : "bg-background"
+                }`}>
+                    <Ionicons 
+                        name={icon as any} 
+                        size={18} 
+                        color={accent ? "#FFFFFF" : "#00120C"} 
+                    />
+                </View>
+                <Text className={`text-h1 text-[24px] mb-0.5 font-jakarta-extrabold italic ${
+                    accent ? "text-white" : "text-ink"
+                }`}>
+                    {value}
+                </Text>
+                <Text className={`text-label text-[9px] tracking-[1.5px] uppercase font-jakarta-bold italic ${
+                    accent ? "text-white/60" : "text-muted"
+                }`}>
+                    {label}
+                </Text>
+            </View>
+        </Animated.View>
+    );
+}
+
+// ─── Online Toggle ──────────────────────────────────────────────────────────────
+function OnlineToggle({ online, onToggle }: { online: boolean; onToggle: () => void }) {
+    const scale = useSharedValue(1);
+    const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
+    const handlePress = () => {
+        scale.value = withSequence(
+            withSpring(0.92, { damping: 6 }),
+            withSpring(1, { damping: 10 })
+        );
+        onToggle();
+    };
+
+    return (
+        <Animated.View style={animatedStyle}>
+            <TouchableOpacity
+                onPress={handlePress}
+                activeOpacity={1}
+                className={`flex-row items-center gap-2.5 px-5 py-3 rounded-full border-[1.5px] shadow-sm ${
+                    online ? "bg-success/10 border-success/30" : "bg-white border-card-border"
+                }`}
+            >
+                <View className={`w-2.5 h-2.5 rounded-full ${online ? "bg-success shadow-[0_0_8px_rgba(26,178,108,0.6)]" : "bg-muted"}`} />
+                <Text className={`text-[12px] font-jakarta-extrabold italic tracking-tight ${online ? "text-success" : "text-muted"}`}>
+                    {online ? "CONNECTED" : "OFFLINE"}
+                </Text>
+            </TouchableOpacity>
+        </Animated.View>
+    );
+}
 
 export default function ArtisanDashboard() {
     const router = useRouter();

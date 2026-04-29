@@ -1,67 +1,60 @@
 # Loom — Mobile App Frontend
 
-Loom is an intelligent, localized platform for professional artisans in Nigeria. This repository contains the complete frontend mobile application built with React Native, Expo SDK 54, and TypeScript.
+Loom is an intelligent, localized platform for artisans in Nigeria. This repository contains the complete frontend mobile application built with React Native, Expo Router, and TypeScript.
 
-## 🌟 Modern Professional Aesthetic
+## Features
 
-The application features the **Loom Tactical Interface**, a high-fidelity design system optimized for Nigerian operational environments. 
+- **Dual Personas:** Seamlessly switch between Client and Artisan roles.
+- **Client Experience:** Browse artisans by category, view top-rated pros, search with real-time filtering, post jobs with multi-step flow (including budget/urgency/location), view matched artisans, and track job progress via timeline.
+- **Artisan Experience:** Detailed dashboard with stats, online/offline toggle, manage new job requests (accept/decline), track active jobs via timeline with status updates (On the way, Start Work, Complete), and view earnings summary with charts and transactions.
+- **Communication:** Built-in messaging thread interface with "Quick Replies" (in Nigerian Pidgin context), unread badges, and real-time chat UI.
+- **Localization:** Full i18n support with English, Nigerian Pidgin, and Yoruba, and culturally relevant mock data including Naira (₦) formatting.
+- **Reusable UI Kit:** Comprehensive standard design system including custom cards, segmented controls, status pills, offline/error boundaries, toast notifications, skeleton loading states, OTP inputs, and more.
+- **Mock Data Engine:** Services layer fully wired to a mock API featuring simulated network delays, random failures, and comprehensive datasets (12 artisans, 10 jobs, message threads, earnings, notifications).
+- **Styling:** Custom theme configuration using standard React Native StyleSheet, newly integrated with `nativewind` (Tailwind CSS) v4 for future development.
 
-### Key Visual Pillars:
-- **Utility-First Styling:** Fully migrated to **NativeWind v4** (Tailwind CSS) for rapid, consistent, and performant UI development.
-- **Tactical Typography:** System-wide deployment of **Plus Jakarta Sans** with a signature "Tactical Extrabold Italic" style for mission-critical headers.
-- **Immersive Depth:** Rich use of elevated cards (`rounded-[32px]/[48px]`), premium shadows (`shadow-2xl/3xl`), and blurred backgrounds for a world-class operative experience.
-- **Dynamic Feedback:** Integrated **React Native Reanimated** for smooth entry transitions (`FadeInUp`, `FadeInDown`) and interactive state changes.
-
-## 🚀 Key Features
-
-- **Dual Personas:** Seamlessly switch between **Client** and **Artisan** roles with specialized dashboard matrices.
-- **Client Experience:** Browse artisans by sector, view top-rated pros, search with real-time filtering, and deploy mission requests via a multi-step logic flow.
-- **Artisan Experience:** Track operative yield via financial charts, manage the mission queue, and update field status (On the way, In Progress, Completed) with real-time sync.
-- **Communication:** Secure end-to-end encrypted channel UI with "Quick Replies" (optimized for Nigerian Pidgin context) and unread signal indicators.
-- **Localization:** Multi-layer i18n support for **English, Nigerian Pidgin, and Yoruba**, featuring localized Naira (₦) formatting and cultural nuances.
-- **Modular UI Kit:** A comprehensive, standardized library of tactical components in `components/ui/` including `DetailItem`, `SettingItem`, `LoomThread`, and `StatusTimeline`.
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework:** Expo SDK 54, React Native
-- **Navigation:** Expo Router (File-based routing with deep-link support)
-- **Styling:** [NativeWind v4](https://www.nativewind.dev/) (Tailwind CSS for React Native)
-- **Animations:** React Native Reanimated
-- **State Management:** Zustand (Performant global state registry)
-- **Validation:** Zod (Type-safe schema validation)
-- **Icons:** @expo/vector-icons (Ionicons Tactical Set)
+- **Navigation:** Expo Router (File-based navigation with tab groups and modals)
+- **State Management:** Zustand
+- **Validation:** Zod
+- **Storage:** AsyncStorage
+- **Styling:** Standard StyleSheet + NativeWind/TailwindCSS integration
+- **Icons:** @expo/vector-icons (Ionicons)
 
-## 📦 Folder Structure
-
-- `/app` — Tactical routing registry (Auth stack, Grouped Tabs, Modals)
-- `/components/ui` — Modularized component library (Atomic design pattern)
-- `/services` — Logic layer and Mock API engine with simulated latency
-- `/store` — Global state registry (Zustand)
-- `/types` — Comprehensive TypeScript interfaces and domain models
-- `/utils` — Helper functions, formatters, and tactical logic
-- `/i18n` — Multi-language localization bundles
-
-## 🚦 Getting Started
+## Setup and Running
 
 1. **Install Dependencies:**
    ```bash
    npm install
    ```
 
-2. **Start the Command Center:**
+2. **Start the Development Server:**
    ```bash
    npm start
    ```
-   Press `i` to launch on iOS Simulator or `a` for Android Emulator.
+   Press `i` to run on iOS Simulator or `a` to run on Android Emulator.
 
-3. **Verify Integrity:**
+3. **Verify Types:**
    ```bash
    npx tsc --noEmit
    ```
 
-## 🗺️ Roadmap
+## Folder Structure
 
-- [ ] Production API Integration (Node.js/PostgreSQL)
-- [ ] Real-time Signal Protocol (WebSockets)
-- [ ] Embedded Financial Settlements (Paystack/Flutterwave)
-- [ ] Live Tactical GPS Tracking for Active Missions
+- `/app` — Expo Router definitions (Root, Auth stack, Tabs grouping, Modals)
+- `/components` — Shared UI elements and complete UI Kit in `/ui`
+- `/services` — Mock API and data fetching layer
+- `/store` — Global state management (Zustand)
+- `/types` — TypeScript interfaces and data models
+- `/theme` — Global design tokens (Colors, Typography, Spacing, Shadows)
+- `/i18n` — Translations and language switching
+- `/utils` — Helper functions, formatters, and Zod schemas
+
+## Future Roadmap
+
+- Integrate backend APIs (Supabase/Firebase/Custom Node.js)
+- Implement real-time WebSockets for Chat and Notifications
+- Integrate Paystack/Flutterwave for embedded payments
+- Add Maps integration for location tracking on the Job Details screen
