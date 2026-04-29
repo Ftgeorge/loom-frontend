@@ -89,6 +89,7 @@ export interface RawJob {
     urgency?: string;
     location?: string;
     status: string;
+    payment_status?: string;
     assigned_artisan_id?: string;
     artisan_first_name?: string;
     artisan_last_name?: string;
@@ -215,6 +216,7 @@ export function mapJob(row: RawJob): JobRequest {
         artisanName: row.artisan_first_name ? `${row.artisan_first_name} ${row.artisan_last_name ?? ""}`.trim() : undefined,
         createdAt: row.created_at,
         completedAt: row.completed_at,
+        paymentStatus: (row.payment_status || 'unpaid') as any,
         ratingId: row.rating_id,
         ratingValue: row.rating_value ? Number(row.rating_value) : undefined,
     };

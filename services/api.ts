@@ -323,6 +323,10 @@ export const jobApi = {
             method: "POST",
             body: JSON.stringify(data),
         }),
+    
+    /** POST /jobs/:jobId/pay — finalize payment (customer only) */
+    pay: (jobId: string) =>
+        apiFetch<RawJob>(`/jobs/${jobId}/pay`, { method: "POST" }),
 };
 
 // ─── Thread / Messaging API ───────────────────────────────

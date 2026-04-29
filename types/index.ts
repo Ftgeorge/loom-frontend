@@ -136,6 +136,7 @@ export interface JobRequest {
     scheduledDate?: string;
     scheduledTime?: string;
     completedAt?: string;
+    paymentStatus?: 'unpaid' | 'pending' | 'paid';
     ratingId?: string;
     ratingValue?: number;
 }
