@@ -6,6 +6,7 @@ import { ErrorState } from '@/components/ui/StateComponents';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { artisanApi } from '@/services/api';
 import { mapArtisan } from '@/services/mappers';
+import { Colors, Typography } from '@/theme';
 import type { Artisan } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -16,6 +17,7 @@ const SORT_OPTIONS = ['TACTICAL MATCH', 'ELITE RATING', 'MINIMAL COST'];
 
 export default function MatchedArtisansScreen() {
     const router = useRouter();
+    // skill param comes from post-job after a job is created
     const { skill } = useLocalSearchParams<{ skill?: string }>();
     const [artisans, setArtisans] = useState<Artisan[]>([]);
     const [loading, setLoading] = useState(true);
@@ -25,8 +27,9 @@ export default function MatchedArtisansScreen() {
     const load = useCallback(async () => {
         try {
             setError(false);
+            // GET /artisans/search?skill=<skill>
             const res = await artisanApi.search({
-                skill: skill || 'plumber',
+                skill: skill || 'plumber', // fall back to a common skill
                 limit: 20,
             });
             const results = (res.results as any[])
@@ -49,15 +52,21 @@ export default function MatchedArtisansScreen() {
     });
 
     return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
                 <LoomThread variant="minimal" opacity={0.3} animated scale={1.3} />
             </View>
             <AppHeader title="MATCHED OPERATIVES" showBack onBack={() => router.back()} showNotification={false} />
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <AppHeader title="Results" showBack onBack={() => router.back()} showNotification={false} />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
 
             <FlatList
                 data={sorted}
                 ListHeaderComponent={
+<<<<<<< HEAD
                     <View className="mb-8">
                         <View className="px-8 pt-10">
                             <View className="flex-row items-center gap-2 mb-3">
@@ -66,11 +75,18 @@ export default function MatchedArtisansScreen() {
                             </View>
                             <Text className="text-h1 text-[40px] uppercase italic font-jakarta-extrabold tracking-tighter text-ink">ACTIVE NODES</Text>
                             <Text className="text-[15px] text-ink/60 mt-3 normal-case leading-6 font-jakarta-medium italic">
+=======
+                    <View>
+                        <View style={{ padding: 24, paddingBottom: 0 }}>
+                            <Text style={Typography.h2}>Ready to help</Text>
+                            <Text style={[Typography.bodySmall, { color: Colors.textSecondary, marginTop: 4 }]}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                                 {loading
                                     ? 'Scanning sector for available professionals...'
                                     : `${artisans.length} elite operatives verified and available for deployment.`}
                             </Text>
                         </View>
+<<<<<<< HEAD
                         
                         <View className="mt-8">
                             <FlatList
@@ -97,6 +113,22 @@ export default function MatchedArtisansScreen() {
                                 }}
                             />
                         </View>
+=======
+                        <FlatList
+                            data={SORT_OPTIONS}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{ paddingHorizontal: 24, paddingVertical: 20, gap: 10 }}
+                            keyExtractor={(item) => item}
+                            renderItem={({ item, index }) => (
+                                <Chip
+                                    label={item}
+                                    selected={sortIdx === index}
+                                    onPress={() => setSortIdx(index)}
+                                />
+                            )}
+                        />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                     </View>
                 }
                 keyExtractor={(item) => item.id}
@@ -107,8 +139,13 @@ export default function MatchedArtisansScreen() {
                 removeClippedSubviews={true}
                 renderItem={({ item, index }) => (
                     <Animated.View
+<<<<<<< HEAD
                         entering={FadeInDown.delay(index * 100).springify()}
                         className="px-8"
+=======
+                        entering={FadeInDown.delay(index * 100)}
+                        style={{ paddingHorizontal: 24 }}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                     >
                         <ArtisanCard
                             artisan={item}
@@ -119,10 +156,17 @@ export default function MatchedArtisansScreen() {
                         />
                     </Animated.View>
                 )}
+<<<<<<< HEAD
                 ItemSeparatorComponent={() => <View className="h-6" />}
                 ListEmptyComponent={
                     loading ? (
                         <View className="px-8 pt-10">
+=======
+                ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
+                ListEmptyComponent={
+                    loading ? (
+                        <View style={{ paddingHorizontal: 24 }}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             <SkeletonList count={4} type="artisan" />
                         </View>
                     ) : error ? (

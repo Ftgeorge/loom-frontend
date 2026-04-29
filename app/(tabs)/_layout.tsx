@@ -1,5 +1,6 @@
 import { t } from '@/i18n';
 import { useAppStore } from '@/store';
+import { Colors } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
@@ -60,12 +61,14 @@ function TabButton({
         <TouchableOpacity
             onPress={handlePress}
             activeOpacity={0.8}
-            className="flex-1 h-full items-center justify-center relative"
+            style={styles.tabButton}
         >
             {/* Active dot indicator */}
             <Animated.View
-                style={{ opacity }}
-                className="absolute top-[10px] w-1 h-1 rounded-full bg-primary"
+                style={[
+                    styles.activeDot,
+                    { opacity },
+                ]}
             />
 
             {/* Icon */}
@@ -73,7 +76,7 @@ function TabButton({
                 <Ionicons
                     name={(focused ? tab.iconFilled : tab.icon) as any}
                     size={24}
-                    className={focused ? 'text-primary' : 'text-gray-400'}
+                    color={focused ? Colors.primary : Colors.gray400}
                 />
             </Animated.View>
         </TouchableOpacity>
@@ -98,13 +101,15 @@ function FloatingTabBar({ state, descriptors, navigation }: any) {
 
     return (
         <View
-            style={{ bottom: Math.max(insets.bottom, 16) + 4 }}
-            className="absolute left-6 right-6 h-16 rounded-[32px] flex-row items-center justify-around overflow-hidden border-[2px] border-black/5 shadow-lg bg-white"
+            style={[
+                styles.barWrapper,
+                { bottom: Math.max(insets.bottom, 16) + 4 },
+            ]}
         >
             {Platform.OS === 'ios' ? (
                 <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFill} />
             ) : (
-                <View style={StyleSheet.absoluteFill} className="bg-white" />
+                <View style={[StyleSheet.absoluteFill, styles.androidBg]} />
             )}
 
             {visibleRoutes.map((route: any) => {
@@ -241,3 +246,44 @@ export default function TabsLayout() {
     );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
+const styles = StyleSheet.create({
+    barWrapper: {
+        position: 'absolute',
+        left: 24,
+        right: 24,
+        height: 64,
+        borderRadius: 32,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        overflow: 'hidden',
+        borderWidth: 2,
+        borderColor: 'rgba(0,0,0,0.06)',
+        // Shadow
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.12,
+        shadowRadius: 24,
+        elevation: 12,
+        backgroundColor: 'white'
+    },
+    androidBg: {
+        backgroundColor: '#FFFFFF',
+    },
+    tabButton: {
+        flex: 1,
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+    },
+    activeDot: {
+        position: 'absolute',
+        top: 10,
+        width: 4,
+        height: 4,
+        borderRadius: 2,
+        backgroundColor: Colors.primary,
+    },
+});

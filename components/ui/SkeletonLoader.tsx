@@ -1,3 +1,4 @@
+import { Colors, Radius, Shadows } from '@/theme';
 import React, { useEffect, useRef } from 'react';
 import { Animated, View, ViewStyle } from 'react-native';
 
@@ -7,10 +8,9 @@ interface SkeletonProps {
     height?: number;
     borderRadius?: number;
     style?: ViewStyle;
-    className?: string;
 }
 
-export function Skeleton({ width = '100%', height = 16, borderRadius = 6, style, className = '' }: SkeletonProps) {
+export function Skeleton({ width = '100%', height = 16, borderRadius = 6, style }: SkeletonProps) {
     const anim = useRef(new Animated.Value(0.4)).current;
 
     useEffect(() => {
@@ -31,11 +31,11 @@ export function Skeleton({ width = '100%', height = 16, borderRadius = 6, style,
                     width: width as any,
                     height,
                     borderRadius,
+                    backgroundColor: Colors.cardBorder,
                     opacity: anim,
                 },
                 style,
             ]}
-            className={`bg-card-border ${className}`}
         />
     );
 }
@@ -43,19 +43,27 @@ export function Skeleton({ width = '100%', height = 16, borderRadius = 6, style,
 // ─── Artisan Card Skeleton (Horizontal - for home screen) ─
 export function SkeletonArtisanCardHorizontal() {
     return (
-        <View className="w-[220px] bg-surface rounded-md p-4 border-[1px] border-card-border shadow-sm">
+        <View style={{
+            width: 220,
+            backgroundColor: Colors.surface,
+            borderRadius: Radius.lg,
+            padding: 16,
+            borderWidth: 1,
+            borderColor: Colors.cardBorder,
+            ...Shadows.sm,
+        }}>
             {/* Avatar + Badge row */}
-            <View className="flex-row items-center mb-3">
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
                 <Skeleton width={52} height={52} borderRadius={26} />
-                <View className="flex-1 ml-3">
-                    <Skeleton width="70%" height={14} className="mb-[6px]" />
+                <View style={{ flex: 1, marginLeft: 12 }}>
+                    <Skeleton width="70%" height={14} style={{ marginBottom: 6 }} />
                     <Skeleton width="50%" height={11} />
                 </View>
             </View>
             {/* Skill chip */}
-            <Skeleton width="40%" height={24} borderRadius={12} className="mb-3" />
+            <Skeleton width="40%" height={24} borderRadius={12} style={{ marginBottom: 12 }} />
             {/* Rating row */}
-            <View className="flex-row gap-2">
+            <View style={{ flexDirection: 'row', gap: 8 }}>
                 <Skeleton width="45%" height={11} />
                 <Skeleton width="30%" height={11} />
             </View>
@@ -66,20 +74,28 @@ export function SkeletonArtisanCardHorizontal() {
 // ─── Artisan Card Skeleton (Vertical - for search / near-you) ─
 export function SkeletonArtisanCard() {
     return (
-        <View className="bg-surface rounded-md p-4 border-[1px] border-card-border mb-3 shadow-sm">
-            <View className="flex-row gap-[14px]">
+        <View style={{
+            backgroundColor: Colors.surface,
+            borderRadius: Radius.lg,
+            padding: 16,
+            borderWidth: 1,
+            borderColor: Colors.cardBorder,
+            marginBottom: 12,
+            ...Shadows.sm,
+        }}>
+            <View style={{ flexDirection: 'row', gap: 14 }}>
                 {/* Avatar */}
                 <Skeleton width={56} height={56} borderRadius={28} />
-                <View className="flex-1 justify-center">
-                    <Skeleton width="65%" height={15} className="mb-[7px]" />
-                    <Skeleton width="45%" height={12} className="mb-[6px]" />
+                <View style={{ flex: 1, justifyContent: 'center' }}>
+                    <Skeleton width="65%" height={15} style={{ marginBottom: 7 }} />
+                    <Skeleton width="45%" height={12} style={{ marginBottom: 6 }} />
                     <Skeleton width="35%" height={12} />
                 </View>
             </View>
             {/* Bottom row: price + availability */}
-            <View className="flex-row gap-2 mt-[14px]">
-                <Skeleton width="50%" height={28} className="rounded-sm" />
-                <Skeleton width="35%" height={28} className="rounded-sm" />
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
+                <Skeleton width="50%" height={28} borderRadius={Radius.sm} />
+                <Skeleton width="35%" height={28} borderRadius={Radius.sm} />
             </View>
         </View>
     );
@@ -88,17 +104,25 @@ export function SkeletonArtisanCard() {
 // ─── Job / Request Card Skeleton ─────────────────────────
 export function SkeletonRequestCard() {
     return (
-        <View className="bg-surface rounded-md p-[18px] border-[1px] border-card-border mb-3 shadow-sm">
+        <View style={{
+            backgroundColor: Colors.surface,
+            borderRadius: Radius.lg,
+            padding: 18,
+            borderWidth: 1,
+            borderColor: Colors.cardBorder,
+            marginBottom: 12,
+            ...Shadows.sm,
+        }}>
             {/* Header row: category + status badge */}
-            <View className="flex-row justify-between mb-3">
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
                 <Skeleton width="40%" height={14} />
                 <Skeleton width={72} height={24} borderRadius={12} />
             </View>
             {/* Description lines */}
-            <Skeleton width="100%" height={12} className="mb-[6px]" />
-            <Skeleton width="80%" height={12} className="mb-4" />
+            <Skeleton width="100%" height={12} style={{ marginBottom: 6 }} />
+            <Skeleton width="80%" height={12} style={{ marginBottom: 16 }} />
             {/* Footer: budget + time */}
-            <View className="flex-row gap-3">
+            <View style={{ flexDirection: 'row', gap: 12 }}>
                 <Skeleton width="30%" height={12} />
                 <Skeleton width="25%" height={12} />
             </View>
@@ -109,10 +133,18 @@ export function SkeletonRequestCard() {
 // ─── Message Thread Skeleton ─────────────────────────────
 export function SkeletonMessageThread() {
     return (
-        <View className="flex-row items-center p-4 bg-surface border-b-[1px] border-card-border gap-[14px]">
+        <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 16,
+            backgroundColor: Colors.surface,
+            borderBottomWidth: 1,
+            borderBottomColor: Colors.cardBorder,
+            gap: 14,
+        }}>
             <Skeleton width={52} height={52} borderRadius={26} />
-            <View className="flex-1">
-                <View className="flex-row justify-between mb-2">
+            <View style={{ flex: 1 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
                     <Skeleton width="40%" height={14} />
                     <Skeleton width={48} height={11} />
                 </View>
@@ -125,12 +157,19 @@ export function SkeletonMessageThread() {
 // ─── Notification Skeleton ───────────────────────────────
 export function SkeletonNotification() {
     return (
-        <View className="flex-row items-start p-4 gap-[14px] border-b-[1px] border-card-border">
+        <View style={{
+            flexDirection: 'row',
+            alignItems: 'flex-start',
+            padding: 16,
+            gap: 14,
+            borderBottomWidth: 1,
+            borderBottomColor: Colors.cardBorder,
+        }}>
             <Skeleton width={44} height={44} borderRadius={22} />
-            <View className="flex-1">
-                <Skeleton width="55%" height={14} className="mb-2" />
-                <Skeleton width="90%" height={11} className="mb-[5px]" />
-                <Skeleton width="70%" height={11} className="mb-2" />
+            <View style={{ flex: 1 }}>
+                <Skeleton width="55%" height={14} style={{ marginBottom: 8 }} />
+                <Skeleton width="90%" height={11} style={{ marginBottom: 5 }} />
+                <Skeleton width="70%" height={11} style={{ marginBottom: 8 }} />
                 <Skeleton width="30%" height={10} />
             </View>
         </View>
@@ -140,17 +179,17 @@ export function SkeletonNotification() {
 // ─── Profile Skeleton ────────────────────────────────────
 export function SkeletonProfile() {
     return (
-        <View className="p-6">
+        <View style={{ padding: 24 }}>
             {/* Avatar + Name */}
-            <View className="items-center mb-8">
-                <Skeleton width={96} height={96} borderRadius={48} className="mb-[14px]" />
-                <Skeleton width={160} height={18} className="mb-2" />
+            <View style={{ alignItems: 'center', marginBottom: 32 }}>
+                <Skeleton width={96} height={96} borderRadius={48} style={{ marginBottom: 14 }} />
+                <Skeleton width={160} height={18} style={{ marginBottom: 8 }} />
                 <Skeleton width={120} height={13} />
             </View>
             {/* Stats row */}
-            <View className="flex-row justify-around mb-8">
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 32 }}>
                 {[0, 1, 2].map((i) => (
-                    <View key={i} className="items-center gap-[6px]">
+                    <View key={i} style={{ alignItems: 'center', gap: 6 }}>
                         <Skeleton width={48} height={20} />
                         <Skeleton width={64} height={11} />
                     </View>
@@ -158,12 +197,19 @@ export function SkeletonProfile() {
             </View>
             {/* Settings rows */}
             {[0, 1, 2, 3].map((i) => (
-                <View key={i} className="flex-row justify-between items-center py-4 border-b-[1px] border-card-border">
-                    <View className="flex-row gap-[14px] items-center">
-                        <Skeleton width={36} height={36} className="rounded-xs" />
+                <View key={i} style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    paddingVertical: 16,
+                    borderBottomWidth: 1,
+                    borderBottomColor: Colors.cardBorder,
+                }}>
+                    <View style={{ flexDirection: 'row', gap: 14, alignItems: 'center' }}>
+                        <Skeleton width={36} height={36} borderRadius={8} />
                         <Skeleton width={120} height={14} />
                     </View>
-                    <Skeleton width={20} height={20} className="rounded-xs" />
+                    <Skeleton width={20} height={20} borderRadius={4} />
                 </View>
             ))}
         </View>
@@ -173,24 +219,36 @@ export function SkeletonProfile() {
 // ─── Dashboard Skeleton (Artisan) ────────────────────────
 export function SkeletonDashboard() {
     return (
-        <View className="p-6">
+        <View style={{ padding: 24 }}>
             {/* Earnings card */}
-            <View className="bg-primary rounded-md p-5 mb-6">
-                <Skeleton width="40%" height={12} className="mb-3 opacity-40 rounded-[4px]" />
-                <Skeleton width="60%" height={32} className="mb-2 opacity-40 rounded-[6px]" />
-                <Skeleton width="40%" height={11} className="opacity-30 rounded-[4px]" />
+            <View style={{
+                backgroundColor: Colors.primary,
+                borderRadius: Radius.lg,
+                padding: 20,
+                marginBottom: 24,
+            }}>
+                <Skeleton width="40%" height={12} borderRadius={4} style={{ marginBottom: 12, opacity: 0.4 }} />
+                <Skeleton width="60%" height={32} borderRadius={6} style={{ marginBottom: 8, opacity: 0.4 }} />
+                <Skeleton width="40%" height={11} borderRadius={4} style={{ opacity: 0.3 }} />
             </View>
             {/* Stats grid */}
-            <View className="flex-row gap-3 mb-6">
+            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 24 }}>
                 {[0, 1].map((i) => (
-                    <View key={i} className="flex-1 bg-surface rounded-xs p-4 border-[1px] border-card-border">
-                        <Skeleton width="60%" height={11} className="mb-2" />
+                    <View key={i} style={{
+                        flex: 1,
+                        backgroundColor: Colors.surface,
+                        borderRadius: Radius.md,
+                        padding: 16,
+                        borderWidth: 1,
+                        borderColor: Colors.cardBorder,
+                    }}>
+                        <Skeleton width="60%" height={11} style={{ marginBottom: 8 }} />
                         <Skeleton width="80%" height={22} />
                     </View>
                 ))}
             </View>
             {/* Recent job rows */}
-            <Skeleton width="45%" height={16} className="mb-4" />
+            <Skeleton width="45%" height={16} style={{ marginBottom: 16 }} />
             {[0, 1, 2].map((i) => (
                 <SkeletonRequestCard key={i} />
             ))}
@@ -201,9 +259,19 @@ export function SkeletonDashboard() {
 // ─── Category Grid Skeleton ──────────────────────────────
 export function SkeletonCategoryGrid() {
     return (
-        <View className="flex-row flex-wrap gap-3 justify-between">
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between' }}>
             {Array(8).fill(0).map((_, i) => (
-                <View key={i} className="w-[22%] aspect-square bg-surface rounded-xs items-center justify-center gap-2 border-[1px] border-card-border">
+                <View key={i} style={{
+                    width: '22%',
+                    aspectRatio: 1,
+                    backgroundColor: Colors.surface,
+                    borderRadius: Radius.md,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    borderWidth: 1,
+                    borderColor: Colors.cardBorder,
+                }}>
                     <Skeleton width={36} height={36} borderRadius={18} />
                     <Skeleton width="80%" height={9} />
                 </View>
@@ -232,11 +300,10 @@ export function SkeletonList({ count = 3, type = 'artisan' }: { count?: number; 
 
 export function SkeletonHorizontalList({ count = 3 }: { count?: number }) {
     return (
-        <View className="flex-row gap-4">
+        <View style={{ flexDirection: 'row', gap: 16 }}>
             {Array(count).fill(0).map((_, i) => (
                 <SkeletonArtisanCardHorizontal key={i} />
             ))}
         </View>
     );
 }
-

@@ -7,8 +7,6 @@ export type JobStatus =
     | 'submitted'
     | 'matched'
     | 'scheduled'
-    | 'accepted'
-    | 'on_the_way'
     | 'in_progress'
     | 'completed'
     | 'cancelled';
@@ -171,7 +169,6 @@ export interface AppNotification {
     read: boolean;
     createdAt: string;
     actionRoute?: string;
-    metadata?: any;
 }
 
 // ─── Earnings ───────────────────────────────────────────

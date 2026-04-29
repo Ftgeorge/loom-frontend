@@ -53,7 +53,7 @@ export function OfflineBanner() {
     return (
         <View className="bg-graphite flex-row items-center justify-center py-3 gap-2">
             <Ionicons name="wifi-outline" size={16} color={Colors.white} />
-            <Text className="text-xs font-semibold tracking-wide text-white">You&apos;re offline. Some features may not work.</Text>
+            <Text className="text-xs font-semibold tracking-wide text-white">You're offline. Some features may not work.</Text>
         </View>
     );
 }

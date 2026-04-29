@@ -4,6 +4,7 @@ import { PrimaryButton } from '@/components/ui/Buttons';
 import { Chip } from '@/components/ui/CardChipBadge';
 import { userApi } from '@/services/api';
 import { useAppStore } from '@/store';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { CategoryId, CATEGORIES } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -113,9 +114,15 @@ export default function ProfileCompletionScreen() {
     };
 
     return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
                 <LoomThread variant="minimal" opacity={0.2} animated scale={1.3} />
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <View style={StyleSheet.absoluteFill}>
+                <LoomThread variant="dense" scale={1.2} animated opacity={0.3} />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
             </View>
             <AppHeader
                 title="PROFILE ACTIVATION"
@@ -124,6 +131,7 @@ export default function ProfileCompletionScreen() {
                 showNotification={false}
             />
 
+<<<<<<< HEAD
             {/* ─── Tactical Stepper Matrix ───────────────────────────────────── */}
             <View className="flex-row px-10 py-6 gap-3">
                 {STEPS.filter((_, i) => user?.role !== 'artisan' || i === 0).map((s, i) => (
@@ -135,6 +143,23 @@ export default function ProfileCompletionScreen() {
                             i === activeStep ? 'text-primary font-jakarta-extrabold italic' : 'text-ink/20 font-jakarta-bold'
                         }`}>
                             {s.toUpperCase()}
+=======
+            {/* Progress Indicator */}
+            <View style={{ flexDirection: 'row', paddingHorizontal: 24, paddingVertical: 16, gap: 8, marginHorizontal: 32 }}>
+                {STEPS.filter((_, i) => user?.role !== 'artisan' || i === 0).map((s, i) => (
+                    <View key={s} style={{ flex: 1, gap: 4 }}>
+                        <View style={{
+                            height: 3,
+                            borderRadius: 2,
+                            backgroundColor: i <= activeStep ? Colors.primary : Colors.cardBorder
+                        }} />
+                        <Text style={[Typography.label, {
+                            fontSize: 9,
+                            color: i === activeStep ? Colors.primary : Colors.muted,
+                            fontWeight: i === activeStep ? '700' : '500'
+                        }]}>
+                            {s}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         </Text>
                     </View>
                 ))}
@@ -147,11 +172,17 @@ export default function ProfileCompletionScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {activeStep === 0 && (
+<<<<<<< HEAD
                     <Animated.View entering={FadeInUp.springify()} className="px-8 pt-6">
                         <View className="items-center mb-12">
+=======
+                    <Animated.View entering={FadeInUp.springify()} style={{ padding: 32 }}>
+                        <View style={{ alignItems: 'center', marginBottom: 40 }}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             <TouchableOpacity
                                 activeOpacity={0.9}
                                 onPress={pickImage}
+<<<<<<< HEAD
                                 className={`w-36 h-36 rounded-full bg-white border-[2px] items-center justify-center p-2 shadow-2xl ${
                                     profileImage ? 'border-primary border-solid' : 'border-primary/40 border-dashed'
                                 }`}
@@ -181,6 +212,66 @@ export default function ProfileCompletionScreen() {
                         </View>
                         <Text className="text-h1 text-[40px] uppercase italic font-jakarta-extrabold tracking-tighter mb-4 text-ink">DEPLOYMENT HUB</Text>
                         <Text className="text-[15px] text-ink/60 mb-12 normal-case font-jakarta-medium italic leading-6">
+=======
+                                style={{
+                                    width: 140,
+                                    height: 140,
+                                    borderRadius: 70,
+                                    backgroundColor: Colors.white,
+                                    borderWidth: 1.5,
+                                    borderColor: Colors.primary,
+                                    borderStyle: profileImage ? 'solid' : 'dashed',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    padding: 4,
+                                    ...Shadows.md
+                                }}
+                            >
+                                <View style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    borderRadius: 70,
+                                    backgroundColor: Colors.primaryLight,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    overflow: 'hidden'
+                                }}>
+                                    {profileImage ? (
+                                        <Image source={{ uri: profileImage }} style={{ width: '100%', height: '100%' }} />
+                                    ) : (
+                                        <Ionicons name="person" size={60} color={Colors.primary} />
+                                    )}
+                                </View>
+                                <View style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    right: 4,
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: 20,
+                                    backgroundColor: Colors.accent,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderWidth: 3,
+                                    borderColor: Colors.white,
+                                    ...Shadows.sm
+                                }}>
+                                    <Ionicons name={profileImage ? "create" : "camera"} size={20} color={Colors.white} />
+                                </View>
+                            </TouchableOpacity>
+                            <Text style={[Typography.h3, { marginTop: 20, fontSize: 20 }]}>
+                                {user?.role === 'artisan' ? 'Add Business Photo' : 'Add Profile Photo'}
+                            </Text>
+                            <Text style={[Typography.bodySmall, { color: Colors.muted, marginTop: 4 }]}>
+                                {user?.role === 'artisan' ? 'Show clients who you are' : 'Help people recognize you'}
+                            </Text>
+                        </View>
+
+                        <Text style={{ fontSize: 24, fontWeight: '800', color: Colors.text, marginBottom: 8 }}>
+                            {user?.role === 'artisan' ? 'Where are you based?' : 'Where are you based?'}
+                        </Text>
+                        <Text style={{ fontSize: 16, color: Colors.textSecondary, lineHeight: 24, marginBottom: 32 }}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             {user?.role === 'artisan'
                                 ? 'Specify your primary operational territory for service inquiries.'
                                 : 'Identify your residence to streamline professional discovery.'}
@@ -230,12 +321,17 @@ export default function ProfileCompletionScreen() {
                         <PrimaryButton
                             title="SYNC PARAMETERS"
                             onPress={nextStep}
+<<<<<<< HEAD
                             className="h-18 rounded-[20px] shadow-2xl border border-white/10"
+=======
+                            style={{ marginTop: 24, height: 60, borderRadius: Radius.md }}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         />
                     </Animated.View>
                 )}
 
                 {activeStep === 1 && (
+<<<<<<< HEAD
                     <Animated.View entering={FadeInRight.springify()} className="px-8 pt-8">
                         <View className="flex-row items-center gap-2 mb-3 px-1">
                             <View className="w-1.5 h-1.5 rounded-full bg-accent shadow-sm" />
@@ -249,6 +345,19 @@ export default function ProfileCompletionScreen() {
                         <View className="flex-row flex-wrap gap-4 py-8 px-6 bg-white rounded-[42px] border-[1.5px] border-card-border/50 shadow-2xl">
                             {CATEGORIES.map((cat) => (
                                 <View key={cat.id}>
+=======
+                    <Animated.View entering={FadeInRight} style={{ padding: 32 }}>
+                        <Text style={{ fontSize: 24, fontWeight: '800', color: Colors.text, marginBottom: 8 }}>
+                            What services do you need?
+                        </Text>
+                        <Text style={{ fontSize: 16, color: Colors.textSecondary, lineHeight: 24, marginBottom: 32 }}>
+                            We&apos;ll customize your home feed based on your interests.
+                        </Text>
+
+                        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                            {CATEGORIES.map((cat) => (
+                                <View key={cat.id} style={{ marginBottom: 4 }}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                                     <Chip
                                         label={cat.label.toUpperCase()}
                                         selected={selectedInterests.includes(cat.id)}
@@ -263,17 +372,27 @@ export default function ProfileCompletionScreen() {
                             title="INITIALIZE PROTOCOL"
                             onPress={nextStep}
                             loading={loading}
+<<<<<<< HEAD
                             variant="accent"
                             className="mt-16 h-18 rounded-[20px] shadow-2xl border border-white/10"
+=======
+                            style={{ marginTop: 40 }}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             disabled={selectedInterests.length === 0}
                         />
 
                         <TouchableOpacity
                             onPress={handleComplete}
+<<<<<<< HEAD
                             activeOpacity={0.8}
                             className="items-center mt-10 p-5 rounded-[20px] bg-background border border-card-border/50 shadow-inner"
                         >
                             <Text className="text-ink/40 font-jakarta-extrabold uppercase text-[10px] tracking-[4px] italic">BYPASS INITIALIZATION</Text>
+=======
+                            style={{ alignItems: 'center', marginTop: 16, padding: 8 }}
+                        >
+                            <Text style={{ color: Colors.muted, fontWeight: '600' }}>Skip for now</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         </TouchableOpacity>
                     </Animated.View>
                 )}

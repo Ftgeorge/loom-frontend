@@ -8,6 +8,7 @@ import { StatusTimeline, getJobStatusSteps } from '@/components/ui/StatusTimelin
 import { jobApi } from '@/services/api';
 import { mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import type { JobRequest } from '@/types';
 import { formatDate, formatNaira } from '@/utils/helpers';
 import { Ionicons } from '@expo/vector-icons';
@@ -65,18 +66,30 @@ export default function RequestDetailsScreen() {
     };
 
     if (loading) return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
                 <LoomThread variant="minimal" opacity={0.4} scale={1.3} />
             </View>
             <AppHeader title="REQUEST LOG" showBack onBack={() => router.back()} showNotification={false} />
             <View className="p-6"><SkeletonList count={3} /></View>
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <LoomThread variant="minimal" opacity={0.4} />
+            <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
+            <View style={{ padding: 24 }}><SkeletonList count={3} /></View>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
         </View>
     );
 
     if (error || !job) return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background">
             <AppHeader title="REQUEST LOG" showBack onBack={() => router.back()} showNotification={false} />
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <AppHeader title="Request Details" showBack onBack={() => router.back()} showNotification={false} />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
             <ErrorState onRetry={load} />
         </View>
     );
@@ -84,17 +97,24 @@ export default function RequestDetailsScreen() {
     const isTerminated = job.status === 'cancelled';
 
     return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
                 <LoomThread variant="minimal" opacity={0.2} animated scale={1.3} />
             </View>
             <AppHeader title="MISSION LOG" showBack onBack={() => router.back()} showNotification={false} />
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <LoomThread variant="minimal" opacity={0.2} animated />
+            <AppHeader title="Mission Log" showBack onBack={() => router.back()} showNotification={false} />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
 
             <ScrollView
                 className="flex-1"
                 contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 24, paddingBottom: 160 }}
                 showsVerticalScrollIndicator={false}
             >
+<<<<<<< HEAD
                 {/* ─── Service Identity ────────────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.springify()} className="mb-10 px-1">
                     <View className="flex-row items-center gap-2 mb-3">
@@ -113,14 +133,39 @@ export default function RequestDetailsScreen() {
                             </Text>
                         </View>
                         <Text className="text-label text-ink/30 text-[10px] uppercase font-jakarta-extrabold italic tracking-[2px]">REF: {job.id.substring(0, 8)}</Text>
+=======
+                {/* Service Identity */}
+                <Animated.View entering={FadeInDown.springify()} style={{ marginBottom: 40 }}>
+                    <Text style={[Typography.label, { color: Colors.primary, marginBottom: 8, letterSpacing: 2 }]}>SERVICE TYPE</Text>
+                    <Text style={[Typography.h1, { fontSize: 32 }]}>{job.category.toUpperCase().replace('_', ' / ')}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16 }}>
+                        <View style={{
+                            backgroundColor: isTerminated ? Colors.error + '10' : Colors.success + '10',
+                            paddingHorizontal: 12,
+                            paddingVertical: 4,
+                            borderRadius: Radius.xs,
+                            borderWidth: 1,
+                            borderColor: isTerminated ? Colors.error : Colors.success
+                        }}>
+                            <Text style={[Typography.label, { color: isTerminated ? Colors.error : Colors.success, fontSize: 10, fontWeight: '900' }]}>
+                                {isTerminated ? 'CANCELLED' : 'ACTIVE'}
+                            </Text>
+                        </View>
+                        <Text style={[Typography.label, { color: Colors.muted, fontSize: 10 }]}>REF: {job.id.substring(0, 8).toUpperCase()}</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                     </View>
                 </Animated.View>
 
                 {/* ─── Status Timeline ───────────────────────────────────────────── */}
                 {!isTerminated && (
                     <Animated.View entering={FadeInDown.delay(100).springify()}>
+<<<<<<< HEAD
                         <View className="mb-10 p-8 bg-white border-[1.5px] border-card-border shadow-2xl rounded-[38px]">
                             <Text className="text-label text-ink/40 mb-8 uppercase tracking-[5px] text-[10px] font-jakarta-extrabold italic">MISSION PROGRESS</Text>
+=======
+                        <Card style={{ marginBottom: 24, padding: 24, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.cardBorder, ...Shadows.sm }}>
+                            <Text style={[Typography.label, { color: Colors.primary, marginBottom: 20 }]}>PROGRESS TRACKER</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             <StatusTimeline steps={getJobStatusSteps(job.status)} />
                         </View>
                     </Animated.View>
@@ -128,8 +173,13 @@ export default function RequestDetailsScreen() {
 
                 {/* ─── Operational Intel ────────────────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(200).springify()}>
+<<<<<<< HEAD
                     <View className="p-10 bg-white border-[1.5px] border-card-border shadow-2xl rounded-[42px]">
                         <Text className="text-label text-primary mb-10 uppercase tracking-[6px] text-[11px] font-jakarta-extrabold italic">CORE INTEL</Text>
+=======
+                    <Card style={{ padding: 24, backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.cardBorder, ...Shadows.sm }}>
+                        <Text style={[Typography.label, { color: Colors.primary, marginBottom: 24 }]}>DETAILS</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
 
                         <DetailItem label="TARGET AREA" value={job.location.area.toUpperCase()} />
                         <DetailItem label="OPERATION DEBRIEF" value={job.description} isDescription />
@@ -142,6 +192,7 @@ export default function RequestDetailsScreen() {
                 {/* ─── Operative Assigned ────────────────────────────────────────── */}
                 {job.artisanName && (
                     <Animated.View entering={FadeInDown.delay(300).springify()}>
+<<<<<<< HEAD
                         <View className="mt-10 p-8 bg-ink shadow-3xl rounded-[42px] border border-white/10 overflow-hidden">
                              {/* Decorative Background Thread */}
                             <View className="absolute -top-10 -right-10 opacity-10">
@@ -164,16 +215,58 @@ export default function RequestDetailsScreen() {
                                 <View className="w-10 h-10 rounded-full bg-white/10 items-center justify-center border border-white/20">
                                     <Ionicons name="chevron-forward" size={20} color="white" />
                                 </View>
+=======
+                        <Card style={{ marginTop: 24, padding: 24, backgroundColor: Colors.primary, ...Shadows.md }}>
+                            <Text style={[Typography.label, { color: Colors.white, marginBottom: 20, opacity: 0.6 }]}>ARTISAN ASSIGNED</Text>
+                            <TouchableOpacity
+                                activeOpacity={0.8}
+                                style={{
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: 16,
+                                    backgroundColor: 'rgba(255,255,255,0.1)',
+                                    padding: 16,
+                                    borderRadius: Radius.md,
+                                    borderWidth: 1,
+                                    borderColor: 'rgba(255,255,255,0.2)'
+                                }}
+                                onPress={() => job.artisanId && router.push({ pathname: '/artisan-profile', params: { id: job.artisanId } })}
+                            >
+                                <View style={{
+                                    width: 48,
+                                    height: 48,
+                                    borderRadius: Radius.xs,
+                                    backgroundColor: Colors.white,
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <Text style={[Typography.h3, { color: Colors.primary }]}>{job.artisanName[0].toUpperCase()}</Text>
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={[Typography.h3, { color: Colors.white }]}>{job.artisanName.toUpperCase()}</Text>
+                                    <Text style={[Typography.label, { color: Colors.accent, fontSize: 8, marginTop: 4 }]}>VIEW PROFILE</Text>
+                                </View>
+                                <Ionicons name="chevron-forward" size={20} color={Colors.white} />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             </TouchableOpacity>
                         </View>
                     </Animated.View>
                 )}
 
+<<<<<<< HEAD
                 {/* ─── Authorization Actions ─────────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(400).springify()} className="mt-12 gap-6 px-1">
                     {job.artisanName && (
                         <View className="flex-row gap-5">
                             <TouchableOpacity
+=======
+                {/* Actions */}
+                <Animated.View entering={FadeInDown.delay(400).springify()} style={{ marginTop: 48, gap: 16 }}>
+                    {job.artisanName && (
+                        <View style={{ flexDirection: 'row', gap: 12 }}>
+                            <SecondaryButton
+                                title="MESSAGE"
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                                 onPress={async () => {
                                     try {
                                         const { threadApi } = await import('@/services/api');
@@ -188,6 +281,7 @@ export default function RequestDetailsScreen() {
                                         Alert.alert('Error', 'Unable to start chat at this time.');
                                     }
                                 }}
+<<<<<<< HEAD
                                 className="flex-1 h-18 rounded-[24px] border-[2.5px] border-primary bg-white items-center justify-center flex-row gap-3 shadow-lg active:bg-gray-50"
                             >
                                 <Ionicons name="chatbubble-ellipses-outline" size={20} color="#00120C" />
@@ -201,6 +295,18 @@ export default function RequestDetailsScreen() {
                                 <Ionicons name="call-outline" size={20} color="#00120C" />
                                 <Text className="text-primary font-jakarta-extrabold uppercase italic tracking-tighter text-[13px]">CALL</Text>
                             </TouchableOpacity>
+=======
+                                style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
+                                textStyle={[Typography.label, { color: Colors.primary }]}
+                            />
+                            <SecondaryButton
+                                title="CALL"
+                                onPress={() => { }}
+                                style={{ flex: 1, height: 64, borderRadius: Radius.md, borderColor: Colors.primary, borderWidth: 1.5 }}
+                                textStyle={[Typography.label, { color: Colors.primary }]}
+                                icon={<Ionicons name="call" size={18} color={Colors.primary} />}
+                            />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         </View>
                     )}
 
@@ -209,16 +315,35 @@ export default function RequestDetailsScreen() {
                             title="RATE & REVIEW OPERATIVE"
                             onPress={() => router.push({ pathname: '/rate-review', params: { jobId: job.id } })}
                             variant="accent"
+<<<<<<< HEAD
                             className="h-18 rounded-[24px] shadow-2xl border border-white/10"
+=======
+                            style={{ height: 64, borderRadius: Radius.md }}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         />
                     )}
 
                     {!['completed', 'cancelled'].includes(job.status) && (
                         <TouchableOpacity
+<<<<<<< HEAD
                             className="items-center justify-center p-6 rounded-[24px] border-[2px] border-error/30 mt-4 bg-white/50 shadow-sm active:bg-error/10"
                             onPress={handleCancel}
                         >
                             <Text className="text-[12px] text-error font-jakarta-extrabold tracking-[4px] uppercase italic">CANCEL MISSION PROTOCOL</Text>
+=======
+                            style={{
+                                alignItems: 'center',
+                                padding: 20,
+                                borderRadius: Radius.md,
+                                borderWidth: 1.5,
+                                borderColor: Colors.error,
+                                marginTop: 12,
+                                backgroundColor: Colors.white
+                            }}
+                            onPress={handleCancel}
+                        >
+                            <Text style={[Typography.label, { color: Colors.error, fontWeight: '900', letterSpacing: 1 }]}>CANCEL REQUEST</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         </TouchableOpacity>
                     )}
                 </Animated.View>
@@ -230,3 +355,21 @@ export default function RequestDetailsScreen() {
         </View>
     );
 }
+<<<<<<< HEAD
+=======
+
+function DetailItem({ label, value }: { label: string; value: string }) {
+    return (
+        <View style={{ marginBottom: 24 }}>
+            <Text style={[Typography.label, { fontSize: 8, color: Colors.muted, marginBottom: 8 }]}>{label}</Text>
+            <Text style={[Typography.body, {
+                color: Colors.primary,
+                fontWeight: '700',
+                fontSize: 15,
+                lineHeight: 22
+            }]}>{value}</Text>
+        </View>
+    );
+}
+
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)

@@ -1,3 +1,4 @@
+import { AppHeader } from '@/components/AppHeader';
 import { SubAppHeader } from '@/components/AppSubHeader';
 import { LoomThread } from '@/components/ui/LoomThread';
 import { RequestCard } from '@/components/ui/RequestCard';
@@ -7,6 +8,7 @@ import { ErrorState } from '@/components/ui/StateComponents';
 import { jobApi } from '@/services/api';
 import { mapJob } from '@/services/mappers';
 import { useAppStore } from '@/store';
+import { Colors, Radius, Typography } from '@/theme';
 import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
@@ -17,7 +19,7 @@ const SEGMENTS = ['ACTIVE', 'COMPLETED', 'CANCELLED'];
 
 export default function RequestsScreen() {
     const router = useRouter();
-    const { jobs, setJobs } = useAppStore();
+    const { jobs, setJobs, language } = useAppStore();
     const [segIdx, setSegIdx] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
@@ -64,18 +66,27 @@ export default function RequestsScreen() {
     }, [load]);
 
     return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
                 <LoomThread variant="minimal" opacity={0.2} animated />
             </View>
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <LoomThread variant="minimal" opacity={0.2} animated />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
             <SubAppHeader
                 label="ACTIVITY TRACKER"
                 title="MY BOOKINGS"
                 description="Monitor your service requests and operational deployments."
                 onNotification={() => router.push('/notifications')}
             />
+<<<<<<< HEAD
             
             <View className="px-6 py-6 border-b border-card-border/30 bg-white/50 backdrop-blur-xl">
+=======
+            <View style={{ paddingHorizontal: 24 }}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                 <SegmentedControl
                     segments={SEGMENTS}
                     selected={segIdx}
@@ -84,6 +95,7 @@ export default function RequestsScreen() {
             </View>
 
             {loading ? (
+<<<<<<< HEAD
                 <View className="p-7"><SkeletonList count={3} type="request" /></View>
             ) : error ? (
                 <ErrorState onRetry={load} />
@@ -101,6 +113,26 @@ export default function RequestsScreen() {
                             {segIdx === 0 ? 'NO ACTIVE REQUESTS' : segIdx === 1 ? 'NO COMPLETED REQUESTS' : 'NO CANCELLED REQUESTS'}
                         </Text>
                         <Text className="text-body text-center text-ink/50 mt-4 leading-5 font-jakarta-medium max-w-[240px]">
+=======
+                <View style={{ padding: 24 }}><SkeletonList count={3} type="request" /></View>
+            ) : error ? (
+                <ErrorState onRetry={load} />
+            ) : jobs.length === 0 ? (
+                <View style={{ flex: 1, justifyContent: 'center', padding: 24 }}>
+                    <View style={{
+                        padding: 48,
+                        alignItems: 'center',
+                        borderStyle: 'dashed',
+                        backgroundColor: Colors.white,
+                        borderColor: Colors.cardBorder,
+                        borderRadius: Radius.md,
+                        borderWidth: 1.5
+                    }}>
+                        <Text style={[Typography.h3, { textAlign: 'center', color: Colors.primary }]}>
+                            {segIdx === 0 ? 'NO ACTIVE REQUESTS' : segIdx === 1 ? 'NO COMPLETED REQUESTS' : 'NO CANCELLED REQUESTS'}
+                        </Text>
+                        <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted, marginTop: 12, lineHeight: 20 }]}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             {segIdx === 0
                                 ? "You don't have any active service requests deployed at the moment."
                                 : "Your past request logs will appear here once they are processed."}
@@ -117,9 +149,14 @@ export default function RequestsScreen() {
                     initialNumToRender={10}
                     maxToRenderPerBatch={10}
                     windowSize={5}
+<<<<<<< HEAD
                     refreshControl={
                         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00120C" />
                     }
+=======
+                    removeClippedSubviews={true}
+                    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); }} tintColor={Colors.primary} />}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                     renderItem={({ item, index }) => (
                         <Animated.View entering={FadeInDown.delay(index * 100).springify()}>
                             <RequestCard
@@ -128,7 +165,7 @@ export default function RequestsScreen() {
                             />
                         </Animated.View>
                     )}
-                    ItemSeparatorComponent={() => <View className="h-4" />}
+                    ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
                 />
             )}
             
@@ -138,5 +175,8 @@ export default function RequestsScreen() {
         </View>
     );
 }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)

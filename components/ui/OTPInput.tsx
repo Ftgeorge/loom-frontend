@@ -1,21 +1,20 @@
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import React, { useRef, useState } from 'react';
 import {
     NativeSyntheticEvent,
     Text,
     TextInput,
     TextInputKeyPressEventData,
-    View,
-    Platform
+    View
 } from 'react-native';
 
 interface OTPInputProps {
     length?: number;
     onComplete: (code: string) => void;
     error?: string;
-    className?: string;
 }
 
-export function OTPInput({ length = 6, onComplete, error, className = '' }: OTPInputProps) {
+export function OTPInput({ length = 6, onComplete, error }: OTPInputProps) {
     const [values, setValues] = useState<string[]>(Array(length).fill(''));
     const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
     const refs = useRef<(TextInput | null)[]>([]);
@@ -44,29 +43,31 @@ export function OTPInput({ length = 6, onComplete, error, className = '' }: OTPI
     };
 
     return (
-        <View className={className}>
-            <View className="flex-row justify-center gap-[10px]">
+        <View>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10 }}>
                 {values.map((val, i) => {
                     const isFocused = focusedIndex === i;
                     const hasError = !!error;
-
-                    const getBorderClass = () => {
-                        if (hasError) return 'border-error';
-                        if (isFocused) return 'border-primary';
-                        return 'border-card-border';
-                    };
-
-                    const getBackgroundClass = () => {
-                        if (isFocused) return 'bg-white';
-                        return 'bg-surface';
-                    };
 
                     return (
                         <TextInput
                             key={i}
                             ref={(r) => { refs.current[i] = r; }}
-                            className={`w-[53px] h-[60px] rounded-md border-[1.5px] text-[24px] font-jakarta-bold text-ink text-center shadow-sm ${getBorderClass()} ${getBackgroundClass()}`}
-                            style={Platform.OS === 'web' ? ({ outlineStyle: 'none' } as any) : {}}
+                            style={[
+                                {
+                                    width: 53,
+                                    height: 60,
+                                    borderRadius: Radius.md,
+                                    borderWidth: 1.5,
+                                    backgroundColor: isFocused ? Colors.white : Colors.surface,
+                                    borderColor: hasError ? Colors.error : (isFocused ? Colors.primary : Colors.cardBorder),
+                                    fontSize: 24,
+                                    fontFamily: 'PlusJakartaSans-Bold',
+                                    color: Colors.text,
+                                    textAlign: 'center',
+                                    ...Shadows.sm
+                                }
+                            ]}
                             value={val}
                             onFocus={() => setFocusedIndex(i)}
                             onBlur={() => setFocusedIndex(null)}
@@ -80,12 +81,11 @@ export function OTPInput({ length = 6, onComplete, error, className = '' }: OTPI
                 })}
             </View>
             {error && (
-                <Text className="text-label text-error mt-3 text-center normal-case text-[11px] tracking-normal">
+                <Text style={[Typography.label, { color: Colors.error, marginTop: 12, textAlign: 'center', fontSize: 11 }]}>
                     {error}
                 </Text>
             )}
         </View>
     );
 }
-
 

@@ -3,9 +3,12 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { RequestCard } from '@/components/ui/RequestCard';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { SkeletonList } from '@/components/ui/SkeletonLoader';
-import { ErrorState } from '@/components/ui/StateComponents';
+import { EmptyState, ErrorState } from '@/components/ui/StateComponents';
+import { t } from '@/i18n';
 import { jobApi } from '@/services/api';
 import { mapJob } from '@/services/mappers';
+import { useAppStore } from '@/store';
+import { Colors, Radius, Typography } from '@/theme';
 import type { JobRequest } from '@/types';
 import { useRouter, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -17,6 +20,7 @@ const SEGMENTS = ['INCOMING', 'ACTIVE', 'HISTORY'];
 
 export default function JobsScreen() {
     const router = useRouter();
+    const { language } = useAppStore();
     const [segIdx, setSegIdx] = useState(0);
     const [jobs, setJobs] = useState<JobRequest[]>([]);
     const [loading, setLoading] = useState(true);
@@ -48,16 +52,21 @@ export default function JobsScreen() {
     );
 
     const filtered = jobs.filter((j) => {
-        if (segIdx === 0) return j.status === 'submitted' || j.status === 'matched';
-        if (segIdx === 1) return ['accepted', 'on_the_way', 'in_progress'].includes(j.status);
-        return j.status === 'completed' || j.status === 'cancelled';
+        if (segIdx === 0) return j.status === 'submitted';
+        if (segIdx === 1) return ['matched', 'scheduled', 'in_progress'].includes(j.status);
+        return j.status === 'completed';
     });
 
     return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
                 <LoomThread variant="minimal" opacity={0.2} animated />
             </View>
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <LoomThread variant="minimal" opacity={0.2} animated />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
             <SubAppHeader
                 label="OPERATIONAL LOG"
                 title="SERVICE JOBS"
@@ -65,7 +74,11 @@ export default function JobsScreen() {
                 onNotification={() => router.push('/notifications')}
             />
 
+<<<<<<< HEAD
             <View className="px-6 py-6 border-b border-card-border/30 bg-white/50 backdrop-blur-xl">
+=======
+            <View style={{ paddingHorizontal: 24, paddingVertical: 20 }}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                 <SegmentedControl
                     segments={SEGMENTS}
                     selected={segIdx}
@@ -74,6 +87,7 @@ export default function JobsScreen() {
             </View>
 
             {loading ? (
+<<<<<<< HEAD
                 <View className="p-7"><SkeletonList count={3} type="request" /></View>
             ) : error ? (
                 <ErrorState onRetry={load} />
@@ -91,6 +105,26 @@ export default function JobsScreen() {
                             {segIdx === 0 ? 'NO MISSION REQUESTS' : segIdx === 1 ? 'ZERO ACTIVE JOBS' : 'EMPTY HISTORY LOG'}
                         </Text>
                         <Text className="text-body text-center text-ink/50 mt-4 leading-5 font-jakarta-medium max-w-[240px]">
+=======
+                <View style={{ padding: 24 }}><SkeletonList count={3} type="request" /></View>
+            ) : error ? (
+                <ErrorState onRetry={load} />
+            ) : filtered.length === 0 ? (
+                <View style={{ flex: 1, justifyContent: 'center', padding: 24 }}>
+                    <View style={{
+                        padding: 48,
+                        alignItems: 'center',
+                        borderStyle: 'dashed',
+                        backgroundColor: Colors.surface,
+                        borderColor: Colors.cardBorder,
+                        borderRadius: Radius.md,
+                        borderWidth: 1.5
+                    }}>
+                        <Text style={[Typography.h3, { textAlign: 'center', color: Colors.primary }]}>
+                            {segIdx === 0 ? 'NO NEW REQUESTS' : segIdx === 1 ? 'NO ACTIVE JOBS' : 'NO JOB HISTORY'}
+                        </Text>
+                        <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted, marginTop: 12, lineHeight: 20 }]}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             {segIdx === 0
                                 ? 'Your transmission frequency is clear. We will alert you when a mission is available.'
                                 : segIdx === 1
@@ -113,7 +147,7 @@ export default function JobsScreen() {
                                 setRefreshing(true);
                                 load();
                             }}
-                            tintColor="#00120C"
+                            tintColor={Colors.primary}
                         />
                     }
                     renderItem={({ item, index }) => (
@@ -125,7 +159,7 @@ export default function JobsScreen() {
                             />
                         </Animated.View>
                     )}
-                    ItemSeparatorComponent={() => <View className="h-4" />}
+                    ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
                 />
             )}
             
@@ -135,5 +169,8 @@ export default function JobsScreen() {
         </View>
     );
 }
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)

@@ -6,7 +6,7 @@ export default function AuthLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: "#F5F3EF" },
+        contentStyle: { backgroundColor: "#F5F3EF" }, // loom-bg matching React Navigation's prop requirement
         animation: "slide_from_right",
       }}
     />

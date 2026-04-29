@@ -121,6 +121,7 @@ export default function OTPScreen() {
                         </View>
                     )}
 
+<<<<<<< HEAD
                     <View className="mt-16 p-7 bg-white rounded-[28px] border-[1.5px] border-card-border shadow-md">
                         <View className="flex-row items-center gap-3 mb-2">
                             <Ionicons name="alert-circle-outline" size={18} color="#64748B" />
@@ -129,6 +130,19 @@ export default function OTPScreen() {
                         <Text className="text-body-sm text-muted leading-5 font-jakarta-medium normal-case">
                             Check repository spam if missing. Authentication key neutralizes in{' '}
                             <Text className="text-primary font-jakarta-extrabold italic">10 MINUTES.</Text>
+=======
+                    <View style={{
+                        marginTop: 48,
+                        padding: 20,
+                        backgroundColor: Colors.surface,
+                        borderRadius: Radius.md,
+                        borderWidth: 1,
+                        borderColor: Colors.cardBorder
+                    }}>
+                        <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted }]}>
+                            Don't see it? Check your spam. It expires in{' '}
+                            <Text style={{ fontWeight: '600', color: Colors.text }}>10 minutes.</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         </Text>
                     </View>
                     

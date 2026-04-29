@@ -1,5 +1,8 @@
 import { AppHeader } from '@/components/AppHeader';
+import { PrimaryButton } from '@/components/ui/Buttons';
+import { Card } from '@/components/ui/CardChipBadge';
 import { artisanApi, skillApi } from '@/services/api';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -23,11 +26,17 @@ export default function ManageSkillsScreen() {
                 artisanApi.meProfile()
             ]);
             setMySkills(me);
+            // Filter out skills I already have
             const meIds = new Set(me.map(s => s.skill_id));
             setAvailableSkills(all.filter(s => !meIds.has(s.id)));
             
+<<<<<<< HEAD
             if (profile?.id) {
                  setArtisanProfileId(profile.id);
+=======
+            if ((all as any).id) { // This is just to satisfy the Promise.all Destructuring if I returned profile as 3rd
+                 setArtisanProfileId((all as any).id);
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
             }
         } catch (err: any) {
             Alert.alert('System Error', err.message || 'Failed to load skill matrix');
@@ -84,18 +93,27 @@ export default function ManageSkillsScreen() {
     };
 
     if (loading) return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background justify-center items-center">
             <LoomThread variant="minimal" animated opacity={0.3} scale={1.5} />
             <ActivityIndicator size="large" color="#00120C" />
             <Text className="text-label text-ink/40 mt-6 uppercase tracking-[5px] font-jakarta-extrabold italic">SYNCING GRID...</Text>
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background, justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
         </View>
     );
 
     return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
                 <LoomThread variant="minimal" opacity={0.2} animated scale={1.3} />
             </View>
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
             <AppHeader
                 title="SKILL MATRIX"
                 showBack
@@ -103,6 +121,7 @@ export default function ManageSkillsScreen() {
                 showNotification={false}
             />
 
+<<<<<<< HEAD
             <ScrollView 
                 className="flex-1"
                 contentContainerStyle={{ paddingHorizontal: 32, paddingTop: 24, paddingBottom: 160 }}
@@ -123,6 +142,18 @@ export default function ManageSkillsScreen() {
                                 <Ionicons name="warning-outline" size={24} color="#EF4444" className="opacity-40" />
                                 <Text className="text-label text-error/60 mt-3 uppercase font-jakarta-extrabold italic tracking-widest text-[11px]">No skills detected in profile</Text>
                             </View>
+=======
+            <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>
+                <View style={{ marginBottom: 32 }}>
+                    <Text style={[Typography.h3, { marginBottom: 8 }]}>Your Skills</Text>
+                    <Text style={[Typography.bodySmall, { color: Colors.muted, marginBottom: 16 }]}>
+                        These skills are visible on your profile. Remove those you no longer offer.
+                    </Text>
+                    
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                        {mySkills.length === 0 ? (
+                            <Text style={[Typography.bodySmall, { fontStyle: 'italic', color: Colors.error }]}>You haven't added any skills yet.</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         ) : (
                             mySkills.map((skill) => (
                                 <Animated.View 
@@ -130,10 +161,27 @@ export default function ManageSkillsScreen() {
                                     entering={FadeInUp.springify()} 
                                     layout={Layout.springify()}
                                 >
+<<<<<<< HEAD
                                     <View className="flex-row items-center bg-primary/10 px-6 py-3.5 rounded-full border border-primary/20 gap-3 shadow-sm">
                                         <Text className="text-[11px] text-primary uppercase font-jakarta-extrabold italic tracking-widest">{skill.name.toUpperCase()}</Text>
                                         <TouchableOpacity onPress={() => handleRemoveSkill(skill.skill_id)} activeOpacity={0.7}>
                                             <Ionicons name="close-circle-outline" size={20} color="#078365" />
+=======
+                                    <View style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        backgroundColor: Colors.primary + '10',
+                                        paddingHorizontal: 12,
+                                        paddingVertical: 8,
+                                        borderRadius: Radius.full,
+                                        borderWidth: 1,
+                                        borderColor: Colors.primary + '30',
+                                        gap: 6
+                                    }}>
+                                        <Text style={[Typography.label, { color: Colors.primary, fontSize: 13 }]}>{skill.name}</Text>
+                                        <TouchableOpacity onPress={() => handleRemoveSkill(skill.skill_id)}>
+                                            <Ionicons name="close-circle" size={18} color={Colors.primary} />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                                         </TouchableOpacity>
                                     </View>
                                 </Animated.View>
@@ -144,6 +192,7 @@ export default function ManageSkillsScreen() {
 
                 {/* ─── Discovery Matrix ────────────────────────────────────────── */}
                 <View>
+<<<<<<< HEAD
                     <View className="flex-row items-center gap-2 mb-3 px-1">
                         <View className="w-1.5 h-1.5 rounded-full bg-accent shadow-sm" />
                         <Text className="text-label text-accent tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">GRID DISCOVERY</Text>
@@ -152,6 +201,14 @@ export default function ManageSkillsScreen() {
                     <Text className="text-[15px] text-ink/60 mb-10 normal-case font-jakarta-medium italic">Tap to add new capabilities to your operational identity.</Text>
 
                     <View className="flex-row flex-wrap gap-4">
+=======
+                    <Text style={[Typography.h3, { marginBottom: 8 }]}>Available Skills</Text>
+                    <Text style={[Typography.bodySmall, { color: Colors.muted, marginBottom: 16 }]}>
+                        Tap a skill to add it to your profile.
+                    </Text>
+
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         {availableSkills.map((skill) => (
                             <Animated.View 
                                 key={skill.id} 
@@ -161,6 +218,7 @@ export default function ManageSkillsScreen() {
                                 <TouchableOpacity 
                                     onPress={() => handleAddSkill(skill)}
                                     disabled={saving}
+<<<<<<< HEAD
                                     activeOpacity={0.8}
                                     className="flex-row items-center bg-white px-6 py-4 rounded-3xl border-[1.5px] border-card-border/50 gap-3 shadow-xl active:scale-95 active:bg-gray-50 transition-transform"
                                 >
@@ -168,6 +226,23 @@ export default function ManageSkillsScreen() {
                                         <Ionicons name="add" size={16} color="#00120C" />
                                     </View>
                                     <Text className="text-[12px] text-ink uppercase font-jakarta-extrabold italic tracking-tight">{skill.name.toUpperCase()}</Text>
+=======
+                                    style={{
+                                        flexDirection: 'row',
+                                        alignItems: 'center',
+                                        backgroundColor: Colors.white,
+                                        paddingHorizontal: 16,
+                                        paddingVertical: 10,
+                                        borderRadius: Radius.full,
+                                        borderWidth: 1,
+                                        borderColor: Colors.cardBorder,
+                                        gap: 6,
+                                        ...Shadows.xs
+                                    }}
+                                >
+                                    <Ionicons name="add" size={16} color={Colors.muted} />
+                                    <Text style={[Typography.label, { color: Colors.ink, fontSize: 13 }]}>{skill.name}</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                                 </TouchableOpacity>
                             </Animated.View>
                         ))}
@@ -176,6 +251,7 @@ export default function ManageSkillsScreen() {
             </ScrollView>
 
             {saving && (
+<<<<<<< HEAD
                 <Animated.View 
                     entering={FadeIn}
                     className="absolute inset-0 bg-background/80 justify-center items-center backdrop-blur-md"
@@ -185,6 +261,17 @@ export default function ManageSkillsScreen() {
                     </View>
                     <Text className="text-label text-ink/40 mt-8 uppercase tracking-[5px] font-jakarta-extrabold italic">UPDATING MATRIX...</Text>
                 </Animated.View>
+=======
+                <View style={{ 
+                    position: 'absolute', 
+                    top: 0, left: 0, right: 0, bottom: 0, 
+                    backgroundColor: 'rgba(255,255,255,0.7)', 
+                    justifyContent: 'center', 
+                    alignItems: 'center' 
+                }}>
+                    <ActivityIndicator size="large" color={Colors.primary} />
+                </View>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
             )}
             
             <View className="absolute bottom-12 left-0 right-0 items-center pointer-events-none opacity-20">

@@ -3,6 +3,7 @@ import { PrimaryButton } from '@/components/ui/Buttons';
 import { Card } from '@/components/ui/CardChipBadge';
 import { AppTextInput } from '@/components/ui/TextInputs';
 import { artisanApi } from '@/services/api';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -62,18 +63,27 @@ export default function VerificationScreen() {
     };
 
     if (loading) return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background justify-center items-center">
             <LoomThread variant="minimal" animated opacity={0.3} scale={1.5} />
             <ActivityIndicator size="large" color="#00120C" />
             <Text className="text-label text-ink/40 mt-6 uppercase tracking-[5px] font-jakarta-extrabold italic">SYNCING IDENTITY HUB...</Text>
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background, justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
         </View>
     );
 
     return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
                 <LoomThread variant="minimal" opacity={0.2} animated scale={1.3} />
             </View>
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
             <AppHeader
                 title={isFromOnboarding ? "FINAL AUDIT" : "IDENTITY SCAN"}
                 showBack={!isFromOnboarding}
@@ -87,6 +97,7 @@ export default function VerificationScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {isFromOnboarding && !verification && (
+<<<<<<< HEAD
                     <Animated.View entering={FadeInDown.delay(200).springify()} className="mb-12">
                         <View className="bg-primary rounded-[42px] p-8 shadow-2xl border border-white/10 overflow-hidden">
                             <View className="flex-row gap-5 items-center">
@@ -97,20 +108,39 @@ export default function VerificationScreen() {
                                     <Text className="text-[20px] text-white uppercase italic font-jakarta-extrabold tracking-tighter">WELCOME TO LOOM</Text>
                                     <Text className="text-[13px] text-white/80 mt-1 italic font-jakarta-medium leading-5">
                                         Verify your identity to unlock core features and begin operational tasks.
+=======
+                    <Animated.View entering={FadeInUp.delay(200).springify()}>
+                        <Card style={{ backgroundColor: Colors.primary, marginBottom: 32, padding: 20 }}>
+                            <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
+                                <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.white + '20', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Ionicons name="sparkles" size={20} color={Colors.white} />
+                                </View>
+                                <View style={{ flex: 1 }}>
+                                    <Text style={[Typography.h3, { color: Colors.white, fontSize: 16 }]}>Welcome to Loom! 🎊</Text>
+                                    <Text style={[Typography.bodySmall, { color: Colors.white, opacity: 0.9, marginTop: 4 }]}>
+                                        You&apos;re almost there. Verify your identity now to unlock all features and start earning.
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                                     </Text>
                                 </View>
                             </View>
                             <TouchableOpacity 
                                 onPress={() => router.replace('/(tabs)/dashboard')}
+<<<<<<< HEAD
                                 className="mt-6 self-end px-4 py-2 bg-white/10 rounded-full border border-white/20 active:bg-white/20"
                             >
                                 <Text className="text-label text-white text-[9px] uppercase font-jakarta-extrabold italic tracking-widest">I&apos;LL VERIFY LATER</Text>
+=======
+                                style={{ marginTop: 16, alignSelf: 'flex-end', padding: 8 }}
+                            >
+                                <Text style={[Typography.label, { color: Colors.white, fontSize: 10, textDecorationLine: 'underline' }]}>I&apos;LL DO THIS LATER</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             </TouchableOpacity>
                         </View>
                     </Animated.View>
                 )}
 
                 {verification ? (
+<<<<<<< HEAD
                     <Animated.View entering={FadeInUp.springify()} className="mt-10">
                         <View className="p-12 items-center bg-white rounded-[48px] border-[1.5px] border-card-border/50 shadow-3xl">
                             <View className={`w-20 h-20 rounded-[28px] items-center justify-center mb-8 shadow-xl ${
@@ -126,6 +156,29 @@ export default function VerificationScreen() {
                                 {verification.status}
                             </Text>
                             <Text className="text-[15px] text-center text-ink/60 mt-4 normal-case leading-6 italic font-jakarta-medium">
+=======
+                    <Animated.View entering={FadeInUp.springify()}>
+                        <Card style={{ padding: 24, alignItems: 'center' }}>
+                            <View style={{
+                                width: 64,
+                                height: 64,
+                                borderRadius: 32,
+                                backgroundColor: verification.status === 'approved' ? Colors.success + '20' : verification.status === 'rejected' ? Colors.error + '20' : Colors.warning + '20',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginBottom: 16
+                            }}>
+                                <Ionicons
+                                    name={verification.status === 'approved' ? 'checkmark-circle' : verification.status === 'rejected' ? 'close-circle' : 'time-outline'}
+                                    size={32}
+                                    color={verification.status === 'approved' ? Colors.success : verification.status === 'rejected' ? Colors.error : Colors.warning}
+                                />
+                            </View>
+                            <Text style={[Typography.h2, { textAlign: 'center' }]}>
+                                {verification.status.toUpperCase()}
+                            </Text>
+                            <Text style={[Typography.bodySmall, { textAlign: 'center', color: Colors.muted, marginTop: 8 }]}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                                 {verification.status === 'pending'
                                     ? 'Our intelligence team is currently reviewing your documents. This protocol usually completes within 24-48 hours.'
                                     : verification.status === 'approved'
@@ -143,14 +196,19 @@ export default function VerificationScreen() {
                                             setVerification(null);
                                         }
                                     }}
+<<<<<<< HEAD
                                     variant={verification.status === 'approved' ? 'accent' : 'primary'}
                                     className="mt-12 w-full h-18 rounded-3xl shadow-2xl border border-white/10"
+=======
+                                    style={{ marginTop: 24, width: '100%' }}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                                 />
                             )}
                         </View>
                     </Animated.View>
                 ) : (
                     <Animated.View entering={FadeInUp.springify()}>
+<<<<<<< HEAD
                         <View className="flex-row items-center gap-2 mb-4 px-1">
                             <View className="w-1.5 h-1.5 rounded-full bg-primary shadow-sm" />
                             <Text className="text-label text-primary tracking-[6px] uppercase font-jakarta-extrabold italic text-[11px]">IDENTIFICATION PROTOCOL</Text>
@@ -181,11 +239,42 @@ export default function VerificationScreen() {
                         <AppTextInput
                             label="FIELD IDENTIFIER (ID NUMBER)"
                             placeholder="OPERATIVE CARD NUMBER"
+=======
+                        <Text style={[Typography.h3, { marginBottom: 8 }]}>Select Document Type</Text>
+                        <View style={{ flexDirection: 'row', gap: 10, marginBottom: 24 }}>
+                            {['nin', 'bvn', 'voter_id'].map((type) => (
+                                <TouchableOpacity
+                                    key={type}
+                                    onPress={() => setDocType(type)}
+                                    style={{
+                                        flex: 1,
+                                        paddingVertical: 12,
+                                        borderRadius: Radius.xs,
+                                        borderWidth: 1.5,
+                                        borderColor: docType === type ? Colors.primary : Colors.cardBorder,
+                                        backgroundColor: docType === type ? Colors.primary + '10' : Colors.white,
+                                        alignItems: 'center'
+                                    }}
+                                >
+                                    <Text style={{
+                                        fontSize: 12,
+                                        fontFamily: 'PlusJakartaSans-Bold',
+                                        color: docType === type ? Colors.primary : Colors.muted
+                                    }}>{type.toUpperCase()}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        <AppTextInput
+                            label="Document Number"
+                            placeholder="Enter your card number"
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             value={docNumber}
                             onChangeText={setDocNumber}
                             className="h-18 rounded-3xl border-card-border/50 shadow-2xl"
                         />
 
+<<<<<<< HEAD
                         <View className="mt-12">
                             <Text className="text-label mb-5 text-primary uppercase tracking-[5px] text-[10px] font-jakarta-extrabold italic px-1">DIGITAL ASSET SCAN</Text>
                             <TouchableOpacity activeOpacity={0.9} className="h-56 rounded-[32px] border-2 border-dashed border-card-border/50 items-center justify-center bg-white shadow-3xl active:bg-gray-50 transition-all">
@@ -193,6 +282,22 @@ export default function VerificationScreen() {
                                     <Ionicons name="camera-outline" size={32} color="#00120C" />
                                 </View>
                                 <Text className="text-ink/40 mt-2 uppercase text-[11px] font-jakarta-extrabold italic tracking-widest">TAP TO CAPTURE ASSET</Text>
+=======
+                        <View style={{ marginTop: 24 }}>
+                            <Text style={[Typography.h3, { marginBottom: 12 }]}>Upload Document Image</Text>
+                            <TouchableOpacity style={{
+                                height: 160,
+                                borderRadius: Radius.md,
+                                borderWidth: 2,
+                                borderStyle: 'dashed',
+                                borderColor: Colors.cardBorder,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: Colors.white
+                            }}>
+                                <Ionicons name="cloud-upload-outline" size={40} color={Colors.muted} />
+                                <Text style={{ color: Colors.muted, marginTop: 12 }}>Tap to capture or upload</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             </TouchableOpacity>
                         </View>
 
@@ -200,8 +305,12 @@ export default function VerificationScreen() {
                             title="SUBMIT FOR AUDIT"
                             onPress={handleSubmit}
                             loading={submitting}
+<<<<<<< HEAD
                             variant="accent"
                             className="mt-16 h-18 rounded-3xl shadow-3xl border border-white/10"
+=======
+                            style={{ marginTop: 40, height: 60, borderRadius: Radius.sm, ...Shadows.md }}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         />
                         
                         <View className="mt-10 items-center flex-row justify-center gap-2 opacity-20">

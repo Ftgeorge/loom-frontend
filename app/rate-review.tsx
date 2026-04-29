@@ -2,7 +2,12 @@ import { AppHeader } from '@/components/AppHeader';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { Chip } from '@/components/ui/CardChipBadge';
 import { Toast } from '@/components/ui/StateComponents';
+<<<<<<< HEAD
 import { LoomThread } from '@/components/ui/LoomThread';
+=======
+import { AppTextInput } from '@/components/ui/TextInputs';
+import { Colors, Typography } from '@/theme';
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
 import { jobApi } from '@/services/api';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -28,6 +33,9 @@ export default function RateReviewScreen() {
     };
 
     const handleSubmit = async () => {
+        if (!jobId) {
+            // No jobId in params — still allow review to be submitted locally
+        }
         setLoading(true);
         try {
             if (jobId) {
@@ -46,6 +54,7 @@ export default function RateReviewScreen() {
     };
 
     return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
                 <LoomThread variant="minimal" opacity={0.3} animated scale={1.3} />
@@ -70,6 +79,23 @@ export default function RateReviewScreen() {
                 {/* ─── Tactical Star Matrix ────────────────────────────────────────── */}
                 <Animated.View entering={FadeInDown.delay(200).springify()} className="mb-14 p-10 bg-white border-[1.5px] border-card-border/50 rounded-[48px] shadow-2xl">
                     <View className="flex-row justify-center gap-4">
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <AppHeader title="Rate Experience" showBack onBack={() => router.back()} showNotification={false} />
+
+            <ScrollView
+                contentContainerStyle={{ padding: 24, paddingBottom: 100 }}
+                showsVerticalScrollIndicator={false}
+            >
+                <Animated.View entering={FadeInDown.delay(100)} style={{ alignItems: 'center', marginVertical: 32 }}>
+                    <Text style={[Typography.h1, { textAlign: 'center', fontSize: 24 }]}>How was your service?</Text>
+                    <Text style={[Typography.body, { color: Colors.muted, marginTop: 8 }]}>Your feedback helps our pros grow.</Text>
+                </Animated.View>
+
+                {/* Star Rating */}
+                <Animated.View entering={FadeInDown.delay(200)} style={{ marginBottom: 40 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12 }}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         {[1, 2, 3, 4, 5].map((star) => (
                             <TouchableOpacity
                                 key={star}
@@ -80,14 +106,20 @@ export default function RateReviewScreen() {
                                 <Animated.View entering={ZoomIn.delay(star * 100).springify()}>
                                     <Ionicons
                                         name={star <= rating ? "star" : "star-outline"}
+<<<<<<< HEAD
                                         size={44}
                                         color={star <= rating ? "#F59E0B" : "#CBD5E1"}
                                         style={star <= rating ? { shadowColor: '#F59E0B', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.5, shadowRadius: 10 } : {}}
+=======
+                                        size={48}
+                                        color={star <= rating ? Colors.accent : Colors.cardBorder}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                                     />
                                 </Animated.View>
                             </TouchableOpacity>
                         ))}
                     </View>
+<<<<<<< HEAD
                     <Text className={`text-[12px] font-jakarta-extrabold text-center mt-8 uppercase italic tracking-[4px] ${rating > 0 ? 'text-primary' : 'text-muted/40'}`}>
                         {rating === 0 ? 'TAP TO CALIBRATE' : rating <= 2 ? 'NEEDS RE-EVALUATION' : rating <= 4 ? 'SATISFACTORY DEPLOYMENT' : 'EXCEPTIONAL EXECUTION'}
                     </Text>
@@ -139,6 +171,46 @@ export default function RateReviewScreen() {
                         disabled={rating === 0}
                         variant="accent"
                         className="h-18 rounded-3xl shadow-2xl border border-white/10"
+=======
+                    <Text style={[Typography.h3, { textAlign: 'center', marginTop: 16, color: rating > 0 ? Colors.primary : Colors.muted }]}>
+                        {rating === 0 ? 'Tap to rate' : rating <= 2 ? 'Could be better' : rating <= 4 ? 'Great experience' : 'Exceptional!'}
+                    </Text>
+                </Animated.View>
+
+                {/* Tags */}
+                <Animated.View entering={FadeInDown.delay(300)} style={{ marginBottom: 40 }}>
+                    <Text style={[Typography.h3, { marginBottom: 16 }]}>What went well?</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                        {TAGS.map((tag) => (
+                            <Chip
+                                key={tag}
+                                label={tag}
+                                selected={selectedTags.includes(tag)}
+                                onPress={() => toggleTag(tag)}
+                            />
+                        ))}
+                    </View>
+                </Animated.View>
+
+                {/* Comment */}
+                <Animated.View entering={FadeInDown.delay(400)}>
+                    <AppTextInput
+                        label="Share more details (Optional)"
+                        placeholder="What else would you like to tell us?"
+                        value={comment}
+                        onChangeText={setComment}
+                        multiline
+                        numberOfLines={4}
+                        style={{ minHeight: 120, textAlignVertical: 'top', paddingTop: 16 }}
+                    />
+
+                    <PrimaryButton
+                        title="Submit Review"
+                        onPress={handleSubmit}
+                        loading={loading}
+                        disabled={rating === 0}
+                        style={{ marginTop: 40 }}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                     />
                 </Animated.View>
             </ScrollView>
@@ -151,3 +223,7 @@ export default function RateReviewScreen() {
         </View>
     );
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)

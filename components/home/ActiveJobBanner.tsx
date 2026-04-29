@@ -1,3 +1,4 @@
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { CATEGORIES } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
@@ -8,49 +9,57 @@ import type { JobRequest } from '@/types';
 interface ActiveJobBannerProps {
     job: JobRequest;
     onPress: () => void;
-    className?: string;
 }
 
-export function ActiveJobBanner({ job, onPress, className = '' }: ActiveJobBannerProps) {
+export function ActiveJobBanner({ job, onPress }: ActiveJobBannerProps) {
     return (
-        <Animated.View entering={FadeInDown.delay(200).springify()} className={`mb-8 ${className}`}>
+        <Animated.View entering={FadeInDown.delay(200).springify()} style={{ marginBottom: 32 }}>
             <TouchableOpacity
-                className="bg-primary rounded-md p-5 shadow-brand overflow-hidden"
+                style={{
+                    backgroundColor: Colors.primary,
+                    borderRadius: Radius.xl,
+                    padding: 20,
+                    ...Shadows.brand,
+                    overflow: 'hidden',
+                }}
                 onPress={onPress}
                 activeOpacity={0.92}
             >
                 {/* Decorative */}
-                <View className="absolute -right-5 -top-5 opacity-[0.06]">
-                    <Ionicons name="shield-checkmark" size={180} color="white" />
+                <View style={{ position: 'absolute', right: -20, top: -20, opacity: 0.06 }}>
+                    <Ionicons name="shield-checkmark" size={180} color={Colors.white} />
                 </View>
 
-                <View className="flex-row items-center gap-2 mb-4">
-                    <View className="bg-success/30 px-[10px] py-1 rounded-[20px] flex-row items-center gap-1">
-                        <View className="w-[6px] h-[6px] rounded-full bg-success" />
-                        <Text className="text-[10px] font-jakarta-bold text-success-light">
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+                    <View style={{
+                        backgroundColor: Colors.success + '30',
+                        paddingHorizontal: 10, paddingVertical: 4,
+                        borderRadius: 20, flexDirection: 'row', alignItems: 'center', gap: 4,
+                    }}>
+                        <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.success }} />
+                        <Text style={{ fontSize: 10, fontFamily: 'PlusJakartaSans-Bold', color: Colors.successLight }}>
                             ACTIVE JOB
                         </Text>
                     </View>
                 </View>
 
-                <Text className="text-h2 text-white text-[20px]">
+                <Text style={[Typography.h2, { color: Colors.white, fontSize: 20 }]}>
                     {CATEGORIES.find(c => c.id === job.category)?.label || 'General Service'}
                 </Text>
-                <Text className="font-inter text-[13px] text-white/60 mt-1">
+                <Text style={{ fontFamily: 'Inter-Regular', fontSize: 13, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>
                     Tap to track your job progress
                 </Text>
 
-                <View className="mt-5">
-                    <View className="flex-row justify-between mb-2">
-                        <Text className="font-inter text-[11px] text-white/60">Progress</Text>
-                        <Text className="font-inter-bold text-[11px] text-success-light">75%</Text>
+                <View style={{ marginTop: 20 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <Text style={{ fontFamily: 'Inter-Regular', fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>Progress</Text>
+                        <Text style={{ fontFamily: 'Inter-Bold', fontSize: 11, color: Colors.successLight }}>75%</Text>
                     </View>
-                    <View className="h-1 bg-white/10 rounded-xs overflow-hidden">
-                        <View className="w-[75%] h-full bg-success rounded-xs" />
+                    <View style={{ height: 4, backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 2, overflow: 'hidden' }}>
+                        <View style={{ width: '75%', height: '100%', backgroundColor: Colors.success, borderRadius: 2 }} />
                     </View>
                 </View>
             </TouchableOpacity>
         </Animated.View>
     );
 }
-

@@ -28,6 +28,7 @@ export default function ForgotPasswordScreen() {
                 <View className="absolute inset-0 opacity-40">
                     <LoomThread variant="minimal" scale={1.2} animated />
                 </View>
+<<<<<<< HEAD
                 <ScrollView 
                     className="flex-1"
                     contentContainerStyle={{ padding: 32, paddingTop: 100 }}
@@ -42,6 +43,13 @@ export default function ForgotPasswordScreen() {
                         </Text>
                         <Text className="text-body text-ink/70 mt-6 mb-12 leading-[24px] font-jakarta-medium text-center max-w-[300px]">
                             We've transmitted a recovery protocol link to your terminal. Check your communications to reset your secret key.
+=======
+                <ScrollView contentContainerStyle={contentStyle}>
+                    <Animated.View entering={FadeInDown.delay(100)}>
+                        <Text style={Typography.h1}>Check Your Phone</Text>
+                        <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 8, marginBottom: 40 }]}>
+                            We've sent a password reset link to your phone number. Follow the link to reset your password.
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         </Text>
                         <PrimaryButton
                             title="ACCESS SIGN IN"
@@ -67,6 +75,7 @@ export default function ForgotPasswordScreen() {
             >
                 <BackButton onPress={() => router.back()} />
 
+<<<<<<< HEAD
                 <Animated.View entering={FadeInDown.delay(100).springify()} className="mb-14 mt-10 px-1">
                     <Text className="text-label text-primary mb-3 tracking-[2px] uppercase font-jakarta-extrabold italic">PROTOCOL RECOVERY</Text>
                     <Text className="text-h1 text-[42px] leading-[44px] uppercase italic font-jakarta-extrabold tracking-tighter">
@@ -74,6 +83,12 @@ export default function ForgotPasswordScreen() {
                     </Text>
                     <Text className="text-body text-ink/70 mt-5 leading-[24px] font-jakarta-medium max-w-[280px]">
                         Initialize your identity via phone number to receive a secure restoration link.
+=======
+                <Animated.View entering={FadeInDown.delay(100)} style={{ marginBottom: 40, marginTop: 24 }}>
+                    <Text style={Typography.h1}>Forgot Password?</Text>
+                    <Text style={[Typography.body, { color: Colors.textSecondary, marginTop: 8 }]}>
+                        Enter your phone number and we'll send you a link to reset your password.
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                     </Text>
                 </Animated.View>
 

@@ -2,72 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  Text, TextInput {
-    font-family: 'Inter-Regular';
-  }
+@layer utilities {
+    .text-inter {
+        font-family: 'Inter-Regular';
+    }
+    .text-jakarta {
+        font-family: 'PlusJakartaSans-Regular';
+    }
 }
 
-@layer utilities {
-    /* Typography Utilities - Mapping from theme/index.ts */
-    .text-display { font-family: 'PlusJakartaSans-ExtraBold'; font-size: 40px; line-height: 46px; letter-spacing: -0.8px; }
-    .text-h1 { font-family: 'PlusJakartaSans-Bold'; font-size: 30px; line-height: 36px; letter-spacing: -0.6px; }
-    .text-h2 { font-family: 'PlusJakartaSans-Bold'; font-size: 22px; line-height: 28px; letter-spacing: -0.4px; }
-    .text-h3 { font-family: 'PlusJakartaSans-SemiBold'; font-size: 17px; line-height: 24px; letter-spacing: -0.2px; }
-    
-    .text-body-lg { font-family: 'Inter-Medium'; font-size: 17px; line-height: 26px; }
-    .text-body { font-family: 'Inter-Regular'; font-size: 15px; line-height: 22px; }
-    .text-body-sm { font-family: 'Inter-Regular'; font-size: 13px; line-height: 18px; }
-    
-    .text-label { font-family: 'PlusJakartaSans-Bold'; font-size: 11px; line-height: 14px; letter-spacing: 0.8px; text-transform: uppercase; }
-    .text-label-sm { font-family: 'PlusJakartaSans-Bold'; font-size: 9px; line-height: 12px; letter-spacing: 1.2px; text-transform: uppercase; }
-    
-    .text-button { font-family: 'PlusJakartaSans-Bold'; font-size: 15px; line-height: 20px; letter-spacing: 0.1px; }
-
-    .text-data { font-family: 'Inter-Bold'; font-size: 28px; line-height: 34px; letter-spacing: -0.5px; }
-    .text-data-sm { font-family: 'Inter-SemiBold'; font-size: 18px; line-height: 24px; }
-
-    /* Shadow Utilities - Mapping from theme/index.ts */
-    .shadow-xs {
-        shadow-color: #000;
-        shadow-offset: 0px 1px;
-        shadow-opacity: 0.04;
-        shadow-radius: 3px;
-        elevation: 1;
-    }
-    .shadow-sm {
-        shadow-color: #000;
-        shadow-offset: 0px 2px;
-        shadow-opacity: 0.06;
-        shadow-radius: 8px;
-        elevation: 3;
-    }
-    .shadow-md {
-        shadow-color: #000;
-        shadow-offset: 0px 6px;
-        shadow-opacity: 0.08;
-        shadow-radius: 16px;
-        elevation: 6;
-    }
-    .shadow-lg {
-        shadow-color: #000;
-        shadow-offset: 0px 12px;
-        shadow-opacity: 0.10;
-        shadow-radius: 28px;
-        elevation: 10;
-    }
-    .shadow-violet {
-        shadow-color: #7C3AED;
-        shadow-offset: 0px 8px;
-        shadow-opacity: 0.25;
-        shadow-radius: 20px;
-        elevation: 8;
-    }
-    .shadow-brand {
-        shadow-color: #0F3826;
-        shadow-offset: 0px 8px;
-        shadow-opacity: 0.15;
-        shadow-radius: 20px;
-        elevation: 8;
-    }
+/* Base text styling to attach the default font to RN Text components */
+Text,
+TextInput {
+    font-family: 'Inter-Regular';
 }

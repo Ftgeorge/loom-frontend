@@ -1,3 +1,4 @@
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Text, TouchableOpacity, View, ViewStyle } from 'react-native';
@@ -22,18 +23,17 @@ export function Card({ children, style, noPadding, className = '', onPress, glas
         transform: [{ scale: scale.value }],
     }));
 
+    const baseStyle: ViewStyle = {
+        backgroundColor: dark ? Colors.primary : glass ? Colors.glass : Colors.surface,
+        borderRadius: Radius.lg,
+        borderWidth: glass ? 1 : 1,
+        borderColor: glass ? 'rgba(255,255,255,0.5)' : dark ? 'rgba(255,255,255,0.06)' : Colors.cardBorder,
+        padding: noPadding ? 0 : 18,
+        ...Shadows.sm,
+    };
+
     const handlePressIn = () => { if (onPress) scale.value = withSpring(0.97, { damping: 15 }); };
     const handlePressOut = () => { if (onPress) scale.value = withSpring(1, { damping: 15 }); };
-
-    const getBaseClasses = () => {
-        let classes = 'rounded-md shadow-sm border-[1px]';
-        if (dark) classes += ' bg-primary border-white/5';
-        else if (glass) classes += ' bg-glass border-white/50';
-        else classes += ' bg-surface border-card-border';
-        
-        if (!noPadding) classes += ' p-[18px]';
-        return classes;
-    };
 
     if (onPress) {
         return (
@@ -42,8 +42,8 @@ export function Card({ children, style, noPadding, className = '', onPress, glas
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}
                 activeOpacity={1}
-                style={[style, animatedStyle]}
-                className={`${getBaseClasses()} ${className}`}
+                style={[baseStyle, style, animatedStyle]}
+                className={className}
             >
                 {children}
             </AnimatedTouchableOpacity>
@@ -51,7 +51,7 @@ export function Card({ children, style, noPadding, className = '', onPress, glas
     }
 
     return (
-        <Animated.View style={style} className={`${getBaseClasses()} ${className}`}>
+        <Animated.View style={[baseStyle, style]} className={className}>
             {children}
         </Animated.View>
     );
@@ -66,11 +66,11 @@ interface ChipProps {
     icon?: string;
     small?: boolean;
     containerStyle?: ViewStyle;
-    className?: string;
     violet?: boolean;
 }
 
-export function Chip({ label, selected, onPress, color, icon, small, containerStyle, className = '', violet }: ChipProps) {
+export function Chip({ label, selected, onPress, color, icon, small, containerStyle, violet }: ChipProps) {
+    const activeColor = violet ? Colors.violet : (color ?? Colors.primary);
     const scale = useSharedValue(1);
 
     const animatedStyle = useAnimatedStyle(() => ({
@@ -80,36 +80,6 @@ export function Chip({ label, selected, onPress, color, icon, small, containerSt
     const handlePressIn = () => { if (onPress) scale.value = withSpring(0.94, { damping: 14 }); };
     const handlePressOut = () => { if (onPress) scale.value = withSpring(1, { damping: 14 }); };
 
-    const getContainerClasses = () => {
-        let classes = 'rounded-xs border-[1px] flex-row items-center gap-[5px] shadow-xs';
-        
-        if (small) classes += ' px-[10px] py-[6px]';
-        else classes += ' px-4 py-[10px]';
-
-        if (selected) {
-            if (violet) classes += ' bg-violet border-violet';
-            else classes += ' bg-primary border-primary';
-        } else {
-            classes += ' bg-surface border-card-border';
-        }
-
-        return classes;
-    };
-
-    const getTextClasses = () => {
-        let classes = 'font-inter-semibold';
-        if (small) classes += ' text-[11px]';
-        else classes += ' text-[13px]';
-
-        if (selected) classes += ' text-white';
-        else classes += ' text-text-secondary';
-
-        return classes;
-    };
-
-    // If a custom color is passed, we use an inline style for the background/border
-    const dynamicStyle = color && selected ? { backgroundColor: color, borderColor: color } : {};
-
     return (
         <AnimatedTouchableOpacity
             onPress={onPress}
@@ -117,17 +87,35 @@ export function Chip({ label, selected, onPress, color, icon, small, containerSt
             onPressOut={handlePressOut}
             disabled={!onPress}
             activeOpacity={1}
-            style={[containerStyle, dynamicStyle, animatedStyle]}
-            className={`${getContainerClasses()} ${className}`}
+            style={[
+                {
+                    backgroundColor: selected
+                        ? (violet ? Colors.violet : activeColor)
+                        : (violet && selected ? Colors.violetLight : Colors.surface),
+                    borderRadius: Radius.xs,
+                    paddingHorizontal: small ? 10 : 16,
+                    paddingVertical: small ? 6 : 10,
+                    borderWidth: 1,
+                    borderColor: selected
+                        ? (violet ? Colors.violet : activeColor)
+                        : Colors.cardBorder,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 5,
+                    ...Shadows.xs,
+                },
+                containerStyle,
+                animatedStyle
+            ]}
         >
-            {icon && (
-                <Ionicons 
-                    name={icon as any} 
-                    size={small ? 12 : 14} 
-                    className={selected ? 'text-white' : 'text-muted'} 
-                />
-            )}
-            <Text className={getTextClasses()}>
+            {icon && <Ionicons name={icon as any} size={small ? 12 : 14} color={selected ? Colors.white : Colors.muted} />}
+            <Text
+                style={{
+                    fontSize: small ? 11 : 13,
+                    fontFamily: 'Inter-SemiBold',
+                    color: selected ? Colors.white : Colors.textSecondary,
+                }}
+            >
                 {label}
             </Text>
         </AnimatedTouchableOpacity>
@@ -139,57 +127,80 @@ interface BadgeProps {
     label?: string;
     count?: number;
     color?: string;
-    className?: string;
     variant?: 'default' | 'verified' | 'success' | 'warn' | 'accent' | 'violet';
 }
 
-export function Badge({ label, count, color, className = '', variant = 'default' }: BadgeProps) {
+export function Badge({ label, count, color, variant = 'default' }: BadgeProps) {
     // Premium "Loom Verified" badge — metallic violet
     if (variant === 'verified') {
         return (
-            <View className={`flex-row items-center bg-violet-light px-[10px] py-1 rounded-[20px] border-[1px] border-violet/30 gap-[5px] ${className}`}>
-                <Ionicons name="shield-checkmark" size={11} className="text-violet" />
-                <Text className="text-[9px] font-jakarta-bold text-violet tracking-[0.4px] uppercase">Loom Verified</Text>
+            <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: Colors.violetLight,
+                paddingHorizontal: 10,
+                paddingVertical: 4,
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: Colors.violet + '30',
+                gap: 5,
+            }}>
+                <Ionicons name="shield-checkmark" size={11} color={Colors.violet} />
+                <Text style={{
+                    fontSize: 9,
+                    fontFamily: 'PlusJakartaSans-Bold',
+                    color: Colors.violet,
+                    letterSpacing: 0.4,
+                    textTransform: 'uppercase' as const,
+                }}>Loom Verified</Text>
             </View>
         );
     }
 
     if (count !== undefined) {
         return (
-            <View className={`bg-error rounded-[12px] min-w-[20px] h-5 items-center justify-center px-[5px] ${className}`}>
-                <Text className="text-[10px] font-inter-bold text-white">
+            <View style={{
+                backgroundColor: Colors.error,
+                borderRadius: 12,
+                minWidth: 20,
+                height: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingHorizontal: 5,
+            }}>
+                <Text style={{ fontSize: 10, fontFamily: 'Inter-Bold', color: Colors.white }}>
                     {count > 99 ? '99+' : count}
                 </Text>
             </View>
         );
     }
 
-    const getVariantClasses = () => {
+    const getColors = () => {
         switch (variant) {
-            case 'success': return 'bg-success-light text-success';
-            case 'warn': return 'bg-warning-light text-warning';
-            case 'accent': return 'bg-accent-light text-accent';
-            case 'violet': return 'bg-violet-light text-violet';
-            default: return 'bg-gray-100 text-text-secondary';
+            case 'success': return { bg: Colors.successLight, text: Colors.success };
+            case 'warn': return { bg: Colors.warningLight, text: Colors.warning };
+            case 'accent': return { bg: Colors.accentLight, text: Colors.accent };
+            case 'violet': return { bg: Colors.violetLight, text: Colors.violet };
+            default: return { bg: Colors.gray100, text: Colors.textSecondary };
         }
     };
 
-    const variantClasses = getVariantClasses();
-    const bgClass = variantClasses.split(' ')[0];
-    const textClass = variantClasses.split(' ')[1];
+    const { bg, text } = getColors();
 
     return (
-        <View 
-            style={color ? { backgroundColor: color + '15' } : {}}
-            className={`${bgClass} px-2 py-1 rounded-[20px] ${className}`}
-        >
-            <Text 
-                style={color ? { color } : {}}
-                className={`text-[10px] font-inter-semibold ${textClass}`}
-            >
+        <View style={{
+            backgroundColor: color ? color + '15' : bg,
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+            borderRadius: 20,
+        }}>
+            <Text style={{
+                fontSize: 10,
+                fontFamily: 'Inter-SemiBold',
+                color: color ?? text,
+            }}>
                 {label}
             </Text>
         </View>
     );
 }
-

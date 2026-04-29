@@ -1,18 +1,7 @@
-import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { RawArtisan, RawUser, RawJob, RawEarnings } from "./mappers";
+import { RawArtisan, RawUser, RawJob, RawEarnings, RawReview, RawPortfolioItem } from "./mappers";
 
-const getBaseUrl = () => {
-    let url = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
-    // For Android emulator, 'localhost' refers to the emulator itself.
-    // Use '10.0.2.2' to access the host machine's localhost.
-    if (__DEV__ && Platform.OS === 'android' && url.includes('localhost')) {
-        url = url.replace('localhost', '10.0.2.2');
-    }
-    return url;
-};
-
-const BASE_URL = getBaseUrl();
+const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
 
 // ─── Helpers ─────────────────────────────────────────────
 async function getAuthHeader(): Promise<Record<string, string>> {
@@ -306,13 +295,6 @@ export const jobApi = {
     complete: (jobId: string) =>
         apiFetch<RawJob>(`/jobs/${jobId}/complete`, { method: "POST" }),
 
-    /** POST /jobs/:jobId/status — update active job status (artisan only) */
-    updateStatus: (jobId: string, status: string) =>
-        apiFetch<RawJob>(`/jobs/${jobId}/status`, {
-            method: "POST",
-            body: JSON.stringify({ status })
-        }),
-
     /** POST /jobs/:jobId/cancel — cancel job (customer only) */
     cancel: (jobId: string) =>
         apiFetch<RawJob>(`/jobs/${jobId}/cancel`, { method: "POST" }),
@@ -346,7 +328,7 @@ export const threadApi = {
     },
 
     /** POST /threads — open or get existing thread */
-    create: (data: { artisanProfileId?: string; jobRequestId?: string }) =>
+    create: (data: { artisanProfileId: string; jobRequestId?: string }) =>
         apiFetch<{ id: string }>("/threads", {
             method: "POST",
             body: JSON.stringify(data),
@@ -357,12 +339,6 @@ export const threadApi = {
         apiFetch<{ id: string; sent_at: string }>(`/threads/${threadId}/messages`, {
             method: "POST",
             body: JSON.stringify({ text }),
-        }),
-
-    /** PATCH /threads/:id/read */
-    markRead: (threadId: string) =>
-        apiFetch<{ success: boolean }>(`/threads/${threadId}/read`, {
-            method: "PATCH",
         }),
 };
 

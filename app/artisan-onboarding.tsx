@@ -3,12 +3,12 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { Chip } from '@/components/ui/CardChipBadge';
 import { artisanApi } from '@/services/api';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { CATEGORIES } from '@/types';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeInRight } from 'react-native-reanimated';
-import { areas, days } from '@/data/ArtisanOnboardingArray';
 import { Ionicons } from '@expo/vector-icons';
 
 const STEPS = ['Skills', 'Areas', 'Days', 'Prices'];
@@ -20,6 +20,9 @@ export default function ArtisanOnboardingScreen() {
     const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
     const [pricingStyle, setPricingStyle] = useState('estimate');
     const [loading, setLoading] = useState(false);
+
+    const areas = ['Wuse', 'Garki', 'Maitama', 'Gwarinpa', 'Jabi', 'Asokoro', 'Kubwa', 'Nyanya', 'Life Camp', 'Utako'];
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const [selectedDays, setSelectedDays] = useState(['Mon', 'Tue', 'Wed', 'Thu', 'Fri']);
 
     const toggleSkill = (id: string) => {
@@ -56,9 +59,7 @@ export default function ArtisanOnboardingScreen() {
 
     return (
         <View className="flex-1 bg-background">
-            <View className="absolute inset-0">
-                <LoomThread variant="minimal" animated opacity={0.2} />
-            </View>
+            <LoomThread variant="minimal" animated opacity={0.2} />
             <AppHeader
                 title="OPERATIVE SETUP"
                 showBack
@@ -66,15 +67,14 @@ export default function ArtisanOnboardingScreen() {
                 showNotification={false}
             />
 
-            {/* Tactical Progress Tracker */}
-            <View className="flex-row py-6 px-8 gap-3">
+            <View className="flex-row py-4 gap-1 px-5">
                 {STEPS.map((s, i) => (
-                    <View key={s} className="flex-1 gap-2">
-                        <View className={`h-1.5 rounded-full shadow-sm ${
+                    <View key={s} className="flex-1 gap-1">
+                        <View className={`h-1 rounded-full ${
                             i <= step ? 'bg-primary' : 'bg-gray-100'
                         }`} />
-                        <Text className={`text-label text-[9px] text-center uppercase tracking-widest ${
-                            i === step ? 'text-primary font-jakarta-extrabold italic' : 'text-muted font-jakarta-bold opacity-40'
+                        <Text className={`text-label text-[8px] text-center uppercase ${
+                            i === step ? 'text-primary' : 'text-muted opacity-50'
                         }`}>{s}</Text>
                     </View>
                 ))}
@@ -87,19 +87,24 @@ export default function ArtisanOnboardingScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {step === 0 && (
-                    <Animated.View entering={FadeInRight.springify()} className="px-8 pt-6">
-                        <Text className="text-label text-primary mb-3 uppercase tracking-[2px] font-jakarta-extrabold italic">PHASE 01</Text>
-                        <Text className="text-h1 text-[38px] leading-[40px] uppercase italic font-jakarta-extrabold tracking-tighter mb-4">Core Skills</Text>
-                        <Text className="text-body text-muted mb-12 normal-case font-jakarta-medium">Select your specialized fields of operation.</Text>
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
+                        <Text className="text-label text-primary mb-2 uppercase">Step 1</Text>
+                        <Text className="text-h1 text-[28px] mb-3">What can you do?</Text>
+                        <Text className="text-body text-muted mb-8">What help do you provide?</Text>
 
-                        <View className="flex-row flex-wrap gap-3">
+                        <View className="flex-row flex-wrap gap-[10px]">
                             {CATEGORIES.map((cat) => (
                                 <Chip
                                     key={cat.id}
                                     label={cat.label.toUpperCase()}
                                     selected={selectedSkills.includes(cat.id)}
                                     onPress={() => toggleSkill(cat.id)}
-                                    className="py-3 px-6 rounded-2xl"
+                                    containerStyle={{
+                                        paddingHorizontal: 16,
+                                        paddingVertical: 10,
+                                        borderRadius: 8,
+                                        borderColor: selectedSkills.includes(cat.id) ? '#00120C' : '#E8ECEF'
+                                    }}
                                 />
                             ))}
                         </View>
@@ -107,25 +112,30 @@ export default function ArtisanOnboardingScreen() {
                             title="NEXT PHASE"
                             onPress={() => setStep(1)}
                             disabled={selectedSkills.length === 0}
-                            className="mt-16 h-16 rounded-xl shadow-xl"
+                            className="mt-12 h-[60px] rounded-md"
                         />
                     </Animated.View>
                 )}
 
                 {step === 1 && (
-                    <Animated.View entering={FadeInRight.springify()} className="px-8 pt-6">
-                        <Text className="text-label text-primary mb-3 uppercase tracking-[2px] font-jakarta-extrabold italic">PHASE 02</Text>
-                        <Text className="text-h1 text-[38px] leading-[40px] uppercase italic font-jakarta-extrabold tracking-tighter mb-4">Service Zones</Text>
-                        <Text className="text-body text-muted mb-12 normal-case font-jakarta-medium">Map your intended zones of deployment.</Text>
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
+                        <Text className="text-label text-primary mb-2 uppercase">Step 2</Text>
+                        <Text className="text-h1 text-[28px] mb-3">Where do you work?</Text>
+                        <Text className="text-body text-muted mb-8">Pick the places where you can go for work.</Text>
 
-                        <View className="flex-row flex-wrap gap-3">
+                        <View className="flex-row flex-wrap gap-[10px]">
                             {areas.map((area) => (
                                 <Chip
                                     key={area}
                                     label={area.toUpperCase()}
                                     selected={selectedAreas.includes(area)}
                                     onPress={() => toggleArea(area)}
-                                    className="py-3 px-6 rounded-2xl"
+                                    containerStyle={{
+                                        paddingHorizontal: 16,
+                                        paddingVertical: 10,
+                                        borderRadius: 8,
+                                        borderColor: selectedAreas.includes(area) ? '#00120C' : '#E8ECEF'
+                                    }}
                                 />
                             ))}
                         </View>
@@ -133,49 +143,45 @@ export default function ArtisanOnboardingScreen() {
                             title="NEXT PHASE"
                             onPress={() => setStep(2)}
                             disabled={selectedAreas.length === 0}
-                            className="mt-16 h-16 rounded-xl shadow-xl"
+                            className="mt-12 h-[60px] rounded-md"
                         />
                     </Animated.View>
                 )}
 
                 {step === 2 && (
-                    <Animated.View entering={FadeInRight.springify()} className="px-8 pt-6">
-                        <Text className="text-label text-primary mb-3 uppercase tracking-[2px] font-jakarta-extrabold italic">PHASE 03</Text>
-                        <Text className="text-h1 text-[38px] leading-[40px] uppercase italic font-jakarta-extrabold tracking-tighter mb-4">Availability</Text>
-                        <Text className="text-body text-muted mb-12 normal-case font-jakarta-medium">Define your weekly mission uptime.</Text>
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
+                        <Text className="text-label text-primary mb-2 uppercase">Step 3</Text>
+                        <Text className="text-h1 text-[28px] mb-3">When are you free?</Text>
+                        <Text className="text-body text-muted mb-8">Pick the days you can do work.</Text>
 
-                        <View className="flex-row flex-wrap gap-4 justify-center py-4 bg-white/50 rounded-[32px] border border-card-border/50 shadow-sm">
-                            {days.map((d) => {
-                                const isSelected = selectedDays.includes(d);
-                                return (
-                                    <TouchableOpacity
-                                        key={d}
-                                        activeOpacity={0.8}
-                                        className={`w-[60px] h-[60px] rounded-[20px] border-[1.5px] items-center justify-center shadow-md ${
-                                            isSelected ? 'bg-primary border-primary' : 'bg-white border-card-border'
-                                        }`}
-                                        onPress={() => toggleDay(d)}
-                                    >
-                                        <Text className={`text-label text-[13px] uppercase font-jakarta-extrabold ${
-                                            isSelected ? 'text-white' : 'text-ink'
-                                        }`}>{d}</Text>
-                                    </TouchableOpacity>
-                                );
-                            })}
+                        <View className="flex-row flex-wrap gap-3 justify-center">
+                            {days.map((d) => (
+                                <TouchableOpacity
+                                    key={d}
+                                    className={`w-[54px] h-[54px] rounded-xs border-[1.5px] items-center justify-center shadow-sm ${
+                                        selectedDays.includes(d) ? 'bg-primary/5 border-primary' : 'bg-white border-card-border'
+                                    }`}
+                                    onPress={() => toggleDay(d)}
+                                >
+                                    <Text className={`text-label text-[12px] uppercase ${
+                                        selectedDays.includes(d) ? 'text-primary' : 'text-muted'
+                                    }`}>{d}</Text>
+                                </TouchableOpacity>
+                            ))}
                         </View>
                         <PrimaryButton
                             title="NEXT PHASE"
                             onPress={() => setStep(3)}
-                            className="mt-16 h-16 rounded-xl shadow-xl"
+                            className="mt-14 h-[60px] rounded-md"
                         />
                     </Animated.View>
                 )}
 
                 {step === 3 && (
-                    <Animated.View entering={FadeInRight.springify()} className="px-8 pt-6">
-                        <Text className="text-label text-primary mb-3 uppercase tracking-[2px] font-jakarta-extrabold italic">PHASE 04</Text>
-                        <Text className="text-h1 text-[38px] leading-[40px] uppercase italic font-jakarta-extrabold tracking-tighter mb-4">Pricing Strategy</Text>
-                        <Text className="text-body text-muted mb-12 normal-case font-jakarta-medium">Establish your resource allocation model.</Text>
+                    <Animated.View entering={FadeInRight.springify()} className="p-8">
+                        <Text className="text-label text-primary mb-2 uppercase">Step 4</Text>
+                        <Text className="text-h1 text-[28px] mb-3">How much?</Text>
+                        <Text className="text-body text-muted mb-8">How do you want to charge?</Text>
 
                         {[
                             { value: 'fixed', label: 'FLAT RATE', desc: 'Secure unified pricing for core services.', icon: 'lock-closed-outline' },
@@ -184,33 +190,21 @@ export default function ArtisanOnboardingScreen() {
                         ].map((opt) => (
                             <TouchableOpacity
                                 key={opt.value}
-                                activeOpacity={0.9}
-                                className={`flex-row items-center gap-5 p-7 rounded-[28px] border-[1.5px] mb-5 bg-white shadow-lg ${
+                                className={`flex-row items-center gap-4 p-6 rounded-md border-[1.5px] mb-4 bg-white shadow-sm ${
                                     pricingStyle === opt.value ? 'border-primary' : 'border-card-border'
                                 }`}
                                 onPress={() => setPricingStyle(opt.value)}
                             >
-                                <View className={`w-12 h-12 rounded-2xl items-center justify-center border shadow-sm ${
-                                    pricingStyle === opt.value ? 'bg-primary border-primary/20' : 'bg-surface border-card-border'
-                                }`}>
-                                    <Ionicons 
-                                        name={opt.icon as any} 
-                                        size={24} 
-                                        color={pricingStyle === opt.value ? 'white' : '#94A3B8'} 
-                                    />
-                                </View>
-                                <View className="flex-1">
-                                    <Text className={`text-h3 text-primary text-base uppercase font-jakarta-extrabold italic tracking-tight ${
-                                        pricingStyle === opt.value ? 'text-primary' : 'text-ink'
-                                    }`}>{opt.label}</Text>
-                                    <Text className="text-body-sm text-muted mt-1 leading-[20px] normal-case font-jakarta-medium italic">{opt.desc}</Text>
-                                </View>
-                                <View className={`w-7 h-7 rounded-full border-[1.5px] items-center justify-center ${
+                                <View className={`w-6 h-6 rounded-full border-2 items-center justify-center ${
                                     pricingStyle === opt.value ? 'border-primary bg-primary/5' : 'border-gray-200'
                                 }`}>
                                     {pricingStyle === opt.value && (
-                                        <View className="w-3.5 h-3.5 rounded-full bg-primary shadow-sm" />
+                                        <View className="w-[10px] h-[10px] rounded-full bg-primary" />
                                     )}
+                                </View>
+                                <View className="flex-1">
+                                    <Text className="text-h3 text-primary text-base uppercase">{opt.label}</Text>
+                                    <Text className="text-body-sm text-muted mt-1 leading-[18px]">{opt.desc}</Text>
                                 </View>
                             </TouchableOpacity>
                         ))}
@@ -219,7 +213,7 @@ export default function ArtisanOnboardingScreen() {
                             title="INITIALIZE PROTOCOL"
                             onPress={handleComplete}
                             loading={loading}
-                            className="mt-14 h-16 rounded-xl shadow-2xl"
+                            className="mt-12 h-16 rounded-md"
                             variant="accent"
                         />
                         
@@ -233,5 +227,4 @@ export default function ArtisanOnboardingScreen() {
         </View>
     );
 }
-
 

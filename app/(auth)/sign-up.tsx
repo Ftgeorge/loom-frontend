@@ -4,6 +4,10 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { AppTextInput, PasswordInput, PhoneInput } from '@/components/ui/TextInputs';
 import { authApi } from '@/services/api';
 import { useAppStore } from '@/store';
+<<<<<<< HEAD
+=======
+import { Colors, Radius, Shadows, Typography } from '@/theme';
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
 import { SignUpSchema, mapZodErrors } from '@/utils/helpers';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -160,15 +164,35 @@ export default function SignUpScreen() {
                 </Animated.View>
 
                 <Animated.View entering={FadeInDown.delay(300).springify()}>
+<<<<<<< HEAD
                     <View className="mt-12 p-6 bg-white rounded-[28px] border-[1.5px] border-card-border shadow-md flex-row items-center justify-center gap-3">
                         <Ionicons name="log-in-outline" size={18} color="#64748B" />
                         <Text className="text-label text-muted text-[11px] uppercase font-jakarta-bold tracking-tight">
                             Identity verified?{" "}
+=======
+                    <View style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginTop: 48,
+                        padding: 16,
+                        backgroundColor: Colors.white,
+                        borderRadius: Radius.xs,
+                        borderWidth: 1,
+                        borderColor: Colors.cardBorder
+                    }}>
+                        <Text style={[Typography.label, { color: Colors.muted, fontSize: 10, textTransform: 'none' }]}>
+                            Been here?{" "}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             <Text
                                 onPress={() => router.push('/(auth)/sign-in')}
                                 className="text-primary font-jakarta-extrabold italic"
                             >
+<<<<<<< HEAD
                                 ACCESS TERMINAL
+=======
+                                GET IN
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                             </Text>
                         </Text>
                     </View>

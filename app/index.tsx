@@ -1,8 +1,9 @@
 import { LoomThread } from '@/components/ui/LoomThread';
 import { useAppStore } from "@/store";
+import { Colors, Radius, Shadows, Typography } from "@/theme";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Dimensions, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   interpolate,
@@ -12,6 +13,8 @@ import Animated, {
   withSpring,
   withTiming
 } from "react-native-reanimated";
+
+const { width } = Dimensions.get('window');
 
 const LETTERS = ["L", "o", "o", "m"];
 const LETTER_DELAY = 80;
@@ -31,7 +34,9 @@ function AnimatedLetter({
     progress.value = withDelay(
       index * LETTER_DELAY,
       withSpring(1, {
-        damping: 15, stiffness: 100, mass: 1,
+        damping: 15,
+        stiffness: 100,
+        mass: 1,
       })
     );
   }, []);
@@ -46,8 +51,12 @@ function AnimatedLetter({
 
   return (
     <Animated.Text
+<<<<<<< HEAD
       style={animatedStyle}
       className={`font-jakarta-extrabold italic text-[88px] text-white tracking-[-5px] ${index === 0 ? 'text-white' : 'text-white/90'}`}
+=======
+      style={[styles.letter, animatedStyle]}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
     >
       {letter}
     </Animated.Text>
@@ -72,6 +81,7 @@ export default function SplashScreen() {
       withTiming(1, { duration: 900, easing: Easing.out(Easing.quad) }),
     );
 
+    // Auto-navigation timer (3.5 seconds)
     const timer = setTimeout(() => {
       handleContinue();
     }, 4000);
@@ -103,23 +113,34 @@ export default function SplashScreen() {
   }));
 
   return (
-    <View className="flex-1 bg-primary items-center justify-center">
-      <View className="absolute inset-0">
+    <View style={styles.container}>
+      <View style={StyleSheet.absoluteFill}>
         <LoomThread
           variant="complex"
+<<<<<<< HEAD
           color="#FFFFFF" 
           opacity={0.18}
+=======
+          color={Colors.accent}
+          opacity={0.15}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
           animated
         />
       </View>
 
+<<<<<<< HEAD
       <View className="items-center z-20">
         <View className="flex-row items-center mb-4">
+=======
+      <View style={styles.center}>
+        <View style={styles.wordRow}>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
           {LETTERS.map((letter, i) => (
             <AnimatedLetter key={i} letter={letter} index={i} />
           ))}
         </View>
 
+<<<<<<< HEAD
         <Animated.View style={taglineStyle}>
           <View className="flex-row items-center gap-4">
             <View className="h-[1.5px] w-6 bg-white/30 rounded-full" />
@@ -136,6 +157,20 @@ export default function SplashScreen() {
         <Text className="text-[9px] text-white/40 font-jakarta-extrabold italic tracking-[4px] uppercase">
           Initializing Frequency
         </Text>
+=======
+        <Animated.View style={[styles.taglineBox, taglineStyle]}>
+          <View style={styles.labelLine} />
+          <Text style={styles.tagline}>
+            SERVICES. SIMPLIFIED.
+          </Text>
+          <View style={styles.labelLine} />
+        </Animated.View>
+      </View>
+
+      <Animated.View style={[styles.footer, indicatorStyle]}>
+        <ActivityIndicator color={Colors.white} size="small" style={{ marginBottom: 20 }} />
+        <Text style={styles.version}>LOADING...</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
       </Animated.View>
       
       <View className="absolute bottom-12 items-center opacity-10">
@@ -145,7 +180,86 @@ export default function SplashScreen() {
   );
 }
 
-
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  center: {
+    alignItems: "center",
+    zIndex: 10,
+  },
+  wordRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  letter: {
+    fontFamily: "PlusJakartaSans-ExtraBold",
+    fontSize: 84,
+    color: Colors.white,
+    letterSpacing: -6,
+  },
+  taglineBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 12,
+  },
+  labelLine: {
+    height: 1,
+    width: 20,
+    backgroundColor: Colors.gray300,
+    opacity: 0.5,
+  },
+  tagline: {
+    fontSize: 9,
+    color: Colors.gray300,
+    fontFamily: "PlusJakartaSans-Bold",
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+  },
+  footer: {
+    position: "absolute",
+    bottom: 64,
+    width: '100%',
+    paddingHorizontal: 40,
+    alignItems: 'center',
+  },
+  button: {
+    backgroundColor: Colors.white,
+    height: 64,
+    width: '100%',
+    borderRadius: Radius.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    ...Shadows.lg,
+  },
+  buttonText: {
+    color: Colors.primary,
+    fontSize: 12,
+    fontFamily: "PlusJakartaSans-Bold",
+    letterSpacing: 1,
+  },
+  btnIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: Radius.xs,
+    backgroundColor: Colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  version: {
+    marginTop: 24,
+    fontSize: 8,
+    color: 'rgba(255,255,255,0.3)',
+    fontFamily: "Inter-Medium",
+    letterSpacing: 2,
+  }
+});
 
 
 

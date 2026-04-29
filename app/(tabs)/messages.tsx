@@ -1,3 +1,4 @@
+import { AppHeader } from '@/components/AppHeader';
 import { SubAppHeader } from '@/components/AppSubHeader';
 import { Avatar } from '@/components/ui/AvatarRating';
 import { Badge } from '@/components/ui/CardChipBadge';
@@ -7,11 +8,17 @@ import { t } from '@/i18n';
 import { threadApi } from '@/services/api';
 import { useAppStore } from '@/store';
 import { timeAgo } from '@/utils/helpers';
+<<<<<<< HEAD
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View, RefreshControl } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+=======
+import { useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
 
 export default function MessagesScreen() {
     const router = useRouter();
@@ -47,11 +54,7 @@ export default function MessagesScreen() {
         }
     }, [refreshing]);
 
-    useFocusEffect(
-        useCallback(() => {
-            load();
-        }, [load])
-    );
+    useEffect(() => { load(); }, [load]);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);

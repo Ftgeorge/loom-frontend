@@ -62,7 +62,6 @@ interface AppState extends AuthState {
   setNotifications: (notifications: AppNotification[]) => void;
   markNotificationRead: (id: string) => void;
   markAllNotificationsRead: () => void;
-  markNotificationsAsReadByThreadId: (threadId: string) => void;
 
   // Earnings (artisan)
   earnings: EarningsSummary | null;
@@ -195,14 +194,6 @@ export const useAppStore = create<AppState>()(
       markAllNotificationsRead: () =>
         set((s) => ({
           notifications: s.notifications.map((n) => ({ ...n, read: true })),
-        })),
-      markNotificationsAsReadByThreadId: (threadId: string) =>
-        set((s) => ({
-          notifications: s.notifications.map((n) =>
-            n.type === 'message' && n.metadata?.threadId === threadId
-              ? { ...n, read: true }
-              : n
-          ),
         })),
 
       // Earnings

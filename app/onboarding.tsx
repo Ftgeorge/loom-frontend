@@ -2,6 +2,7 @@ import { LoomThread } from '@/components/ui/LoomThread';
 import { PrimaryButton } from '@/components/ui/Buttons';
 import { t } from '@/i18n';
 import { useAppStore } from '@/store';
+import { Colors, Radius, Shadows, Typography } from '@/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useRef, useState } from 'react';
@@ -14,7 +15,7 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
 
 const { width, height } = Dimensions.get('window');
 
@@ -23,30 +24,42 @@ const pages = [
         icon: 'scan-outline' as const,
         titleKey: 'onboard1Title' as const,
         descKey: 'onboard1Desc' as const,
+<<<<<<< HEAD
         accent: '#00120C',
         bgAccent: 'bg-primary',
         textAccent: 'text-primary',
         borderAccent: 'border-primary/20',
+=======
+        accent: Colors.primary,
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
         mission: 'DISCOVER'
     },
     {
         icon: 'terminal-outline' as const,
         titleKey: 'onboard2Title' as const,
         descKey: 'onboard2Desc' as const,
+<<<<<<< HEAD
         accent: '#7DCCFF',
         bgAccent: 'bg-accent',
         textAccent: 'text-accent',
         borderAccent: 'border-accent/20',
+=======
+        accent: Colors.accent,
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
         mission: 'MATCH'
     },
     {
         icon: 'shield-checkmark-outline' as const,
         titleKey: 'onboard3Title' as const,
         descKey: 'onboard3Desc' as const,
+<<<<<<< HEAD
         accent: '#1AB26C',
         bgAccent: 'bg-success',
         textAccent: 'text-success',
         borderAccent: 'border-success/20',
+=======
+        accent: Colors.success,
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
         mission: 'TRUST'
     },
 ];
@@ -80,6 +93,7 @@ export default function OnboardingScreen() {
     };
 
     return (
+<<<<<<< HEAD
         <View className="flex-1 bg-background">
             <View className="absolute inset-0">
                 <LoomThread variant="dense" scale={1.2} opacity={0.3} animated />
@@ -96,6 +110,17 @@ export default function OnboardingScreen() {
                     className="bg-white/90 px-5 py-2.5 rounded-xl border border-card-border shadow-sm active:bg-gray-100"
                 >
                     <Text className="text-label text-ink text-[9px] uppercase font-jakarta-extrabold tracking-tight italic">SKIP PROTOCOL</Text>
+=======
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+            <View style={StyleSheet.absoluteFill}>
+                <LoomThread variant="dense" scale={1.5} opacity={0.4} animated />
+            </View>
+
+            <View style={{ position: 'absolute', top: 64, width: '100%', paddingHorizontal: 32, zIndex: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Text style={[Typography.label, { color: Colors.primary, fontSize: 8 }]}>STEP {currentPage + 1}</Text>
+                <TouchableOpacity onPress={handleSkip} style={{ backgroundColor: Colors.gray100, paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.xs }}>
+                    <Text style={[Typography.label, { color: Colors.muted, fontSize: 8 }]}>SKIP</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                 </TouchableOpacity>
             </View>
 
@@ -107,6 +132,7 @@ export default function OnboardingScreen() {
                 showsHorizontalScrollIndicator={false}
                 onMomentumScrollEnd={onMomentumScrollEnd}
                 keyExtractor={(_, i) => `${i}`}
+<<<<<<< HEAD
                 renderItem={({ item }) => (
                     <View className="flex-1 px-10" style={{ paddingTop: height * 0.14, width }}>
                         <View className="items-center mb-16">
@@ -122,20 +148,60 @@ export default function OnboardingScreen() {
 
                                 <View className={`absolute -bottom-6 px-7 py-3 rounded-2xl shadow-xl border border-white/20 ${item.bgAccent}`}>
                                     <Text className="text-label text-white text-[10px] uppercase tracking-[3px] font-jakarta-extrabold italic">{item.mission}</Text>
+=======
+                renderItem={({ item, index }) => (
+                    <View style={{ width, flex: 1, paddingTop: height * 0.12, paddingHorizontal: 40 }}>
+                        <View style={{ alignItems: 'center', marginBottom: 56 }}>
+                            <Animated.View
+                                entering={FadeInDown.delay(200).springify()}
+                                style={{
+                                    width: 240,
+                                    height: 240,
+                                    borderRadius: Radius.md,
+                                    backgroundColor: Colors.white,
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    ...Shadows.lg,
+                                    borderWidth: 1.5,
+                                    borderColor: Colors.cardBorder
+                                }}
+                            >
+                                <View style={{
+                                    position: 'absolute',
+                                    width: 180,
+                                    height: 180,
+                                    borderRadius: Radius.xs,
+                                    borderWidth: 1,
+                                    borderColor: item.accent + '20',
+                                    transform: [{ rotate: '45deg' }]
+                                }} />
+                                <Ionicons name={item.icon} size={80} color={item.accent} />
+
+                                <View style={{ position: 'absolute', bottom: -12, backgroundColor: item.accent, paddingHorizontal: 12, paddingVertical: 4, borderRadius: Radius.xs }}>
+                                    <Text style={[Typography.label, { color: Colors.white, fontSize: 8 }]}>{item.mission}</Text>
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                                 </View>
                             </Animated.View>
                         </View>
 
                         <Animated.Text
                             entering={FadeInDown.delay(400).springify()}
+<<<<<<< HEAD
                             className="text-h1 text-center text-[38px] leading-[42px] mb-8 uppercase italic font-jakarta-extrabold tracking-tighter text-ink"
+=======
+                            style={[Typography.h1, { textAlign: 'center', fontSize: 28, marginBottom: 16 }]}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         >
                             {t(item.titleKey, language).toUpperCase()}
                         </Animated.Text>
 
                         <Animated.Text
                             entering={FadeInDown.delay(500).springify()}
+<<<<<<< HEAD
                             className="text-body text-center text-ink/60 leading-7 normal-case font-jakarta-medium px-2 italic"
+=======
+                            style={[Typography.body, { textAlign: 'center', color: Colors.muted, lineHeight: 24 }]}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         >
                             {t(item.descKey, language)}
                         </Animated.Text>
@@ -143,6 +209,7 @@ export default function OnboardingScreen() {
                 )}
             />
 
+<<<<<<< HEAD
             <View className="px-10 pb-16">
                 <View className="flex-row justify-center gap-3 mb-14">
                     {pages.map((_, i) => (
@@ -151,6 +218,19 @@ export default function OnboardingScreen() {
                             className={`h-[5px] rounded-full shadow-sm ${
                                 i === currentPage ? 'bg-primary w-12' : 'bg-card-border w-4'
                             }`}
+=======
+            <View style={{ paddingHorizontal: 32, paddingBottom: 64 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 6, marginBottom: 40 }}>
+                    {pages.map((_, i) => (
+                        <View
+                            key={i}
+                            style={{
+                                height: 3,
+                                borderRadius: 1.5,
+                                backgroundColor: i === currentPage ? Colors.primary : Colors.gray200,
+                                width: i === currentPage ? 32 : 12,
+                            }}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                         />
                     ))}
                 </View>
@@ -158,7 +238,11 @@ export default function OnboardingScreen() {
                 <PrimaryButton
                     title={currentPage === pages.length - 1 ? "INITIALIZE" : "NEXT PHASE"}
                     onPress={handleNext}
+<<<<<<< HEAD
                     className="h-18 rounded-2xl shadow-2xl border border-white/10"
+=======
+                    style={{ height: 64, borderRadius: Radius.md }}
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
                     variant={currentPage === pages.length - 1 ? 'accent' : 'primary'}
                 />
                 
@@ -170,6 +254,9 @@ export default function OnboardingScreen() {
     );
 }
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> parent of fa2c86a (refactor: migrate component styles from StyleSheet to Tailwind CSS classes across the entire application)
